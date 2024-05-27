@@ -1,0 +1,107 @@
+@import "@styles/common/variables";
+@import "@styles/common/mixins";
+
+.main {
+
+  .banner-wrapper{
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .category {
+    height: 77.5px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    flex-grow: 1;
+
+    &-wrapper {
+      margin-top: 50px;
+      display: flex;
+      justify-content: center;
+    }
+
+    &-list {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+    }
+
+    &-text{
+      font-family: Noto Sans;
+      font-size: 14px;
+      height: 100%;
+      margin-top: 25px;
+      text-align: center;
+    }
+
+    &-icn{
+      width: 35px;
+      height: 35px;
+      align-self: center;
+    }
+  }
+
+  .newgoods{
+    &-title{
+      margin: 60px 0 35px 0;
+      font-size: 26px;
+      font-weight: bold;
+    }
+  }
+
+  .swiper-button-next{
+    color:  rgb(228, 228, 228);
+  }
+
+  .swiper-button-prev{
+    color: rgb(228, 228, 228);
+  }
+
+  .swiper-pagination-bullet-active{
+    background-color: white;
+  }
+
+  @include small-desktop{
+    .category {
+      &-text{
+        font-size: 12px;
+      }
+    }
+  }
+
+  @include tablet{
+    .category {
+      &-list{
+        grid-template-columns: repeat(5, 1fr);
+        gap : 40px 0;
+      }
+    }
+  }
+
+  @include mobile{
+    .category {
+      &-list{
+        grid-template-columns: repeat(5, 1fr);
+        gap : 40px 0;
+      }
+
+      .category {
+        &-text{
+          font-size: 12px;
+        }
+      }
+    }
+
+    .swiper-button-prev{
+      display: none;
+    }
+
+    .swiper-button-next{
+      display: none;
+    }
+  }
+
+}
