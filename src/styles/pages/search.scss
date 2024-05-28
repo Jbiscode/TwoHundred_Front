@@ -17,10 +17,12 @@
     }
 
     &-wrapper {
-      width: 100%;
+      width: 90%;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      margin-left: 5%;
+      margin-top: 3%;
       padding: 50px 20px;
       border: 1px solid $BORDER_COLOR;
       border-radius: 5px;
@@ -65,8 +67,20 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap : 3%;
-      .filter_minprice-input{
-        min-width: 100%;
+      .filter_maxprice-input, .filter_minprice-input{
+        width: 100%;
+        height: 50px;
+        background: none;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        text-align: center;
+
+        /* 스피너 제거 */
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+      }
       }
     }
 
@@ -100,6 +114,20 @@
         & .filter_category-btn{
           display: none;
         }
+
+        /* 스크롤바 */
+        &::-webkit-scrollbar {
+          width: 10px; 
+          height: 8px;
+        }
+        &::-webkit-scrollbar-track {
+          background: transparent; 
+          
+        }
+        &::-webkit-scrollbar-thumb {
+          background: #CCC; 
+          border-radius: 5px;
+        }
         
       }
       &.orderway {
@@ -109,7 +137,9 @@
         :hover{
           color: $PRIMARY_COLOR;
         }
+        
         .filter_trademethod-btn{
+
         }
       }
 
@@ -119,10 +149,33 @@
     &-cont_item-notice{
       margin-top: 8px !important;
       color: $FONT_GRAY_COLOR;
+      font-size: small;
+    }
+
+    &-reset-btn, &-submit-btn{
+      border: 1px solid #FF6E59;
+      border-radius: 3px;
+      margin-left: 20px;
+      width: 150px;
+      height: 40px;
+      font-size: small;
+      font-weight: bold;
+    }
+
+    &-reset-btn{
+      color: #FF6E59;
+    }
+
+    &-submit-btn{
+      background-color: #FF6E59;
+      color: white;
     }
 
 
   }
+
+
+
 
   /* search result - header */
   .result {
@@ -138,12 +191,14 @@
       & h3{
         display: inline-block;
         margin: 0;
-        font-size: 26px;
+        font-size: 25px;
+        font-weight: bolder;
       }
 
       & span{
         margin-left: 10px;
         color: $PRIMARY_COLOR;
+        font-size: 20px;
       }
     }
 
@@ -160,6 +215,8 @@
       }
 
       &_sort-item {
+        font-size: 15px;
+
         &.recent::after {
           content: '';
           margin: 0 10px;
