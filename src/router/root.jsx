@@ -7,8 +7,11 @@ import postRouter from "@router/postRouter.jsx";
 const Loading = <div>Loading....</div>;
 const MainPage = lazy(() => import("@pages/MainPage"));
 const LoginPage = lazy(() => import("@pages/LoginPage.jsx"));
+
+const IndexPage = lazy(() => import("@pages/IndexPage.jsx"));
 const SearchPage = lazy(() => import("@pages/SearchPage.jsx"));
 const PostPage = lazy(() => import("@pages/post/IndexPage"));
+
 
 const root = createBrowserRouter([
     {
@@ -30,6 +33,14 @@ const root = createBrowserRouter([
         ),
     },
     {
+        path: "/index",
+        element: (
+        <Suspense fallback={Loading}>
+            <IndexPage />
+        </Suspense>
+        ),
+    },
+      {
         path: "/search",
         element: (
             <Suspense fallback={Loading}>
