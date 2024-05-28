@@ -10,6 +10,7 @@ import WriteReviewModal from "@/components/modal/WriteReviewModal";
 import MyReviewModal from "@/components/modal/MyReviewModal";
 import ChatModal from "@/components/modal/ChatModal";
 import InfoModifyModal from "@/components/modal/InfoModifyModal";
+import BasicLayout from "@layouts/BasicLayout.jsx";
 
 const ProfilePage = () => {
     const [isModalOpen, setIsModalOpen] = useState(true);
@@ -19,7 +20,7 @@ const ProfilePage = () => {
     }
 
     return (
-        <div>
+        <BasicLayout>
             {/* 프로필 정보 */}
             <div className="border-2 w-full border-black min-h-80 p-8">
                 <div className="flex">
@@ -115,7 +116,7 @@ const ProfilePage = () => {
                 <MyReviewModal/>
             </Modal>
 
-        </div>
+        </BasicLayout>
     )
 }
 
