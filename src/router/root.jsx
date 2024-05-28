@@ -5,6 +5,8 @@ import ProtectedRoute from "@components/ProtectedRoute";
 const Loading = <div>Loading....</div>;
 const MainPage = lazy(() => import("@pages/MainPage"));
 const LoginPage = lazy(() => import("@pages/LoginPage.jsx"));
+const IndexPage = lazy(() => import("@pages/IndexPage.jsx"));
+
 
 const root = createBrowserRouter([
     {
@@ -25,6 +27,14 @@ const root = createBrowserRouter([
         </Suspense>
         ),
     },
+    {
+        path: "/index",
+        element: (
+        <Suspense fallback={Loading}>
+            <IndexPage />
+        </Suspense>
+        ),
+    }
 ]);
 
 export default root;
