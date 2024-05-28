@@ -30,7 +30,7 @@ const root = createBrowserRouter([
         <Suspense fallback={Loading}>
             <LoginPage />
         </Suspense>
-        ),
+        )
     },
     {
         path: "/index",

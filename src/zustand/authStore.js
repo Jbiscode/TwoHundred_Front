@@ -1,29 +1,56 @@
 import { create } from 'zustand';
-import {login, refreshToken} from '@api/apis.js';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { login, refreshToken, logout } from '@api/apis.js';
 
-const useAuthStore = create((set) => ({
-  token: null,
-  setToken: (token) => set({ token }),
-  removeToken: () => set({ token: null }),
-}));
-
-export const loginEffect = (username, password) => async (set) => {
-  try {
-    const token = await login(username, password);
-    set({ token });
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-export const refreshTokenEffect = () => async (set) => {
-  try {
-    const token = await refreshToken();
-    set({ token });
-  } catch (error) {
-    console.error(error);
-  }
-}
+export const useAuthStore = create(
+  persist(
+    (set, get) => ({
+      token: null,
+      isLoggedin: false,
+      user: null,
+      id: null,
+      getToken: () => get().token,
+      getUser: () => get().user,
+      getId: () => get().id,
+      
+      setToken: (token) => set({ token, isLoggedin: true }),
+      setUser: (user) => set({ user }),
+      setId: (id) => set({ id }),
+      removeToken: () => set({ token: null, isLoggedin: false, user: null, id: null }),
+      login: async (username, password) => {
+        try {
+          const token = await login(username, password);
+          set({ token, isLoggedin: true });
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+      },
+      refreshToken: async () => {
+        try {
+          const token = await refreshToken();
+          console.log(token + " 토큰 재발급");
+          set({ token });
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+      },
+      logout: async () => {
+        try {
+          await logout();
+          set({ token: null, isLoggedin: false, user: null });
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+      },
+    }),
+    {
+      name: 'Authorization',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
 
 export default useAuthStore;
-
