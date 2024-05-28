@@ -32,11 +32,12 @@ const root = createBrowserRouter([
     {
         path: "/search",
         element: (
-        <Suspense fallback={Loading}>
-            <SearchPage />
-        </Suspense>
+            <Suspense fallback={Loading}>
+                <SearchPage/>
+            </Suspense>
         ),
-
+    },
+    {
         path : "/profile",
         element : (
             <Suspense fallback={Loading}>
