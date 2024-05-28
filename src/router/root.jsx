@@ -23,7 +23,7 @@ const root = createBrowserRouter([
         <Suspense fallback={Loading}>
             <LoginPage />
         </Suspense>
-        ),
+        )
     },
 ]);
 

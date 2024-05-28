@@ -1,26 +1,26 @@
 import { useState } from 'react';
-import useAuthStore from '@zustand/authStore';
-import { login, moveuserpage, logout } from '@api/apis';
+import { login, naverlogin, logout, moveuserpage } from '@api/apis';
+import { Outlet } from 'react-router-dom';
 
 function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const setToken = useAuthStore((state) => state.setToken);
-  const token = useAuthStore((state) => state.token);
 
   const handleLogin = () => {
-
     login(username, password).then((token) => {
-    setToken(token);
+      console.log(token + "로그인 토큰확인");
   });
-  console.log(token);
   };
 
   const handleLogout = () => {
     logout();
-    setToken(null);
+
   }
-  const movePage = () => {
+  const naverlogins = () => {
+    naverlogin();
+  }
+
+  const movepage = () => {
     moveuserpage();
   }
 
@@ -42,7 +42,9 @@ function LoginForm() {
       />
       <button onClick={handleLogin}>로그인</button>
       <button onClick={handleLogout}>로그아웃</button>
-      <button onClick={movePage}><div className="test">회원페이지</div></button>
+      <button onClick={movepage}><div className="test">회원페이지</div></button>
+      <button onClick={naverlogins}><div className="test">네이버로그인</div></button>
+      <Outlet />
     </div>
   );
 }
