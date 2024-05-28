@@ -38,7 +38,7 @@ function BasicHeader() {
                                     <summary>마이페이지</summary>
                                     <ul className="p-2 rounded-t-none bg-white">
                                         <li>
-                                            <a>프로필</a>
+                                            <Link to={'/profile'}>프로필</Link>
                                         </li>
                                         <li>
                                             <a>로그아웃</a>
