@@ -1,7 +1,15 @@
-
 import { setInterceptors, convertResponse } from '@api/interceptor';
+const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
-const BASE_API_URL = `http://localhost:8080`;
+
+export const originalFetch = async (url, endpoint, method, requestOptions) => {
+  const response = await fetch(`${url}${endpoint}`, {
+    ...requestOptions,
+    method,
+  });
+  console.log("이게 기본적인 요청", response)
+  return response;
+};
 
 const createFetchInstance = (url, options) => {
   const defaultOptions = {
@@ -22,10 +30,10 @@ const createFetchInstance = (url, options) => {
       method,
     };
 
-    return fetch(`${url}${endpoint}`, mergedRequestOptions)
+    return originalFetch(url, endpoint, method, mergedRequestOptions)
       .then((response) => {
-        console.log("response", response)
-        return convertResponse(response);
+        console.log("1. 여기서 기본적인 요청에 대한 응답(from createFetchInstance -> fetchInstance)", response);
+        return convertResponse(response, endpoint, method, mergedRequestOptions);
       })
       .catch((error) => {
         if (error.headers && error.headers.get('Content-Type') === 'application/json') {

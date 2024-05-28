@@ -41,10 +41,17 @@ export default defineConfig({
   // },
   server: {
     port: 3000,
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:8080',
-    //   }
+    proxy: {
+      '/Backend/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/Backend\/api/, '')
+      }
+    },
+
+    // cors: {
+    //   origin: 'http://localhost:8080',
+    //   credentials: true,
     // }
   }
 })
