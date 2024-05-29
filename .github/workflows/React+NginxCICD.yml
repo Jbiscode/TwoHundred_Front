@@ -42,14 +42,14 @@ jobs:
       - name: Nginx Config
         run: |
           touch nginx.conf
-          echo ${{ secrets.NGINX_CONF }} >> nginx.conf
+          echo "${{ secrets.NGINX_CONF }}" | base64 -d >> nginx.conf
 
       - name: SSL Certificate INPUT
         run: |
           touch certificate.crt
-          echo "${{ secrets.SSL_MIXED_CERTIFICATE_CRT }}" | base64 -decode >> mixed_certificate.crt
+          echo "${{ secrets.SSL_MIXED_CERTIFICATE_CRT }}" | base64 -d >> mixed_certificate.crt
           touch private.key
-          echo "${{ secrets.SSL_PRIVATE_KEY }}" | base64 -decode >> private.key
+          echo "${{ secrets.SSL_PRIVATE_KEY }}" | base64 -d >> private.key
       - name: Build and push Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_REPO }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ github.sha }} -f Dockerfile .
