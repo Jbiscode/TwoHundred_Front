@@ -62,7 +62,7 @@ const root = createBrowserRouter([
         children : profileRouter()
     },
     {
-        path: "post",
+        path: "/post",
         element: (
             <Suspense fallback={Loading}>
                 <PostPage />
@@ -71,7 +71,7 @@ const root = createBrowserRouter([
         children: postRouter(),
     },
     {
-        path: "chat",
+        path: "/chat",
         element: (
             <Suspense fallback={Loading}>
                 <ChatPage />
