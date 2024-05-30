@@ -3,12 +3,13 @@ import { lazy, Suspense } from "react";
 import ProtectedRoute from "@components/ProtectedRoute";
 import postRouter from "@router/postRouter.jsx";
 import chatRouter from "@router/chatRouter.jsx";
+import profileRouter from "./profileRouter";
 
 
 const Loading = <div>Loading....</div>;
 const MainPage = lazy(() => import("@pages/MainPage"));
 const LoginPage = lazy(() => import("@pages/LoginPage.jsx"));
-const ProfilePage = lazy(() => import("@pages/profile/ProfilePage.jsx"))
+const ProfilePage = lazy(() => import("@pages/profile/IndexPage.jsx"))
 
 const IndexPage = lazy(() => import("@pages/IndexPage.jsx"));
 const SearchPage = lazy(() => import("@pages/SearchPage.jsx"));
@@ -57,7 +58,8 @@ const root = createBrowserRouter([
             <Suspense fallback={Loading}>
                 <ProfilePage/>
             </Suspense>
-        )
+        ),
+        children : profileRouter()
     },
     {
         path: "post",
