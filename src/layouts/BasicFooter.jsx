@@ -1,10 +1,12 @@
 function BasicFooter() {
     return (
-        <footer className="footer footer-center p-4 bg-white text-base-content">
-            <aside>
-                <p>Copyright © 2024 - All right reserved by BnB Industries Ltd</p>
-            </aside>
-        </footer>
+        <div className="sticky bottom-0 z-50">
+            <footer className="footer footer-center p-4 bg-white text-base-content">
+                <aside>
+                    <p>Copyright © 2024 - All right reserved by BnB Industries Ltd</p>
+                </aside>
+            </footer>
+        </div>
     );
 }
 
