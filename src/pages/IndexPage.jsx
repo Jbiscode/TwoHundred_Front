@@ -1,13 +1,13 @@
 // import { MainResponse } from "../api/mainApi.jsx";
 import { useState, useEffect } from 'react';
 
-import bannerImage1 from '@/assets/images/banner/banner1_mobile.png';
-import bannerImage2 from '@/assets/images/banner/banner2_mobile.png';
-import bannerImage3 from '@/assets/images/banner/banner3_mobile.png';
+import bannerImage1 from '@assets/images/banner/banner1_pc.png';
+import bannerImage2 from '@assets/images/banner/banner2_pc.png';
+import bannerImage3 from '@assets/images/banner/banner3_pc.png';
 
-import categoryImage_best from '../assets/images/icon/category_bestgoods.svg';
-import goodsItem from '../assets/images/goodsItem/goodsItem1.jpeg';
-import BasicLayout from '../layouts/BasicLayout';
+import categoryImage_best from '@assets/images/icon/category_bestgoods.svg';
+import goodsItem from '@assets/images/goodsItem/goodsItem1.jpeg';
+import BasicLayout from '@layouts/BasicLayout';
 
 function IndexPage() {
     
