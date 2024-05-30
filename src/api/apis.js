@@ -4,7 +4,7 @@ import useAuthStore from "@zustand/authStore";
 
 export const login = async (username, password) => {
   try {
-    const response = await instance.post('/login', {
+    const response = await instance.post('/api/login', {
       body: JSON.stringify({ username, password }),
       withCredentials: true,
     });
@@ -38,7 +38,7 @@ export const login = async (username, password) => {
 
 export const logout = async () => {
   try {
-    const response = await auth.post('/logout', {
+    const response = await auth.post('/api/logout', {
       withCredentials: true,
     });
     // localStorage.removeItem('Authorization');
@@ -55,7 +55,7 @@ export const logout = async () => {
 export const refreshToken = async () => {
   // return instance.post('/refreshToken');
   try {
-    const refreshTokenResponse = await instance.post('/refreshToken');
+    const refreshTokenResponse = await instance.post('/api/refreshToken');
 
     console.log("refreshTokenResponse", refreshTokenResponse);
     if (refreshTokenResponse.resultCode == 200) {
