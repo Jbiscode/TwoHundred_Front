@@ -78,23 +78,7 @@ export const moveuserpage = () => {
 
 export const naverlogin = () => {
   try {
-    fetch('/api/v1/oauth2/redirect/naver', {
-      withCredentials: true,
-    })
-      .then(response => {
-        if (response.ok) {
-          return response.text();
-        } else {
-          throw new Error('리다이렉트 응답 오류');
-        }
-      })
-      .then(naverAuthUrl => {
-        window.location.href = naverAuthUrl;
-      })
-      .catch(error => {
-        console.error('네이버 로그인 실패:', error);
-        throw error;
-      });
+    window.location.href = '/api/v1/oauth2/redirect/naver';
   } catch (error) {
     console.error('네이버 로그인 실패:', error);
     throw error;
