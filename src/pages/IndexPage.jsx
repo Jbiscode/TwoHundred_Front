@@ -1,9 +1,9 @@
 // import { MainResponse } from "../api/mainApi.jsx";
 import { useState, useEffect } from 'react';
 
-import bannerImage1 from '@assets/images/banner/banner1_pc.png';
-import bannerImage2 from '@assets/images/banner/banner2_pc.png';
-import bannerImage3 from '@assets/images/banner/banner3_pc.png';
+import bannerImage1 from '@assets/images/banner/banner1_mobile.png';
+import bannerImage2 from '@assets/images/banner/banner2_mobile.png';
+import bannerImage3 from '@assets/images/banner/banner3_mobile.png';
 
 import categoryImage_best from '@assets/images/icon/category_bestgoods.svg';
 import goodsItem from '@assets/images/goodsItem/goodsItem1.jpeg';
@@ -175,14 +175,14 @@ function IndexPage() {
             {/* 카테고리 */}
             <div className="justify-center flex-col flex-grow ">
                 <div className="mt-7 mb-7  grid justify-center ">
-                    <div className="category-list p-2 w-full justify-center grid grid-cols-4">
+                    <div className="category-list p-3 w-full justify-center grid grid-cols-4">
                     {categoryList.map((category) => (
                         <div key={category.value} className="grid p-1">
                             <a href="#" >
                                 <img src={category.src} alt={category.text} className="m-[20px] w-12 h-[35px] items-center" />
                             </a>
 
-                            <div className="category-text font-family[Noto Sans] text-base h-full text-center grid items-center">
+                            <div className="category-text text-m font-family[Noto Sans] text-base h-full text-center grid items-center">
                             {category.text}
                             </div>
                         </div>
@@ -192,12 +192,12 @@ function IndexPage() {
                 </div>
                 
                 {/* 추천상품 */}
-                <div className="newgoods-title mt-30 mx-6 text-lg font-bold">추천 상품</div>
+                <div className="newgoods-title mt-30 mb-2 mx-7 text-lg font-bold">추천 상품</div>
                 <div className="goods">
                     <div className="goods-wrapper w-full grid justify-center box-border">
-                        <div className="goods-list mr-7 ml-3 w-full grid box-border list-none  ">
+                        <div className="goods-list mr-7 ml-3 w-full grid box-border list-none grid-cols-2 ">
                             {goodsList.map((item) => (
-                                <div key={item.value} className="goods-cont ">
+                                <div key={item.value} className="goods-cont mb-4">
                                     <a href="#"><img src={item.src} alt={item.title} className="goods-icn items-center max-w-[165px] h-[211px]" /></a>
                                     <span className="w-full text-base font-medium  truncate h-5 break-words inline-block line-clamp-1">
                                         {item.title}
