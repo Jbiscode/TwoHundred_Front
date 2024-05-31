@@ -61,14 +61,13 @@ export const setInterceptors = (withAuth, fetchInstance) => {
     if (withAuth) {
       const token = useAuthStore.getState().getToken()
         ? useAuthStore.getState().getToken()
-        : null;
+        : "";
 
-      console.log("token 값확인", token);
       config.headers = {
         ...config.headers,
         Authorization: token,
       };
-      console.log("config.headers", config.headers);
+
     } else {
       config.headers = {
         ...config.headers,
@@ -78,35 +77,10 @@ export const setInterceptors = (withAuth, fetchInstance) => {
 
     try {
       const response = await fetchInstance(endpoint, method, config);
-      console.log(
-        "3.인스턴스에서 응답 확인(from index.js -> convertResponse)",
-        response
-      );
-      console.log("4. 인터셉터 로직 실행");
-      console.log(
-        "여기서 부터는 convertResponse 형식이다. 모든 응답이 거치면 convertResponse형식으로 조회",
-        response
-      );
+      // console.log("3.인스턴스에서 응답 확인(from index.js -> convertResponse)",response);
       if (response.resultCode == 401) {
         console.log("401 에러 발생");
         refreshToken();
-        // try {
-        //   const refreshTokenResponse = await refreshToken();
-
-        //   console.log("refreshTokenResponse", refreshTokenResponse);
-        //   if (refreshTokenResponse.resultCode == 200) {
-        //     const newToken = refreshTokenResponse.headers.get("Authorization");
-        //     // localStorage.setItem("Authorization", newToken);
-        //     useAuthStore.getState().setToken(newToken);
-        //     console.log("새로운 토큰 저장 완료");
-        //   } else {
-        //     console.log("토큰 재발급 실패");
-        //     useAuthStore.getState().logout();
-        //   }
-        // } catch (refreshError) {
-        //   console.error("토큰 재발급 중 에러 발생:", refreshError);
-        //   throw refreshError;
-        // }
       }
       return response;
     } catch (error) {
