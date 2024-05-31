@@ -1,13 +1,12 @@
 import { setInterceptors, convertResponse } from '@api/interceptor';
 const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
-
+// 가장 근본의 요청을 만들어주는 함수
 export const originalFetch = async (url, endpoint, method, requestOptions) => {
   const response = await fetch(`${url}${endpoint}`, {
     ...requestOptions,
     method,
   });
-  console.log("이게 기본적인 요청", response)
   return response;
 };
 
@@ -17,7 +16,6 @@ const createFetchInstance = (url, options) => {
       'Content-Type': 'application/json',
     },
   };
-
   const mergedOptions = {
     ...defaultOptions,
     ...options,
@@ -26,7 +24,7 @@ const createFetchInstance = (url, options) => {
   const fetchInstance = (endpoint, method, requestOptions) => {
     const mergedRequestOptions = {
       ...mergedOptions,
-      ...requestOptions,
+      ...requestOptions, // json 형태로 들어오는 요청
       method,
     };
 

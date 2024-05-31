@@ -105,12 +105,12 @@ const ChatListComponent = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col">
             <div className="p-4">
                 <h2 className="text-2xl font-bold mb-4">{userName}님의 채팅 목록</h2>
                 <hr className="border-1 mb-4 border-orange-400"/>
             </div>
-            <div className="flex-1  overflow-y-auto">
+            <div className="flex-1">
                 <ul className="space-y-4 p-4">
                     {chatList.map((chat) => (
                         <li key={chat.id}
