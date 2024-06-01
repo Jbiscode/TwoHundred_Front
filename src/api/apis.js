@@ -76,9 +76,12 @@ export const moveuserpage = () => {
   }
 }
 
-export const naverlogin = () => {
+export const naverlogin = async () => {
   try {
-    window.location.href = '/api/v1/oauth2/redirect/naver';
+    await instance.get('/api/v1/oauth2/redirect/naver',{
+      withCredentials: true,
+    });
+
   } catch (error) {
     console.error('네이버 로그인 실패:', error);
     throw error;
