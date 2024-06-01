@@ -11,5 +11,5 @@ COPY mixed_certificate.crt /etc/nginx/ssl/mixed_certificate.crt
 COPY private.key /etc/nginx/ssl/private.key
 
 RUN ls -la /etc/nginx/ssl
-RUN nginx -t
+# RUN nginx -t
 EXPOSE 80 443

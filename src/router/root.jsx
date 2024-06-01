@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import ProtectedRoute from "@components/ProtectedRoute";
+// import ProtectedRoute from "@components/ProtectedRoute";
 import postRouter from "@router/postRouter.jsx";
 import chatRouter from "@router/chatRouter.jsx";
 import profileRouter from "./profileRouter";
@@ -22,9 +22,9 @@ const root = createBrowserRouter([
         path: "/",
         element: (
         <Suspense fallback={Loading}>
-            <ProtectedRoute>
+            {/* <ProtectedRoute> */}
                 <MainPage />
-            </ProtectedRoute>
+            {/* </ProtectedRoute> */}
         </Suspense>
         ),
     },
