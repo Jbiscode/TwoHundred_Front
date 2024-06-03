@@ -190,7 +190,7 @@ const ProfileComponent = () => {
 
 
             <Modal isModalOpen={isModalOpen} onModalClose={onModalClose}>
-                <MyReviewModal/>
+                <SignupModal/>
             </Modal>
 
         </div>

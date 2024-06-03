@@ -1,7 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useDaumPostcodePopup } from "react-daum-postcode";
+import PostModal from "./PostModal";
 
 const SignupModal = () => {
+
+    const [address, setAddress] = useState({
+        addr1 : '',
+        addr2 : ''
+    })
+    
+
+
     return (
         <div>
             <div className="text-center font-bold text-lg mb-6">
@@ -19,7 +29,13 @@ const SignupModal = () => {
                         <div className="mb-6">
                             <p className="font-bold text-lg mb-2 pl-1">주소</p>
                             <div >
-                                <input type="text" placeholder="주소" className="input input-bordered w-full " />
+                                <div className="flex gap-3">
+                                    <input type="text" placeholder="시" className="input input-bordered w-full " value={address.addr1}/>
+                                    <PostModal className="w-full" setAddress={setAddress}/>
+                                </div>
+                                <div className="mt-3">
+                                    <input type="text" placeholder="군/구" className="input input-bordered w-full " value={address.addr2}/>
+                                </div>
                             </div>
                         </div>
                         <div className="mb-6">
