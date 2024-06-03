@@ -2,18 +2,15 @@ import { instance, auth } from '@api/index';
 import useAuthStore from "@zustand/authStore";
 
 
-export const login = async (username, password) => {
+export const login = async (email, password) => {
   try {
-    const response = await instance.post('/login', {
-      body: JSON.stringify({ username, password }),
+    const response = await instance.post('/api/login', {
+      body: JSON.stringify({ email, password }),
       withCredentials: true,
     });
 
     if (response.resultCode == '200') {
       let token = response.headers.get('authorization');
-
-      console.log("Authorization Header:", token);
-      console.log("쿠키쿠키" ,response.cookies);
 
       if (!token) {
         token = document.cookie
@@ -23,14 +20,12 @@ export const login = async (username, password) => {
         token = "Bearer " + token;
       }
       if (token) {
-        // localStorage.setItem('Authorization', token);
         useAuthStore.getState().setToken(token);
       }
       return token;
     }
   } catch (error) {
-    console.error('로그인 실패:', error);
-    throw error;
+    throw new Error(error);
   }
 };
 
@@ -38,29 +33,31 @@ export const login = async (username, password) => {
 
 export const logout = async () => {
   try {
-    const response = await auth.post('/logout', {
+    const response = await auth.post('/api/logout', {
       withCredentials: true,
     });
-    // localStorage.removeItem('Authorization');
     useAuthStore.getState().removeToken();
 
     return response;
   } catch (error) {
-    console.error('로그아웃 실패:', error);
-    throw error;
+    throw new Error(error);
   }
 };
 
 
 export const refreshToken = async () => {
-  // return instance.post('/refreshToken');
   try {
-    const refreshTokenResponse = await instance.post('/refreshToken');
+    const refreshTokenResponse = await fetch('/api/refreshToken', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     console.log("refreshTokenResponse", refreshTokenResponse);
     if (refreshTokenResponse.resultCode == 200) {
       const newToken = refreshTokenResponse.headers.get("Authorization");
-      // localStorage.setItem("Authorization", newToken);
+
       useAuthStore.getState().setToken(newToken);
       console.log("새로운 토큰 저장 완료");
     } else {
@@ -84,15 +81,15 @@ export const moveuserpage = () => {
   }
 }
 
-export const naverlogin = () => {
+export const naverlogin = async () => {
   try {
-    return fetch('/oauth2/authorization/naver',{
+    await instance.get('/api/v1/oauth2/redirect/naver',{
       withCredentials: true,
     });
-  }
-  catch (error) {
+
+  } catch (error) {
     console.error('네이버 로그인 실패:', error);
     throw error;
   }
-}
+};
 

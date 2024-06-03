@@ -3,11 +3,11 @@ import { login, naverlogin, logout, moveuserpage } from '@api/apis';
 import { Outlet } from 'react-router-dom';
 
 function LoginForm() {
-  const [username, setUsername] = useState('');
+  const [email, setemail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    login(username, password).then((token) => {
+    login(email, password).then((token) => {
       console.log(token + "로그인 토큰확인");
   });
   };
@@ -28,10 +28,10 @@ function LoginForm() {
     <div>
       <input
         type="text"
-        name='username'
+        name='email'
         placeholder="아이디"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        value={email}
+        onChange={(e) => setemail(e.target.value)}
       />
       <input
         type="password"
