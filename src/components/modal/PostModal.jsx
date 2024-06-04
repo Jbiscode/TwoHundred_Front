@@ -1,7 +1,7 @@
 import React from "react";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 
-const PostModal = ({setAddress}) => {
+const PostModal = ({setUserSignupDTO}) => {
     const scriptUrl = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
     const open = useDaumPostcodePopup(scriptUrl);
 
@@ -26,7 +26,11 @@ const PostModal = ({setAddress}) => {
       console.log(cleanedAddress); 
       
       const [addr1, addr2] = cleanedAddress.split(' ').filter(Boolean);
-      setAddress({addr1, addr2});
+      setUserSignupDTO(prev => ({
+        ...prev,
+        addr1,
+        addr2
+      }));
       };
     
       const handleClick = () => {
