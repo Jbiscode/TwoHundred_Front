@@ -47,12 +47,7 @@ export const logout = async () => {
 
 export const refreshToken = async () => {
   try {
-    const refreshTokenResponse = await fetch('/api/refreshToken', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const refreshTokenResponse = await instance.post('/api/refreshToken');
 
     console.log("refreshTokenResponse", refreshTokenResponse);
     if (refreshTokenResponse.resultCode == 200) {
@@ -73,7 +68,7 @@ export const refreshToken = async () => {
 
 export const moveuserpage = () => {
   try {
-    return auth.get('/manager');
+    return auth.get('/api/v2/manager');
   }
   catch (error) {
     console.error('유저페이지 이동 실패:', error);
@@ -93,3 +88,19 @@ export const naverlogin = async () => {
   }
 };
 
+export const userSignUp = async(userSignupDTO) => {
+   
+    
+    try{
+      await instance.post('/api/v1/auth', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userSignupDTO),
+        withCredentials: true,
+      })
+    }catch(error){
+      console.log("회원가입 실패:", error)
+      throw error;
+    }
+}

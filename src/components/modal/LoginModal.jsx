@@ -1,7 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { login } from "@api/apis";
+import toast, { Toaster } from "react-hot-toast";
 
-const LoginModal = () => {
+const LoginModal = ({onModalClose}) => {
+
+    
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        login(email, password)
+          .then((token) => {
+            console.log(token + "로그인 토큰확인");
+            if (token !== undefined) {
+              toast.success('로그인 성공');
+              onModalClose();
+            } else {
+              toast.error('이메일 또는 비밀번호를 확인해주세요');
+            }
+          })
+          .catch((error) => {
+            console.error('로그인 실패:', error);
+            toast.error('로그인 실패');
+          });
+      };
+
     return (
         <div>
             <div className="text-center font-bold text-lg mb-6">
@@ -13,18 +39,18 @@ const LoginModal = () => {
                     <div className="mb-6">
                         <p className="font-bold text-lg mb-2 pl-1">이메일</p>
                         <div >
-                            <input type="text" placeholder="이메일" className="input input-bordered w-full " />
+                            <input type="text" placeholder="이메일" className="input input-bordered w-full" name="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
                         </div>
                     </div>
                     <div className="mb-6">
                         <p className="font-bold text-lg mb-1 pl-1">비밀번호</p>
                         <p className="font-bold text-sm mb-2 pl-1 text-gray-400">영문, 숫자를 포함한 8자 이상의 비밀번호를 입력해주세요.</p>
                         <div >
-                            <input type="password" placeholder="비밀번호" className="input input-bordered w-full " />
+                            <input type="password" placeholder="비밀번호" className="input input-bordered w-full" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                         </div>
                     </div>
                     <div>
-                        <button className="btn btn-primary w-full text-lg mb-3 font-bold">이메일로 로그인</button>
+                        <button className="btn btn-primary w-full text-lg mb-3 font-bold" onClick={handleLogin}>이메일로 로그인</button>
                         <button className="btn btn-accent w-full text-lg">카카오로 로그인</button>
                     </div>
                 </form>
