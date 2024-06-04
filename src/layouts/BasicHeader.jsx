@@ -117,7 +117,7 @@ function BasicHeader() {
         </div>
        
         <Modal isModalOpen={isModalOpen} onModalClose={onModalHandler}>
-            <MyReviewModal onModalClose={onModalHandler}/>
+            <LoginModal onModalClose={onModalHandler}/>
         </Modal>
 
         </>
