@@ -7,7 +7,7 @@ function BasicLayout({ children }) {
     <>
         <BasicHeader />
         <div className="flex flex-col min-h-screen">
-            <main className="flex-grow mx-auto">{children}</main>
+            <main className="flex-grow mx-auto w-full">{children}</main>
         </div>
         <BasicFooter />
     </>

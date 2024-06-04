@@ -1,16 +1,30 @@
 import {lazy, Suspense} from "react";
 import {Navigate} from "react-router-dom";
 
-
 const Loading = <div>Loading....</div>
-const ProfilePage = lazy(() => import("@pages/profile/ProfilePage"))
+const UserProfilePage = lazy(() => import("@pages/profile/UserProfilePage"))
+const MyProfilePage = lazy(() => import("@pages/profile/MyProfilePage"))
+const ProtectedRoute = lazy(() => import("@router/ProtectedRoute"))
 
 const profileRouter = () => {
     return [
         {
             path: "",
-            element: <Suspense fallback={Loading}><ProfilePage/></Suspense>
-        }
+            element: <Navigate replace={true} to="me"/>
+        },
+        {
+            path: ":user_id",
+            element: <Suspense fallback={Loading}><UserProfilePage/></Suspense>
+        },
+        {
+            path: "me",
+            element: 
+            <ProtectedRoute fetchURL="/api/v2/manager">
+                <Suspense fallback={Loading}>
+                    <MyProfilePage/>
+                </Suspense>
+            </ProtectedRoute>
+        },
         
     ]
 }
