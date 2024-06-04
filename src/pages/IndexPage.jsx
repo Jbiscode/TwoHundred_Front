@@ -147,7 +147,7 @@ function IndexPage() {
             <div className="flex flex-col">
 
             {/* 배너 */}
-            <div className="-z-10 carousel w-full" data-interval="false">
+            <div className="z-0 carousel w-full" data-interval="false">
                 <div className={`carousel-item relative w-full ${currentSlide === 0 ? 'block' : 'hidden'}`}>
                     <img src={bannerImage1} className="w-full h-[180px]" />
                     <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
