@@ -14,12 +14,7 @@ import InfoModifyModal from "@/components/modal/InfoModifyModal";
 import BasicLayout from "@layouts/BasicLayout.jsx";
 
 const ProfileComponent = () => {
-    const [isModalOpen, setIsModalOpen] = useState(true);
-    
-    const onModalClose = () => {
-        setIsModalOpen(false)
-    }
-
+  
     return (
         <div className="px-6">
             {/* 나의 프로필 정보 */}
@@ -188,10 +183,6 @@ const ProfileComponent = () => {
             </div>
 
 
-
-            <Modal isModalOpen={isModalOpen} onModalClose={onModalClose}>
-                <SignupModal/>
-            </Modal>
 
         </div>
     )

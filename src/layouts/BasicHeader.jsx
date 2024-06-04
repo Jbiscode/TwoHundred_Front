@@ -1,8 +1,38 @@
+import { useState } from "react";
 import {Link} from "react-router-dom";
+import Modal from "@/components/templates/Modal";
+import LoginModal from "@/components/modal/LoginModal";
+import SignupModal from "@/components/modal/SignupModal";
+import MyReviewModal from "@/components/modal/MyReviewModal";
+import WriteReviewModal from "@/components/modal/WriteReviewModal";
+import useAuthStore from "@zustand/authStore";
+import {logout} from "@api/apis"
+import toast, { Toaster } from "react-hot-toast";
 
 function BasicHeader() {
-    return (
-        <div className="sticky top-0 z-50">
+
+    const {isLoggedin}  = useAuthStore(state => state)
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    const onModalHandler = () => {
+        setIsModalOpen(prev => !prev)
+    }
+
+    const handleLogout = () => {
+       
+        toast.promise(logout(),
+            {
+                loading: 'loading...',
+                success: <b>로그아웃 되었습니다.</b>,
+                error: <b>로그아웃에 실패하였습니다.</b>,
+            })
+    }
+
+
+    return (<>
+        <Toaster></Toaster>
+        <div className="sticky top-0 z-0">
             <div className="bg-white w-full h-full">
                 <div className="hidden sm:block">
                     <div className="navbar bg-white mb-2">
@@ -74,7 +104,10 @@ function BasicHeader() {
                                         </Link>
                                     </li>
                                     <li><a>프로필</a></li>
-                                    <li><a>로그아웃</a></li>
+                                    
+                                    {
+                                       isLoggedin ? <li onClick={handleLogout}><a>로그아웃</a></li> : <li onClick={onModalHandler}><a>로그인</a></li>     
+                                    }
                                 </ul>
                             </div>
                         </div>
@@ -82,6 +115,12 @@ function BasicHeader() {
                 </div>
             </div>
         </div>
+       
+        <Modal isModalOpen={isModalOpen} onModalClose={onModalHandler}>
+            <MyReviewModal onModalClose={onModalHandler}/>
+        </Modal>
+
+        </>
     );
 }
 
