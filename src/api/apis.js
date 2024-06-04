@@ -93,9 +93,6 @@ export const userSignUp = async(userSignupDTO) => {
     
     try{
       await instance.post('/api/v1/auth', {
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(userSignupDTO),
         withCredentials: true,
       })
