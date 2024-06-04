@@ -21,27 +21,31 @@ const createFetchInstance = (url, options) => {
     ...options,
   };
 
-  const fetchInstance = (endpoint, method, requestOptions) => {
+  const fetchInstance = async (endpoint, method, requestOptions) => {
     const mergedRequestOptions = {
       ...mergedOptions,
       ...requestOptions, // json 형태로 들어오는 요청
-      method,
+      headers:{
+        ...mergedOptions.headers,
+        ...requestOptions.headers
+      },
+      method
     };
 
-    return originalFetch(url, endpoint, method, mergedRequestOptions)
-      .then((response) => {
-        console.log("1. 여기서 기본적인 요청에 대한 응답(from createFetchInstance -> fetchInstance)", response);
-        return convertResponse(response, endpoint, method, mergedRequestOptions);
-      })
-      .catch((error) => {
-        if (error.headers && error.headers.get('Content-Type') === 'application/json') {
-          return error.json().then((response) => {
-            return Promise.reject(convertResponse(response));
-          });
-        } else {
-          return Promise.reject(convertResponse(error));
-        }
-      });
+    try {
+      const response = await originalFetch(url, endpoint, method, mergedRequestOptions);
+      console.log("1. 여기서 기본적인 요청에 대한 응답(from createFetchInstance -> fetchInstance)", response);
+
+      return convertResponse(response, endpoint, method, mergedRequestOptions);
+    } catch (error) {
+      if (error.headers && error.headers.get('Content-Type') === 'application/json') {
+        return error.json().then((response_1) => {
+          return Promise.reject(convertResponse(response_1));
+        });
+      } else {
+        return Promise.reject(convertResponse(error));
+      }
+    }
   };
 
   const interceptedFetchInstance = setInterceptors(mergedOptions.withAuth, fetchInstance);

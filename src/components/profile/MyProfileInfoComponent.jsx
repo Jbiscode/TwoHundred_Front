@@ -1,7 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PROFILE_IMAGE from "@/assets/images/sorage.png"
+import useAuthStore from "@zustand/authStore"
+import {auth} from "@api/index"
 
 const MyProfileInfoComponent = () => {
+
+    const {userDTO, setUserDTO} = useState();
+    const {isLoggedin} = useAuthStore(state => state)
+
+    useEffect(()=>{
+        const fetchData = async () => {
+            // 로그인이 필요한 정보받아오기
+            try{
+                const response = await auth.get(
+                    '/api/v1/users/my',
+                    {withCredentials: true}
+                )
+            if(response.resultCode == '401'){
+                setIsModalOpen(true)
+            }
+            if(response.resultCode == '200'){
+                setUserDTO(response.data)
+            }
+            console.log(response.data)
+            }catch(error){
+                console.log(error)
+            }
+        }
+        
+        fetchData();
+    },[])
 
     return (
             <div className="border w-full border-gray-300 px-6 py-10 border-solid mt-8 mb-8">
