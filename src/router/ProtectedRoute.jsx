@@ -1,4 +1,5 @@
 import { useAuthStore } from '@zustand/authStore';
+import useModalStore from "@zustand/modalStore";
 import { useEffect, useState } from 'react';
 import LoginModal from '@components/modal/LoginModal';
 import Modal from '@components/templates/Modal';
@@ -7,31 +8,19 @@ import { auth ,instance} from '@api/index';
 
 const ProtectedRoute = ({ children, fetchURL }) => {
     const { isLoggedin } = useAuthStore();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { openLoginModal, closeLoginModal } = useModalStore();
 
     useEffect(() => {
-    
         if (!isLoggedin) {
-            setIsModalOpen(true);
+            openLoginModal();
         } else {
-            setIsModalOpen(false);
+            closeLoginModal();
         }
     }, [isLoggedin]);
-
-
-
-    const onModalHandler = () => {
-        setIsModalOpen(prev => !prev);
-    };
 
     return (
         <>
             {isLoggedin && children}
-            {!isLoggedin && (
-                <Modal isModalOpen={isModalOpen} onModalClose={onModalHandler}>
-                    <LoginModal onModalClose={onModalHandler} />
-                </Modal>
-            )}
         </>
     );
 };
