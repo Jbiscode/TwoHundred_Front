@@ -46,12 +46,17 @@ export default defineConfig({
         target: 'http://localhost:8080/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      '/socket': {
+        target: 'http://localhost:5000/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/socket/, '')
       }
     },
 
-    cors: {
-      origin: 'http://localhost:8080',
-      credentials: true,
-    }
+    // cors: {
+    //   origin: 'http://localhost:8080',
+    //   credentials: true,
+    // }
   }
 })

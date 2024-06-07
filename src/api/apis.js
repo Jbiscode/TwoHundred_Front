@@ -11,6 +11,8 @@ export const login = async (email, password) => {
 
     if (response.resultCode == '200') {
       let token = response.headers.get('authorization');
+      const userId = response.data.userId;
+      const username = response.data.username;
 
       if (!token) {
         token = document.cookie
@@ -21,6 +23,8 @@ export const login = async (email, password) => {
       }
       if (token) {
         useAuthStore.getState().setToken(token);
+        useAuthStore.getState().setId(userId);
+        useAuthStore.getState().setUser(username);
       }
       return token;
     }
