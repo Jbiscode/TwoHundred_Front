@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { login } from "@api/apis";
 import toast, { Toaster } from "react-hot-toast";
+import useModalStore from "@zustand/modalStore";
 
-const LoginModal = ({onModalClose}) => {
 
+const LoginModal = () => {
+    const { openSignupModal, closeLoginModal } = useModalStore();
     
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [signupModal, setSignupModal] = useState(false)
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -17,7 +19,7 @@ const LoginModal = ({onModalClose}) => {
             console.log(token + "로그인 토큰확인");
             if (token !== undefined) {
               toast.success('로그인 성공');
-              onModalClose();
+              closeLoginModal();
             } else {
               toast.error('이메일 또는 비밀번호를 확인해주세요');
             }
@@ -57,14 +59,15 @@ const LoginModal = ({onModalClose}) => {
                 <div className="mt-8">
                     <div className="text-sm flex justify-center text-gray-400 mb-1">
                         <span className="mr-2">아직 회원이 아니신가요?</span>
-                        <Link className="underline">회원가입</Link>
+                        <a className="underline" onClick={() => {openSignupModal(); closeLoginModal(); }}>회원가입</a>
                     </div>
                     <div className="text-sm flex justify-center text-gray-400">
                         <span className="mr-2">비밀번호를 잊으셨나요?</span>
-                        <Link className="underline">비밀번호 찾기</Link>
+                        <a className="underline">비밀번호 찾기</a>
                     </div>
                 </div>
             </div>
+           
         </div>          
     )
 }

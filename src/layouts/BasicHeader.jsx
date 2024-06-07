@@ -6,21 +6,16 @@ import SignupModal from "@/components/modal/SignupModal";
 import MyReviewModal from "@/components/modal/MyReviewModal";
 import WriteReviewModal from "@/components/modal/WriteReviewModal";
 import useAuthStore from "@zustand/authStore";
+import useModalStore from "@zustand/modalStore";
 import {logout} from "@api/apis"
 import toast, { Toaster } from "react-hot-toast";
 
 function BasicHeader() {
-
+    const { openLoginModal } = useModalStore();
     const {isLoggedin}  = useAuthStore(state => state)
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    const onModalHandler = () => {
-        setIsModalOpen(prev => !prev)
-    }
 
     const handleLogout = () => {
-       
         toast.promise(logout(),
             {
                 loading: 'loading...',
@@ -68,10 +63,10 @@ function BasicHeader() {
                                         <summary>마이페이지</summary>
                                         <ul className="p-2 rounded-t-none bg-white">
                                             <li>
-                                                <Link to={'/profile'}>프로필</Link>
+                                                <Link to={'/users/me'}>프로필</Link>
                                             </li>
                                             <li>
-                                                <a>로그아웃</a>
+                                                <a onClick={handleLogout}>로그아웃</a>
                                             </li>
                                         </ul>
                                     </details>
@@ -103,10 +98,9 @@ function BasicHeader() {
                                             판매하기
                                         </Link>
                                     </li>
-                                    <li><a>프로필</a></li>
-                                    
+                                    <li><Link to={'/users/me'}>프로필</Link></li>
                                     {
-                                       isLoggedin ? <li onClick={handleLogout}><a>로그아웃</a></li> : <li onClick={onModalHandler}><a>로그인</a></li>     
+                                       isLoggedin ? <li onClick={handleLogout}><a>로그아웃</a></li> : <li onClick={openLoginModal}><a>로그인</a></li>     
                                     }
                                 </ul>
                             </div>
@@ -116,10 +110,7 @@ function BasicHeader() {
             </div>
         </div>
        
-        <Modal isModalOpen={isModalOpen} onModalClose={onModalHandler}>
-            <LoginModal onModalClose={onModalHandler}/>
-        </Modal>
-
+        
         </>
     );
 }
