@@ -32,7 +32,7 @@ function BasicHeader() {
 
     return (<>
         <Toaster></Toaster>
-        <div className="sticky top-0 z-10">
+        <div className="sticky top-0 z-20">
             <div className="bg-white w-full h-full">
                 <div className="hidden sm:block">
                     <div className="navbar bg-white mb-2">
