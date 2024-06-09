@@ -18,7 +18,7 @@ const postRouter = () => {
             element: <Suspense fallback={Loading}><PostList/></Suspense>
         },
         {
-            path: "read",
+            path: "read/:aid",
             element:  <Suspense fallback={Loading}><PostRead/></Suspense>
         },
         {
