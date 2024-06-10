@@ -8,14 +8,10 @@ import bannerImage3 from '@assets/images/banner/banner3_mobile.png';
 import categoryImage_best from '@assets/images/icon/category_bestgoods.svg';
 import goodsItem from '@assets/images/goodsItem/goodsItem1.jpeg';
 import BasicLayout from '@layouts/BasicLayout';
-import useSocketStore from '@zustand/useSocketStore';
-import { toast } from 'react-hot-toast';
-import ChatAlarm from '@components/chat/ChatAlarm';
 
 function IndexPage() {
     
     const [currentSlide, setCurrentSlide] = useState(0);
-    const { socket } = useSocketStore();
 
     const handleSlideChange = (direction) => {
         if (direction === 'prev') {
@@ -27,12 +23,7 @@ function IndexPage() {
 
     useEffect(() => {
         console.log('Current slide:', currentSlide);
-        socket?.on("newMessage", (newMessage) => {
-            toast.custom((t) => (
-                <ChatAlarm t={t} newMessage={newMessage} />
-            ))
-        });
-    }, [currentSlide,socket]);
+      }, [currentSlide]);
 
     const categoryList = [
         {

@@ -1,13 +1,24 @@
 import ChatListItem from "@components/chat/ChatListItem";
 import authStore from "@zustand/authStore";
 import useGetConversations from "@hooks/chat/useGetConversations";
-import useGetLastMessageAndUnread from "@hooks/chat/useGetLastMessageAndUnread";
-
 
 const ChatListComponent = () => {
     const { user } = authStore();
     const { loading, conversations } = useGetConversations();
-    const { lastMessage, unreadCount } = useGetLastMessageAndUnread(conversations);
+
+
+    // const chatList = [
+    //     {
+    //         id: 1,
+    //         name: '황금효정',
+    //         lastMessage: '팔렸나요?',
+    //         timestamp: '1시간 전',
+    //         location: "관악구 봉천동",
+    //         productImage: "https://picsum.photos/200",
+    //         profileImage: "https://picsum.photos/100"
+    //     },
+    // ];
+
 
 
     return (
@@ -26,8 +37,6 @@ const ChatListComponent = () => {
                             key={chat.id} 
                             chat={chat} 
                             user={user}
-                            lastMessage={lastMessage[chat.id]}
-                            unreadCount={unreadCount[chat.id]}
                         />
                     ))
                 )}

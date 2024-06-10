@@ -6,28 +6,19 @@ import { useAuthStore } from '@zustand/authStore';
 function useGetMessages() {
   const [loading, setLoading] = useState(false);
   const { messages, setMessages, selectedConversation } = conversationStore();
-  const {token, id} = useAuthStore();
+  const {token} = useAuthStore();
 
   useEffect(() => {
     const getMessages = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/socket/messages/get/${selectedConversation}/${id}`,
+        const response = await fetch(`/socket/messages/get/${selectedConversation}`,
         {
           headers: {
             Authorization: `${token}`,
           },
         }
         );
-        if(response.status === 401){
-          setMessages([]);
-          toast.error("로그인이 필요합니다.");
-        }
-        if(response.status === 403){
-          setMessages([]);
-          toast.error("권한이 없습니다.");
-        }
-
         const data = await response.json();
         if(data.error) throw new Error(data.error);
         console.log("데이터",data);
@@ -44,7 +35,7 @@ function useGetMessages() {
     if (selectedConversation) {
       getMessages();
     }
-  }, [selectedConversation, setMessages, token,id]);
+  }, [selectedConversation, setMessages]);
 
   return { loading, messages };
 }

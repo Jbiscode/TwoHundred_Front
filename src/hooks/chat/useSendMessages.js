@@ -4,13 +4,13 @@ import conversationStore from "@zustand/conversationStore";
 import { useAuthStore } from '../../zustand/authStore';
 
 const useSendMessages = () => {
-  const {token,id} = useAuthStore();
+  const {token} = useAuthStore();
   const [loading, setLoading] = useState(false);
   const {messages, setMessages, selectedConversation} = conversationStore()
   const sendMessage = async (inputs) => {
     setLoading(true);
     try {
-      const response = await fetch(`/socket/messages/send/${selectedConversation}/${id}`, {
+      const response = await fetch(`/socket/messages/send/${selectedConversation}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

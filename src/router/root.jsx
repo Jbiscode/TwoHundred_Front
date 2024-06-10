@@ -24,7 +24,7 @@ const root = createBrowserRouter([
         </Suspense>
         ),
     },
-    {
+      {
         path: "/search",
         element: (
             <Suspense fallback={Loading}>
