@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import MyProfileInfoComponent from "@components/profile/MyProfileInfoComponent";
 import SaleComponent from "@components/profile/SaleComponent";
 import LikeComponent from "@components/profile/LikeComponent";
