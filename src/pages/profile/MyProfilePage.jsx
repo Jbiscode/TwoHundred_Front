@@ -7,6 +7,7 @@ import SaleComponent from "@components/profile/SaleComponent";
 import LikeComponent from "@components/profile/LikeComponent";
 import usemyprofileStore from "@zustand/myprofileStore"
 import OfferComponent from "@components/profile/OfferComponent";
+import BuyComponent from "@components/profile/BuyComponent";
 
 
 const MyProfilePage = () => {
@@ -23,7 +24,7 @@ const MyProfilePage = () => {
             {currentView === 'sales' &&   <SaleComponent/>}
             {currentView === 'likes' && <LikeComponent updateMyProfileInfo ={updateMyProfileInfo }/>}
             {currentView === 'offers' && <OfferComponent updateMyProfileInfo ={updateMyProfileInfo }/>}
-            {currentView === 'buy' && <BuyView />}
+            {currentView === 'buy' && <BuyComponent updateMyProfileInfo ={updateMyProfileInfo }/>}
           
        </div>
     )

@@ -6,7 +6,7 @@ import {auth} from "@api/index"
 import useModalStore from "@zustand/modalStore"
 
 
-const OfferComponent = ({updateMyProfileInfo }) => {
+const BuyComponent = ({updateMyProfileInfo }) => {
     const {openLoginModal} = useModalStore(state => state)
 
     const [sortBy, setSortBy] = useState('latest')
@@ -25,7 +25,7 @@ const OfferComponent = ({updateMyProfileInfo }) => {
             // 로그인이 필요한 정보받아오기
             try{
                 const response = await auth.get(
-                    `/api/v1/users/me/offers/${tradeStatus}/${sortBy}?page=${page}`,
+                    `/api/v1/users/me/buys/${tradeStatus}/${sortBy}?page=${page}`,
                     {withCredentials: true}
                 )
             if(response.resultCode == '401'){
@@ -73,7 +73,7 @@ const OfferComponent = ({updateMyProfileInfo }) => {
         setPage(1)
     }
 
-    const handleLikeChange = (id) => {
+    const handleLikeChange = (id,isLiked) => {
         console.log('왜 안눌리누?')
         console.log(id)
         const fetch = async() => {
@@ -100,10 +100,10 @@ const OfferComponent = ({updateMyProfileInfo }) => {
 
     return (
         <div>
-            <p className="font-bold pt-4 mb-3">가격 제안</p>
+            <p className="font-bold pt-4 mb-3">구매 내역</p>
             <div>
                 <div className="w-full flex border-solid border-t-2 border-black text-lg">
-                <div className="w-full"><p className={`block w-full text-center py-3 text-base font-bold border-solid border-b-2 border-black`} >가격 제안</p></div>
+                <div className="w-full"><p className={`block w-full text-center py-3 text-base font-bold border-solid border-b-2 border-black`} >구매 내역</p></div>
                 </div>
             </div>
             <div className="flex text-base font-bold justify-end my-4 gap-2 items-center">
@@ -125,7 +125,7 @@ const OfferComponent = ({updateMyProfileInfo }) => {
                                             거래 완료
                                         </div>
                                 }
-                                <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={()=>{handleLikeChange(item.id)}}/>
+                                <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={()=>{handleLikeChange(item.id, item.isLiked)}}/>
                             </div>
                             <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-2">{item.title}</p>
                             <div className="my-2 flex text-sm gap-1 font-bold text-gray-400">
@@ -153,4 +153,4 @@ const OfferComponent = ({updateMyProfileInfo }) => {
     )
 }
 
-export default OfferComponent
+export default BuyComponent
