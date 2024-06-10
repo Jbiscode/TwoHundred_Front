@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PROFILE_IMAGE from "@/assets/images/sorage.png"
 import useAuthStore from "@zustand/authStore"
+import usemyprofileStore from "@zustand/myprofileStore"
 import {auth} from "@api/index"
 
 const MyProfileInfoComponent = () => {
+    const {updateMyProfile, setSalesView, setLikesView, setOffersView, setBuyView, currentView} = usemyprofileStore(state => state)
 
     const [userDTO, setUserDTO] = useState({
         id : '',
@@ -43,7 +45,7 @@ const MyProfileInfoComponent = () => {
         }
         
         fetchData();
-    },[])
+    },[updateMyProfile])
 
     useEffect(()=>{
 
@@ -64,18 +66,18 @@ const MyProfileInfoComponent = () => {
                 <div className="divider divider-default"></div>
                 <div className="flex justify-around text-center font-bold ">
                     <div>
-                        <p className="text-lg mb-1">판매 상품</p>
-                        <p className="text-lg">{countSale}</p>
+                        <p className={`text-lg mb-1 ${currentView === 'sales' ? 'text-orange-600' : ''}`} onClick={setSalesView}>판매 상품</p>
+                        <p className={`text-lg mb-1 ${currentView === 'sales' ? 'text-orange-600' : ''}`} onClick={setSalesView}>{countSale}</p>
                     </div>
                     <div>
-                        <p className="text-lg mb-1">찜한 상품</p>
-                        <p className="text-lg">{countLike}</p>
+                        <p className={`text-lg mb-1 ${currentView === 'likes' ? 'text-orange-600' : ''}`} onClick={setLikesView}>찜한 상품</p>
+                        <p className={`text-lg mb-1 ${currentView === 'likes' ? 'text-orange-600' : ''}`} onClick={setLikesView}>{countLike}</p>
                     </div><div>
-                        <p className="text-lg mb-1">가격 제안</p>
-                        <p className="text-lg">{countOffer}</p>
+                        <p className={`text-lg mb-1 ${currentView === 'offers' ? 'text-orange-600' : ''}`} onClick={setOffersView}>가격 제안</p>
+                        <p className={`text-lg mb-1 ${currentView === 'offers' ? 'text-orange-600' : ''}`} onClick={setOffersView}>{countOffer}</p>
                     </div><div>
-                        <p className="text-lg mb-1">구매 내역</p>
-                        <p className="text-lg">{countBuy}</p>
+                        <p className={`text-lg mb-1 ${currentView === 'buy' ? 'text-orange-600' : ''}`} onClick={setBuyView}>구매 내역</p>
+                        <p className={`text-lg mb-1 ${currentView === 'buy' ? 'text-orange-600' : ''}`}  onClick={setBuyView}>{countBuy}</p>
                     </div>
                 </div>
             </div>
