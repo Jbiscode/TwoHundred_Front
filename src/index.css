@@ -4,6 +4,9 @@
 :root{
   background-color: #fff;
 }
+input.input{
+	background-color: #fff;
+}
 div{
   /* font-size: 20px; */
 }
