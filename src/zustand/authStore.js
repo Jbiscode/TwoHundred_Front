@@ -8,7 +8,7 @@ export const useAuthStore = create(
       token: null,
       isLoggedin: false,
       user: null,
-      id: null,
+      id: 0,
       getToken: () => get().token,
       getUser: () => get().user,
       getId: () => get().id,
@@ -16,7 +16,7 @@ export const useAuthStore = create(
       setToken: (token) => set({ token, isLoggedin: true }),
       setUser: (user) => set({ user }),
       setId: (id) => set({ id }),
-      removeToken: () => set({ token: null, isLoggedin: false, user: null, id: null }),
+      removeToken: () => set({ token: null, isLoggedin: false, user: null, id: 0 }),
       login: async (username, password) => {
         try {
           const token = await login(username, password);

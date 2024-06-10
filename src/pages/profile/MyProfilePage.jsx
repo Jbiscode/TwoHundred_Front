@@ -1,7 +1,3 @@
-import React, { useEffect, useState } from "react";
-import PROFILE_IMAGE from "@/assets/images/sorage.png"
-import CLOTHES from "@/assets/images/clothes.png"
-import { Link } from "react-router-dom";
 import MyProfileInfoComponent from "@components/profile/MyProfileInfoComponent";
 import SaleComponent from "@components/profile/SaleComponent";
 import LikeComponent from "@components/profile/LikeComponent";
