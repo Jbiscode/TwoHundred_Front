@@ -5,6 +5,36 @@ import filter from '@assets/images/icon/filter.svg';
 
 const Search = () => {
 
+    const [articleDTO, setArticleDTO] = useState({
+        id : '',
+        category : '',
+        title: '',
+        content : '',
+        price : '',
+        tradeMethod : '',
+        createDate : '',
+        addr1 : '',
+        addr2 : '',
+    });
+
+    const {id, category, title, content, price, tradeMethod, createDate, addr1, addr2} = articleDTO
+
+    useEffect(() => {
+        fetch('http://localhost:8080/api/v1/search')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched categories:', data); // 로그 추가
+
+                if (Array.isArray(data)) {
+                    setArticleDTO(data);
+                } else {
+                    console.error('Expected an array but got:', data);
+                }
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+    }, []);
+    
+
     const categoryCode = [
         {
             id : '가전 제품',
