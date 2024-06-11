@@ -1,12 +1,22 @@
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const ChatAlarm = ({ t, newMessage }) => {
+  const navigate = useNavigate();
+
+  const handleLinkClick = (event) => {
+    event.preventDefault();
+    toast.dismiss(t.id);
+    setTimeout(() => {
+      navigate("/chat");
+    }, 1000);
+  };
   return (
     <div
       className={`${
         t.visible ? "animate-enter" : "animate-leave"
       } max-w-md w-full bg-slate-200 shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5`}>
-      <div className="flex-1 w-0 p-4">
+      <button to="/chat" onClick={handleLinkClick} className="flex-1 w-0 p-4">
         <div className="flex items-start">
           <div className="flex-shrink-0 pt-0.5">
             <img
@@ -20,7 +30,7 @@ const ChatAlarm = ({ t, newMessage }) => {
             <p className="mt-1 text-sm text-gray-500">{newMessage.message}</p>
           </div>
         </div>
-      </div>
+      </button>
       <div className="flex border-l border-gray-200">
         <button
           onClick={() => toast.dismiss(t.id)}

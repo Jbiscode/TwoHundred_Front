@@ -7,7 +7,7 @@ import useGetLastMessageAndUnread from "@hooks/chat/useGetLastMessageAndUnread";
 const ChatListComponent = () => {
     const { user } = authStore();
     const { loading, conversations } = useGetConversations();
-    const { lastMessage, unreadCount } = useGetLastMessageAndUnread(conversations);
+    const { lastMessage, unreadCount, modifiedDate } = useGetLastMessageAndUnread(conversations);
 
 
     return (
@@ -28,6 +28,7 @@ const ChatListComponent = () => {
                             user={user}
                             lastMessage={lastMessage[chat.id]}
                             unreadCount={unreadCount[chat.id]}
+                            modifiedDate={modifiedDate[chat.id]}
                         />
                     ))
                 )}
