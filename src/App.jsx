@@ -4,6 +4,7 @@ import {RouterProvider} from "react-router-dom";
 import root from "@router/root.jsx";
 import authStore from "@zustand/authStore";
 import useSocketStore from "@zustand/useSocketStore";
+import { useEffect } from "react";
 
 
 function App() {
