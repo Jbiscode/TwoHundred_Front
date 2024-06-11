@@ -8,7 +8,7 @@ const useSocketStore = create((set) => ({
     setSocket: (newSocket) => set({ socket: newSocket }),
     setOnlineUsers: (users) => set({ onlineUsers: users }),
     initializeSocket: (userId) => {
-        const newSocket = io(`${SOCKET_API_URL}/socket.io`, {
+        const newSocket = io(`${SOCKET_API_URL}/socket.start`, {
             query: { userId },
         });
 
