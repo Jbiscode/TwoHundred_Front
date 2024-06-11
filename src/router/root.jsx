@@ -4,6 +4,8 @@ import { lazy, Suspense } from "react";
 import postRouter from "@router/postRouter.jsx";
 import chatRouter from "@router/chatRouter.jsx";
 import profileRouter from "./profileRouter";
+import ParentModal from "@components/templates/ParentModal";
+
 
 
 const Loading = <div>Loading....</div>;
@@ -20,6 +22,7 @@ const root = createBrowserRouter([
         path: "/",
         element: (
         <Suspense fallback={Loading}>
+                <ParentModal/>
                 <IndexPage />
         </Suspense>
         ),
@@ -28,6 +31,7 @@ const root = createBrowserRouter([
         path: "/search",
         element: (
             <Suspense fallback={Loading}>
+                <ParentModal/>
                 <SearchPage/>
             </Suspense>
         ),
@@ -36,6 +40,7 @@ const root = createBrowserRouter([
         path : "/users",
         element : (
             <Suspense fallback={Loading}>
+                <ParentModal/>
                 <ProfilePage/>
             </Suspense>
         ),
@@ -45,6 +50,7 @@ const root = createBrowserRouter([
         path: "/post",
         element: (
             <Suspense fallback={Loading}>
+                <ParentModal/>
                 <PostPage />
             </Suspense>
         ),
@@ -54,6 +60,7 @@ const root = createBrowserRouter([
         path: "/chat",
         element: (
             <Suspense fallback={Loading}>
+                <ParentModal/>
                 <ChatPage />
             </Suspense>
         ),

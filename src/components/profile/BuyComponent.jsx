@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import CLOTHES from "@/assets/images/clothes.png"
-import useAuthStore from "@zustand/authStore"
 import {auth} from "@api/index"
 import useModalStore from "@zustand/modalStore"
+import usemyprofileStore from "@zustand/myprofileStore";
 
 
 const BuyComponent = ({updateMyProfileInfo }) => {
-    const {openLoginModal} = useModalStore(state => state)
+    const {openLoginModal, openWriteReviewModal} = useModalStore(state => state)
+    const {setSelectReviewId} = usemyprofileStore(state => state)
 
     const [sortBy, setSortBy] = useState('latest')
     const [tradeStatus, setTradeStatus] = useState('ON_SALE')
@@ -47,6 +46,11 @@ const BuyComponent = ({updateMyProfileInfo }) => {
         
         fetchData();
     },[page,tradeStatus,sortBy,like])
+
+    const handleClickReview = (articleId) => {
+        setSelectReviewId(articleId)
+        openWriteReviewModal();
+    }
 
     const handleTradeStatusChangeSoldOut = () => {
         setTradeStatus('SOLD_OUT')
@@ -133,7 +137,16 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                                 <p>|</p>
                                 <p>{item.timeAgo}</p>
                             </div>
-                            <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
+                            <div className="flex justify-between items-center">
+                                <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
+                                {
+                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral">작성완료</button>
+                                }
+                                {
+                                    item.isReviewed ||  <button className="btn btn-sm btn-secondary" onClick={() => {handleClickReview(item.id)}}>리뷰작성</button>
+                                }
+                               
+                            </div>
                         </div>
                     ))
                 }
