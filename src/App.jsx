@@ -2,16 +2,14 @@ import '@styles/common/index.scss'
 import './App.css'
 import {RouterProvider} from "react-router-dom";
 import root from "@router/root.jsx";
-import ParentModal from './components/templates/ParentModal';
 import authStore from "@zustand/authStore";
 import useSocketStore from "@zustand/useSocketStore";
-import { useEffect } from "react";
 
 
 function App() {
   const { id } = authStore();
   const { initializeSocket, closeSocket} = useSocketStore();
-
+ 
   // useEffect(() => {
   //     if (id !== null) {
   //     initializeSocket(id);
@@ -21,8 +19,7 @@ function App() {
   // }, [id, initializeSocket, closeSocket]);
   return (
     <>
-    <RouterProvider router={root}/>
-    <ParentModal/>
+      <RouterProvider router={root}/>
     </>
   );
 }
