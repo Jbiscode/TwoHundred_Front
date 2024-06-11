@@ -12,13 +12,13 @@ function App() {
   const { id } = authStore();
   const { initializeSocket, closeSocket} = useSocketStore();
 
-  // useEffect(() => {
-  //     if (id !== null) {
-  //     initializeSocket(id);
-  //     } else {
-  //     closeSocket();
-  //     }
-  // }, [id, initializeSocket, closeSocket]);
+  useEffect(() => {
+      if (id !== null) {
+      initializeSocket(id);
+      } else {
+      closeSocket();
+      }
+  }, [id, initializeSocket, closeSocket]);
   return (
     <>
     <RouterProvider router={root}/>
