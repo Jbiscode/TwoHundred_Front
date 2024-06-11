@@ -51,17 +51,17 @@ export const logout = async () => {
 
 export const refreshToken = async () => {
   try {
-    const refreshTokenResponse = await instance.post('/api/refreshToken');
+    const refreshTokenResponse = await instance.get('/api/refreshToken');
 
     console.log("refreshTokenResponse", refreshTokenResponse);
     if (refreshTokenResponse.resultCode == 200) {
       const newToken = refreshTokenResponse.headers.get("Authorization");
+      console.log("newToken", newToken);
 
-      useAuthStore.getState().setToken(newToken);
-      console.log("새로운 토큰 저장 완료");
+      return newToken;
     } else {
       console.log("토큰 재발급 실패");
-      // useAuthStore.getState().logout();
+      useAuthStore.getState().logout();
     }
   } catch (refreshError) {
     console.error("토큰 재발급 중 에러 발생:", refreshError);
