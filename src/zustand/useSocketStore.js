@@ -12,6 +12,7 @@ const useSocketStore = create((set) => ({
             query: { userId },
         });
 
+        console.log("API URL: ", SOCKET_API_URL);
         newSocket.on("getOnlineUsers", (users) => {
         set({ onlineUsers: users });
         });
