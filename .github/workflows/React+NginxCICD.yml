@@ -35,7 +35,7 @@ jobs:
       - name: Env File add
         run: |
           touch .env
-          echo ${{ secrets.SECRET_DEV }} >> .env
+          echo ${{ secrets.SECRET_DEV }} | base64 -d >> .env
           cat .env
           ls -alrth
       - name: Build
