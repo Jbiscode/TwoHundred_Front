@@ -8,7 +8,7 @@ const useSocketStore = create((set) => ({
     setSocket: (newSocket) => set({ socket: newSocket }),
     setOnlineUsers: (users) => set({ onlineUsers: users }),
     initializeSocket: (userId) => {
-        const newSocket = io(`https://api-bidbuy.duckdns.org:5000`, {
+        const newSocket = io(SOCKET_API_URL, {
             query: { userId },
         });
 
