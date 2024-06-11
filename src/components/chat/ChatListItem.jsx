@@ -1,9 +1,9 @@
 import conversationStore from "@zustand/conversationStore";
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isValid } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useNavigate } from "react-router-dom";
 
-const ChatListItem = ({ chat, user, lastMessage, unreadCount }) => {
+const ChatListItem = ({ chat, user, lastMessage, unreadCount,modifiedDate }) => {
   const { setSelectedConversation } = conversationStore();
 
   const navigate = useNavigate();
@@ -12,6 +12,10 @@ const ChatListItem = ({ chat, user, lastMessage, unreadCount }) => {
     setSelectedConversation(chatId);
     navigate(`/chat/room/${chatId}`);
   };
+
+  const formattedDate = isValid(new Date(modifiedDate)) 
+  ? formatDistanceToNow(new Date(modifiedDate), { addSuffix: true, locale: ko }) 
+  : 'Invalid date';
 
   return (
     <li
@@ -36,7 +40,7 @@ const ChatListItem = ({ chat, user, lastMessage, unreadCount }) => {
             )}
           </h3>
           <div className="text-sm text-gray-400 ml-2">
-            {chat.addr1} {chat.addr2} · {formatDistanceToNow(new Date(chat.modified_date), { addSuffix: true, locale: ko })}
+            {chat.addr1} {chat.addr2} · {formattedDate}
           </div>
         </div>
         <p className="text-gray-500">{lastMessage}</p>
