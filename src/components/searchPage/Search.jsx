@@ -1,26 +1,45 @@
 import React, { useEffect, useRef, useState } from 'react';
 import filter from '@assets/images/icon/filter.svg';
+import { useLocation } from 'react-router-dom';
 
 
 
 const Search = () => {
-
     const [articleDTO, setArticleDTO] = useState([]);
+    const location = useLocation();
+    const query = new URLSearchParams(location.search).get('content');
+    const [searchContent, setSearchContent] = useState(query || '');
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/search')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched categories:', data); // 로그 추가
+        if (query !== searchContent) {
+            setSearchContent(query || '');
+        }
+    }, [query]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            let url = `http://localhost:8080/api/v1/search`;
+            if (searchContent) {
+                url += `?content=${searchContent}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                console.log('Fetched categories:', data);
 
                 if (Array.isArray(data.data)) {
                     setArticleDTO(data.data);
                 } else {
                     console.error('Expected an array but got:', data);
                 }
-            })
-            .catch(error => console.error('Error fetching categories:', error));
-    }, []);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchData();
+    }, [searchContent]);
     
     const articleCount = articleDTO.length;
 
@@ -227,7 +246,7 @@ const Search = () => {
             <div className="text-2xl">
                 {/* <h3>{`"${title || ''}" 의 검색결과`}</h3> */}
                 <h3 className="inline-block m-0 text-m font-bold border-b-2 border-gray-300">
-                    "------"의 검색 결과
+                    " {searchContent} "의 검색 결과
                 </h3>
 
                 {/* <span>{title ? goodsList.length : 0}</span> */}
@@ -286,7 +305,7 @@ const Search = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p>No articles available.</p>
+                                <p className='text-sm'>관련 상품이 존재하지 않습니다!</p>
                             )}
                         </div>
                     </div>

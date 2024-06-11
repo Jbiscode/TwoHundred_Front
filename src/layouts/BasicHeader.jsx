@@ -1,24 +1,52 @@
-import {Link} from "react-router-dom";
+import { useState } from "react";
+import {Link, useNavigate} from "react-router-dom";
 
 function BasicHeader() {
+    const [searchContent, setSearchContent] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearchChange = (e) => {
+        setSearchContent(e.target.value);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchClick();
+        }
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        searchClick();
+    };
+
+    const searchClick = () => {
+        navigate(`/search?content=${searchContent}`);
+    };
+
     return (
         <div className="bg-white w-full h-full">
             <div className="hidden sm:block">
                 <div className="navbar bg-white mb-2">
                     <div className="flex-1 ml-4">
                         <Link to={'/'} className="btn btn-ghost text-xl">Bid&Buy</Link>
-
+                        <form onSubmit={handleSubmit} >
                         <label className="w-full input input-bordered flex items-center gap-2 ml-4 bg-white">
                             <input
                                 type="text"
                                 className="grow"
                                 placeholder="상품명을 입력해주세요."
+                                value={searchContent}
+                                onChange={handleSearchChange}
+                                //onKeyDown={handleKeyDown}
                             />
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 16 16"
                                 fill="currentColor"
                                 className="w-4 h-4 opacity-70"
+                                onClick={searchClick}
                             >
                                 <path
                                     fillRule="evenodd"
@@ -26,7 +54,9 @@ function BasicHeader() {
                                     clipRule="evenodd"
                                 />
                             </svg>
-                        </label>
+                        </label>    
+                        </form>
+                        
                     </div>
                     <div className="flex-none mr-10">
                         <ul className="menu menu-horizontal">
@@ -59,7 +89,10 @@ function BasicHeader() {
                     </div>
                     <div className="flex-none gap-2">
                         <div className="form-control mr-4">
-                            <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto bg-white" />
+                            <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto bg-white" 
+                                value={searchContent}
+                                onChange={handleSearchChange}
+                                onKeyDown={handleKeyDown}/>
                         </div>
                         <div className="dropdown dropdown-end mr-10">
                             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
@@ -80,7 +113,10 @@ function BasicHeader() {
                     </div>
                 </div>
             </div>
+
         </div>
+
+
     );
 }
 
