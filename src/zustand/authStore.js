@@ -39,7 +39,7 @@ export const useAuthStore = create(
       logout: async () => {
         try {
           await logout();
-          set({ token: null, isLoggedin: false, user: null });
+          set({ token: null, isLoggedin: false, user: null, id: 0 });
         } catch (error) {
           console.error(error);
           throw error;

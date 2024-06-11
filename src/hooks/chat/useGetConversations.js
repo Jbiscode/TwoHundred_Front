@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import authStore from '@zustand/authStore';
 
 const useGetConversations = () => {
-  const { token } = authStore();
+  const { token, refreshToken } = authStore();
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
 
@@ -20,8 +20,11 @@ const useGetConversations = () => {
             "Authorization": `${token}`,
           },
         });
-        const data = await response.json();  
-        console.log(data);
+        if(response.status === 401){
+          refreshToken();
+        }
+          const data = await response.json();  
+          console.log(data);
         if(data.length > 0){
           setConversations(data);
         } else {
@@ -36,7 +39,7 @@ const useGetConversations = () => {
       
     };
     getConversation();
-  },[token]);
+  },[token, refreshToken]);
 
   return { loading, conversations };
 };
