@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import filter from '@assets/images/icon/filter.svg';
 import { useLocation } from 'react-router-dom';
+import {instance} from '@api/index.js';
 
 
 
@@ -9,6 +10,9 @@ const Search = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search).get('content');
     const [searchContent, setSearchContent] = useState(query || '');
+    const [selectedOption, setSelectedOption] = useState('latest');
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedtrade, setSelectedtrade] = useState(null);
 
     useEffect(() => {
         if (query !== searchContent) {
@@ -17,119 +21,122 @@ const Search = () => {
     }, [query]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            let url = `http://localhost:8080/api/v1/search`;
-            if (searchContent) {
-                url += `?content=${searchContent}`;
-            }
+        let url = `/api/v1/search`;
+        switch (selectedOption) {
+            case 'latest':
+                url += `/orderByLatest`;
+                break;
+            case 'lowPrice':
+                url += `/orderByRowPrice`;
+                break;
+            case 'highPrice':
+                url += `/orderByHighPrice`;
+                break;
+            default:
+                break;
+        }
+        if (searchContent) {
+            url += `?content=${searchContent}`;
+        }
+        if (selectedCategory) {
+            url += `?category=${selectedCategory}`;
+        }
+        if (selectedtrade) {
+            url += `?tradeMethod=${selectedtrade}`;
+        }
 
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                console.log('Fetched categories:', data);
-
-                if (Array.isArray(data.data)) {
-                    setArticleDTO(data.data);
+        instance.get(url)
+            .then(response => {
+                console.log('Fetched categories:', response);
+                return response.data;
+            })
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setArticleDTO(data);
                 } else {
                     console.error('Expected an array but got:', data);
                 }
-            } catch (error) {
+            })
+            .catch(error => {
                 console.error('Error fetching categories:', error);
-            }
-        };
-
-        fetchData();
-    }, [searchContent]);
+            });
+    }, [searchContent, selectedOption, selectedCategory, selectedtrade]);
     
     const articleCount = articleDTO.length;
 
     const categoryCode = [
         {
-            id : '가전 제품',
+            id : 'MEMBERSHIP',
             value : false,
-            htmlFor: '가전 제품',
+            htmlFor: '회원권',
             key: 1,
         },
         {
-            id : '무료 나눔',
+            id : 'PT',
             value : false,
-            htmlFor: '무료 나눔',
+            htmlFor: 'PT',
             key: 2,
         },
         {
-            id : '여성 잡화',
+            id : 'HEALTH_SUPPLIES',
             value : false,
-            htmlFor: '여성 잡화',
+            htmlFor: '헬스용품',
             key: 3,
         },
         {
-            id : '남성 잡화',
+            id : 'HEALTH_EQUIPMENT',
             value : false,
-            htmlFor: '남성 잡화',
+            htmlFor: '헬스장비',
             key: 4,
         },
         {
-            id : '스포츠 / 레저',
+            id : 'SPORT_WEAR',
             value : false,
-            htmlFor: '스포츠 / 레저',
+            htmlFor: '스포츠웨어',
             key: 5,
         },
         {
-            id : '반려동물 용품',
+            id : 'FOOD',
             value : false,
-            htmlFor: '반려동물 용품',
+            htmlFor: '건강식품',
             key: 6,
         },
-        {
-            id : '뷰티 / 미용',
-            value : false,
-            htmlFor: '뷰티 / 미용',
-            key: 7,
-        }
     ]
 
     const tradeMethodCode = [
         {
             htmlFor: '상관없음',
-            key: 2,
+            key: 1,
             value: false,
-            id: '상관없음'  
+            id: 'NO_MATTER'  
         },
         {
             htmlFor: '직거래',
             key: 2,
             value: false,
-            id: '직거래'
+            id: 'FACE_TO_FACE'
         },
         {
             htmlFor: '택배 거래',
-            key: 2,
+            key: 3,
             value: false,
-            id: '택배 거래'
+            id: 'DELIVERY'
         }
     ]
 
     //카테고리 선택
-    const [selectedCategory, setSelectedCategory] = useState(null);
-
-   
     const handleSelectCategory = (item) => {
         setSelectedCategory(item.id);
     };
     
     //거래방식 선택
-    const [selectedtrade, setSelectedtrade] = useState(null);
-
-    
     const handleSelectedtrade = (item) => {
         setSelectedtrade(item.id); 
     };
 
     //정렬
-    const [selectedOption, setSelectedOption] = useState('');
-
-    const handleSelectOption = (option) => {
-        setSelectedOption(option);
+    const handleSelectOption = (id) => {
+        setSelectedOption(id);
     };
 
 
@@ -175,7 +182,7 @@ const Search = () => {
                                                 className="cursor-pointer text-sm"
                                                 htmlFor={item.htmlFor}
                                                 onClick={() => handleSelectCategory(item)}>
-                                                {item.id}
+                                                {item.htmlFor}
                                             </label>
                                         </div>
                                     ))}
@@ -192,7 +199,7 @@ const Search = () => {
                                                 className="flex items-center cursor-pointer"
                                                 htmlFor={item.htmlFor}
                                                 onClick={() => handleSelectedtrade(item)}>
-                                                <span className='text-sm'>{item.id}</span>
+                                                <span className='text-sm'>{item.htmlFor}</span>
                                             </label>
                                         </div>
                                     ))}
@@ -241,7 +248,7 @@ const Search = () => {
             </div>
 
             {/* header */}
-            <div className="w-[90%] mx-auto">
+            <div className="w-[90%] mx-auto ">
             <div className="text-2xl">
             <div className="text-2xl">
                 {/* <h3>{`"${title || ''}" 의 검색결과`}</h3> */}
@@ -252,7 +259,7 @@ const Search = () => {
                 {/* <span>{title ? goodsList.length : 0}</span> */}
                 <span className="ml-2 text-red-500 text-[20px]">{articleCount}</span>
             </div>
-            <div className="mt-2 w-full flex justify-between items-center">
+            <div className="mt-5 w-full flex justify-between items-center">
                 <div className="">
                 <div
                     className="border-solid border border-gray-300 cursor-pointer p-1 bg-white rounded-lg flex items-center text-sm"
@@ -268,40 +275,45 @@ const Search = () => {
                 <div className="flex justify-end items-center mt-2">
                     <div
                         className={`text-[12px] after:content-[''] after:mx-2 after:border after:border-gray-300 cursor-pointer ${selectedOption === 'latest' ? 'text-red-500' : ''}`}
+                        id='latest'
                         onClick={() => handleSelectOption('latest')}
                     >
                         최신순
                     </div>
                     <div
                         className={`text-[12px] after:content-[''] after:mx-2 after:border after:border-gray-300  cursor-pointer ${selectedOption === 'lowPrice' ? 'text-red-500' : ''}`}
+                        id='lowPrice'
                         onClick={() => handleSelectOption('lowPrice')}
                     >
                         낮은 가격순
                     </div>
                     <div
                         className={`text-[12px] cursor-pointer ${selectedOption === 'highPrice' ? 'text-red-500' : ''}`}
+                        id='highPrice'
                         onClick={() => handleSelectOption('highPrice')}
                     >
                         높은 가격순
                     </div>
-                    </div>
+                </div>
             </div>
             </div>
             </div>
 
             {/* body */}
-            <div className='w-[90%] mx-auto'>
+            <div className='w-[90%] mx-auto mt-5'>
                 <div className="goods">
-                    <div className="goods-wrapper">
-                        <div className="goods-list">
+                    <div className="goods-wrapper w-full grid justify-center box-border">
+                        <div className="goods-list mr-7 ml-3 w-full grid box-border list-none grid-cols-2">
                             {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
                                 articleDTO.map((item) => (
-                                    <div key={item.id} className="goods-cont">
-                                        <a href="#"><img src={item.imageUrl} alt={item.imageId} className="goods-icn" /></a>
-                                        <span className="goods-cont_title">{item.title}</span>
-                                        <span className="goods-cont_meta">{item.addr1} {item.addr2}</span>
-                                        <span className="goods-cont_bottom"></span>
-                                        <span className="goods-cont_price">{item.price}</span>
+                                    <div key={item.id} className="goods-cont mb-4">
+                                        <a href="#"><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/s_${item.imageUrl}`} alt={item.imageId} className="goods-icn items-center max-w-[165px] h-[211px]" /></a>
+                                        <span className="w-full text-base font-medium  truncate h-5 break-words inline-block line-clamp-1">
+                                            {item.title}
+                                        </span>
+                                        <span className="text-sm  text-gray-500">{item.addr1} {item.addr2}</span>
+                                        <span className="flex justify-between goods-cont_bottom"></span>
+                                        <span className="text-lg font-extrabold goods-cont_price">{item.price}</span>
                                     </div>
                                 ))
                             ) : (
@@ -311,6 +323,7 @@ const Search = () => {
                     </div>
                 </div>
             </div>
+            
         </div>
         
 
