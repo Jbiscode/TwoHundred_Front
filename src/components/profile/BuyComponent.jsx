@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import CLOTHES from "@/assets/images/clothes.png"
-import useAuthStore from "@zustand/authStore"
 import {auth} from "@api/index"
 import useModalStore from "@zustand/modalStore"
+import usemyprofileStore from "@zustand/myprofileStore";
 
 
-const SaleComponent = () => {
-    const {openLoginModal} = useModalStore(state => state)
+const BuyComponent = ({updateMyProfileInfo }) => {
+    const {openLoginModal, openWriteReviewModal} = useModalStore(state => state)
+    const {setSelectReviewId} = usemyprofileStore(state => state)
 
     const [sortBy, setSortBy] = useState('latest')
     const [tradeStatus, setTradeStatus] = useState('ON_SALE')
@@ -18,14 +17,14 @@ const SaleComponent = () => {
     const [isExistNext, setIsExistNext] = useState(false)
     const [nextPage, setNextPage] = useState();
     const [prevPage, setPrevPage] = useState();
-    
+    const [like, setLike] = useState(false);
 
     useEffect(()=>{
         const fetchData = async () => {
             // 로그인이 필요한 정보받아오기
             try{
                 const response = await auth.get(
-                    `/api/v1/users/me/${tradeStatus}/${sortBy}?page=${page}`,
+                    `/api/v1/users/me/buys/${tradeStatus}/${sortBy}?page=${page}`,
                     {withCredentials: true}
                 )
             if(response.resultCode == '401'){
@@ -46,7 +45,12 @@ const SaleComponent = () => {
         }
         
         fetchData();
-    },[page,tradeStatus,sortBy])
+    },[page,tradeStatus,sortBy,like])
+
+    const handleClickReview = (articleId) => {
+        setSelectReviewId(articleId)
+        openWriteReviewModal();
+    }
 
     const handleTradeStatusChangeSoldOut = () => {
         setTradeStatus('SOLD_OUT')
@@ -73,14 +77,37 @@ const SaleComponent = () => {
         setPage(1)
     }
 
+    const handleLikeChange = (id,isLiked) => {
+        console.log('왜 안눌리누?')
+        console.log(id)
+        const fetch = async() => {
+            try{
+                const response = await auth.put(
+                    `/api/v1/users/me/likes/${id}`,
+                    {withCredentials: true}
+                )
+                if(response.resultCode == '401'){
+                    openLoginModal()
+                }
+                if(response.resultCode == '200'){
+                    console.log("click")
+                    setLike(prev => !prev)
+                    updateMyProfileInfo();
+                }
+            }catch(error){
+                console.log(error)
+            }
+        }
+        fetch()
+    }
+
 
     return (
         <div>
-            <p className="font-bold pt-4 mb-3">판매 상품</p>
+            <p className="font-bold pt-4 mb-3">구매 내역</p>
             <div>
                 <div className="w-full flex border-solid border-t-2 border-black text-lg">
-                    <div className="w-1/2 "><p className={`block w-full text-center py-3 text-base font-bold border-solid border-b-2 ${tradeStatus === 'ON_SALE' ? 'border-black' : 'border-gray-300'}`} onClick={handleTradeStatusChangeOnSale}>판매중</p></div>
-                    <div className="w-1/2 "><p className={`block w-full text-center py-3 text-base font-bold border-solid border-b-2 ${tradeStatus === 'SOLD_OUT' ? 'border-black' : 'border-gray-300'}`} onClick={handleTradeStatusChangeSoldOut}>판매완료</p></div>
+                <div className="w-full"><p className={`block w-full text-center py-3 text-base font-bold border-solid border-b-2 border-black`} >구매 내역</p></div>
                 </div>
             </div>
             <div className="flex text-base font-bold justify-end my-4 gap-2 items-center">
@@ -102,6 +129,7 @@ const SaleComponent = () => {
                                             거래 완료
                                         </div>
                                 }
+                                <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={()=>{handleLikeChange(item.id, item.isLiked)}}/>
                             </div>
                             <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-2">{item.title}</p>
                             <div className="my-2 flex text-sm gap-1 font-bold text-gray-400">
@@ -109,7 +137,16 @@ const SaleComponent = () => {
                                 <p>|</p>
                                 <p>{item.timeAgo}</p>
                             </div>
-                            <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
+                            <div className="flex justify-between items-center">
+                                <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
+                                {
+                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral">작성완료</button>
+                                }
+                                {
+                                    item.isReviewed ||  <button className="btn btn-sm btn-secondary" onClick={() => {handleClickReview(item.id)}}>리뷰작성</button>
+                                }
+                               
+                            </div>
                         </div>
                     ))
                 }
@@ -129,4 +166,4 @@ const SaleComponent = () => {
     )
 }
 
-export default SaleComponent
+export default BuyComponent

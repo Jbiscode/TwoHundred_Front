@@ -1,9 +1,47 @@
 import React, { useEffect, useRef, useState } from 'react';
 import filter from '@assets/images/icon/filter.svg';
+import { useLocation } from 'react-router-dom';
 
 
 
 const Search = () => {
+    const [articleDTO, setArticleDTO] = useState([]);
+    const location = useLocation();
+    const query = new URLSearchParams(location.search).get('content');
+    const [searchContent, setSearchContent] = useState(query || '');
+
+    useEffect(() => {
+        if (query !== searchContent) {
+            setSearchContent(query || '');
+        }
+    }, [query]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            let url = `http://localhost:8080/api/v1/search`;
+            if (searchContent) {
+                url += `?content=${searchContent}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                console.log('Fetched categories:', data);
+
+                if (Array.isArray(data.data)) {
+                    setArticleDTO(data.data);
+                } else {
+                    console.error('Expected an array but got:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchData();
+    }, [searchContent]);
+    
+    const articleCount = articleDTO.length;
 
     const categoryCode = [
         {
@@ -115,37 +153,33 @@ const Search = () => {
                         <div className="inset-y-0 right-0">
                             {/* 카테고리 */}
                             <div className="px-8 pt-10 w-screen">
-                            <div className="flex justify-between items-center border-b-2 border-solid pb-4">
-                                <h3 className="font-bold text-lg">카테고리</h3>
-                                <button className="btn btn-square bg-white border-0" type='reset' onClick={() => setIsopenedFilter(!isopenedFilter)}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 bg-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <ul className="flex flex-col space-y-2 h-48 pt-3 overflow-y-auto">
-                                {categoryCode.map((item) => (
-                                <>
-                                <div key={item.id} className={selectedCategory === item.id ? 'text-green-700' : 'text-black'}>
-                                    <input
-                                        type="radio"
-                                        id={item.id}
-                                        className="hidden"
-                                        value={item.value}
-                                        onChange={() => handleSelectCategory(item)}
-                                        />
-                                    <label
-                                        className="cursor-pointer text-sm"
-                                        htmlFor={item.htmlFor}
-                                        key={item.key}
-                                        value={item.value}
-                                        onClick={() => handleSelectCategory(item)}>
-                                        {item.id}
-                                    </label>
+                                <div className="flex justify-between items-center border-b-2 border-solid pb-4">
+                                    <h3 className="font-bold text-lg">카테고리</h3>
+                                    <button className="btn btn-square bg-white border-0" type='reset' onClick={() => setIsopenedFilter(!isopenedFilter)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 bg-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                                 </div>
-                                </>
-                                ))}
-                            </ul>
+                                <ul className="flex flex-col space-y-2 h-48 pt-3 overflow-y-auto">
+                                    {categoryCode.map((item) => (
+                                        <div key={item.id} className={selectedCategory === item.id ? 'text-green-700' : 'text-black'}>
+                                            <input
+                                                type="radio"
+                                                id={item.id}
+                                                className="hidden"
+                                                value={item.value}
+                                                onChange={() => handleSelectCategory(item)}
+                                            />
+                                            <label
+                                                className="cursor-pointer text-sm"
+                                                htmlFor={item.htmlFor}
+                                                onClick={() => handleSelectCategory(item)}>
+                                                {item.id}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </ul>
                             </div>
 
                             {/* 거래 방식 */}
@@ -157,20 +191,17 @@ const Search = () => {
                                             <label
                                                 className="flex items-center cursor-pointer"
                                                 htmlFor={item.htmlFor}
-                                                key={item.key}
-                                                value={item.value}
                                                 onClick={() => handleSelectedtrade(item)}>
-                                                <span className='text-sm'
-                                                >{item.id}</span>
+                                                <span className='text-sm'>{item.id}</span>
                                             </label>
-                                        </div> 
+                                        </div>
                                     ))}
-                                    
                                 </div>
                             </div>
 
+
                             {/* 가격 */}
-                            <div className="px-8 pt-10">
+                            {/* <div className="px-8 pt-10">
                                 <h3 className="font-bold pb-4 text-lg border-b-2 border-solid">가격</h3>
                                 <div className="flex flex-col space-y-4 mt-10">
                                     <div className="flex space-x-4">
@@ -192,7 +223,7 @@ const Search = () => {
                                             가격은 숫자로만 입력할 수 있어요!
                                     </p>
                                 </div>
-                            </div>
+                            </div> */}
 
                         </div>
                         <div className="pt-10 flex flex-col items-center space-y-4">
@@ -215,11 +246,11 @@ const Search = () => {
             <div className="text-2xl">
                 {/* <h3>{`"${title || ''}" 의 검색결과`}</h3> */}
                 <h3 className="inline-block m-0 text-m font-bold border-b-2 border-gray-300">
-                    "------"의 검색 결과
+                    " {searchContent} "의 검색 결과
                 </h3>
 
                 {/* <span>{title ? goodsList.length : 0}</span> */}
-                <span className="ml-2 text-red-500 text-[20px]">30</span>
+                <span className="ml-2 text-red-500 text-[20px]">{articleCount}</span>
             </div>
             <div className="mt-2 w-full flex justify-between items-center">
                 <div className="">
@@ -260,8 +291,24 @@ const Search = () => {
 
             {/* body */}
             <div className='w-[90%] mx-auto'>
-                <div className="">
-                    상품
+                <div className="goods">
+                    <div className="goods-wrapper">
+                        <div className="goods-list">
+                            {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
+                                articleDTO.map((item) => (
+                                    <div key={item.id} className="goods-cont">
+                                        <a href="#"><img src={item.imageUrl} alt={item.imageId} className="goods-icn" /></a>
+                                        <span className="goods-cont_title">{item.title}</span>
+                                        <span className="goods-cont_meta">{item.addr1} {item.addr2}</span>
+                                        <span className="goods-cont_bottom"></span>
+                                        <span className="goods-cont_price">{item.price}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className='text-sm'>관련 상품이 존재하지 않습니다!</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

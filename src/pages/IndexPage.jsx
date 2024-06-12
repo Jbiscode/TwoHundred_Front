@@ -17,12 +17,16 @@ import newest from '@assets/images/icon/newest.png';
 
 
 import BasicLayout from '@layouts/BasicLayout';
+import useSocketStore from '@zustand/useSocketStore';
+import { toast } from 'react-hot-toast';
+import ChatAlarm from '@components/chat/ChatAlarm';
 
 
 function IndexPage() {
     
     //배너
     const [currentSlide, setCurrentSlide] = useState(0);
+    const { socket } = useSocketStore();
 
     const handleSlideChange = (direction) => {
         if (direction === 'prev') {
@@ -38,8 +42,13 @@ function IndexPage() {
             setCurrentSlide((prevSlide) => (prevSlide === 2 ? 0 : prevSlide + 1));
         }, 4000); // 4초
 
+        socket?.on("newMessage", (newMessage) => {
+            toast.custom((t) => (
+                <ChatAlarm t={t} newMessage={newMessage} />
+            ))
+        });
         return () => clearInterval(interval); 
-    }, []);
+    }, [socket]);
 
     // 카테고리
     const categoryList = [

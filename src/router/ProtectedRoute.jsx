@@ -1,37 +1,22 @@
 import { useAuthStore } from '@zustand/authStore';
-import { useEffect, useState } from 'react';
-import LoginModal from '@components/modal/LoginModal';
-import Modal from '@components/templates/Modal';
-import { Navigate, useLocation } from 'react-router-dom';
-import { auth ,instance} from '@api/index';
+import useModalStore from "@zustand/modalStore";
+import { useEffect } from 'react';
 
-const ProtectedRoute = ({ children, fetchURL }) => {
+const ProtectedRoute = ({ children }) => {
     const { isLoggedin } = useAuthStore();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { openLoginModal, closeLoginModal } = useModalStore();
 
     useEffect(() => {
-    
         if (!isLoggedin) {
-            setIsModalOpen(true);
+            openLoginModal();
         } else {
-            setIsModalOpen(false);
+            closeLoginModal();
         }
-    }, [isLoggedin]);
-
-
-
-    const onModalHandler = () => {
-        setIsModalOpen(prev => !prev);
-    };
+    }, [isLoggedin, openLoginModal, closeLoginModal]);
 
     return (
         <>
             {isLoggedin && children}
-            {!isLoggedin && (
-                <Modal isModalOpen={isModalOpen} onModalClose={onModalHandler}>
-                    <LoginModal onModalClose={onModalHandler} />
-                </Modal>
-            )}
         </>
     );
 };

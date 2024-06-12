@@ -11,6 +11,8 @@ export const login = async (email, password) => {
 
     if (response.resultCode == '200') {
       let token = response.headers.get('authorization');
+      const userId = response.data.userId;
+      const username = response.data.username;
 
       if (!token) {
         token = document.cookie
@@ -21,6 +23,8 @@ export const login = async (email, password) => {
       }
       if (token) {
         useAuthStore.getState().setToken(token);
+        useAuthStore.getState().setId(userId);
+        useAuthStore.getState().setUser(username);
       }
       return token;
     }
@@ -47,14 +51,14 @@ export const logout = async () => {
 
 export const refreshToken = async () => {
   try {
-    const refreshTokenResponse = await instance.post('/api/refreshToken');
+    const refreshTokenResponse = await instance.get('/api/refreshToken');
 
     console.log("refreshTokenResponse", refreshTokenResponse);
     if (refreshTokenResponse.resultCode == 200) {
       const newToken = refreshTokenResponse.headers.get("Authorization");
+      console.log("newToken", newToken);
 
-      useAuthStore.getState().setToken(newToken);
-      console.log("새로운 토큰 저장 완료");
+      return newToken;
     } else {
       console.log("토큰 재발급 실패");
       useAuthStore.getState().logout();
