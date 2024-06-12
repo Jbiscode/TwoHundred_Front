@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 nginx.conf
 nginx.conf.base64
+yarn.lock
