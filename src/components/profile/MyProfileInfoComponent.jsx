@@ -5,6 +5,7 @@ import usemyprofileStore from "@zustand/myprofileStore"
 import {auth} from "@api/index"
 
 const MyProfileInfoComponent = () => {
+    const {token, user} = useAuthStore()
     const {updateMyProfile, setSalesView, setLikesView, setOffersView, setBuyView, currentView} = usemyprofileStore(state => state)
 
     const [userDTO, setUserDTO] = useState({
@@ -19,7 +20,6 @@ const MyProfileInfoComponent = () => {
         offerLevel : '',
         profileImageUrl : ''
     });
-    const {isLoggedin} = useAuthStore(state => state)
 
     const { id,name, addr1, addr2, countBuy, countLike, countOffer, countSale, offerLevel, profileImageUrl} = userDTO
 
@@ -47,18 +47,17 @@ const MyProfileInfoComponent = () => {
         fetchData();
     },[updateMyProfile])
 
-    useEffect(()=>{
-
-    },[])
 
     return (
             <div className="border w-full border-gray-300 px-6 py-10 border-solid mt-8 mb-8">
-                <div className="flex">
-                    <div className="w-1/3 flex justify-center items-center">
-                        <img src={`https://kr.object.ncloudstorage.com/kjwtest/${profileImageUrl}`} className="w-20 h-20 rounded-full"/>
+                <div className="flex gap-4">
+                    <div className="avatar">
+                        <div className="w-32 rounded-full">
+                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${profileImageUrl}`} />
+                        </div>
                     </div>
-                    <div>
-                        <p className="mb-2 font-bold">{name}</p>
+                    <div className="flex flex-col justify-center">
+                        <p className="mb-2 font-bold">{user}</p>
                         <p className="text-orange-500 text-base font-semibold">Level {offerLevel}</p>
                         <p className="text-gray-400 text-base font-semibold">{`${addr1} ${addr2}`}</p>
                     </div>

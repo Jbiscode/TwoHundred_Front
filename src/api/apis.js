@@ -92,12 +92,15 @@ export const naverlogin = async () => {
   }
 };
 
-export const userSignUp = async(userSignupDTO) => {
+export const userSignUp = async(formData) => {
    
     
     try{
-      await instance.post('/api/v1/auth', {
-        body: JSON.stringify(userSignupDTO),
+      await instance.post('/api/v1/auth',{
+        headers : {
+          'Content-Type' : 'multipart/form-data'
+        },
+        body : formData,
         withCredentials: true,
       })
     }catch(error){

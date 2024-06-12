@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 import PostModal from "./PostModal";
 import { userSignUp } from "@api/apis";
 import {moveuserpage} from "@api/apis"
+import useModalStore from '@zustand/modalStore'
+import IMAGEUPLOAD from '@assets/images/icon/defaultprofileImg.png'
+import CAMERA from '@assets/images/icon/camera-solid.svg'
+import axios from "axios";
 
 const SignupModal = () => {
-    
+    const {closeSignupModal } = useModalStore();
+
+    const [imgList, setImgList] = useState([])
+    const [files,setFiles] = useState([])
+    const imgRef = useRef();
+
     const [userSignupDTO, setUserSignupDTO] = useState({
         username : '',
         password : '',
@@ -59,7 +68,51 @@ const SignupModal = () => {
         
         console.log(userSignupDTO)
         // 모든 값이 false인 경우에만 회원가입 진행
-        userSignUp(userSignupDTO);
+        
+        var formData = new FormData()
+
+        formData.append("userSignupDTO", new Blob(
+            [JSON.stringify(userSignupDTO)],
+             {type : 'application/json'})
+        )
+
+        if(files.length > 0){
+            for(var i = 0 ; i<files.length ; i++){
+                formData.append("img", files[i])
+            }
+        }
+
+        // userSignUp(formData);
+        axios.post(`http://localhost:3000/api/v1/auth`, formData, {
+            headers : {
+                "Content-Type" : 'multipart/form-data'
+            }
+        })
+        .then(res => {
+            alert('이미지 업로드 완료')
+        })
+        .catch(error => console.log(error))
+
+
+        closeSignupModal();
+    }   
+
+    const onImgInput = (e) => {
+    
+        const files = Array.from(e.target.files)
+        var imgArray = []
+
+        files.map((item,index) => {
+            const objectURL = URL.createObjectURL(item);
+            imgArray.push(objectURL);
+        })
+
+        setFiles(files)
+        setImgList(imgArray)
+    }
+
+    const handleImgInputTrigger = () => {
+        imgRef.current.click()
     }
 
     return (
@@ -70,6 +123,32 @@ const SignupModal = () => {
             <div className="p-5">
                 <form action="">
                     <div className="h-96 overflow-y-auto px-2">
+                        <div className="flex justify-center items-center relative" onClick={handleImgInputTrigger}>
+                            {
+                                imgList.length === 0 ?
+                                        <>
+                                            <div className="avatar relative" >
+                                                <div className="w-40 rounded-full">
+                                                    <img src={IMAGEUPLOAD}/>
+                                                </div>
+                                               
+                                            </div>
+                                            <img className="absolute w-8 h-8 block bottom-0 right-1/3" src={CAMERA}/>
+                                        </>
+                                    :
+                                     imgList.map(item => (
+                                        <>
+                                            <div className="avatar relative" onClick={handleImgInputTrigger} key={item}>
+                                                <div className="w-40 rounded-full">
+                                                    <img src={item} />
+                                                </div>
+                                            </div>
+                                            <img className="absolute w-8 h-8 block bottom-0 right-1/3" src={CAMERA}/>
+                                        </>
+                                    ))
+                            }
+                        </div>
+                        <input className="invisible" type="file"  name="img[]" onChange={onImgInput} ref={imgRef}/>
                         <div className="mb-4">
                             <p className="font-bold text-lg mb-2 pl-1">닉네임</p>
                             <div >
@@ -96,6 +175,7 @@ const SignupModal = () => {
                         </div>
                         <div className="mb-4">
                             <p className="font-bold text-lg mb-2 pl-1">이메일</p>
+                            <p className="font-bold text-sm mb-2 pl-1 text-gray-400">* 로그인 시 사용할 이메일입니다.</p>
                             <div className="flex gap-3">
                                 <input type="text" placeholder="이메일" className={`input input-bordered w-full ${isEmptyInput.isEmailEmpty ? 'border-rose-600' : ''}`} name="email" value={userSignupDTO.email} onChange={onInputChange}/>
                                 <button className="btn btn-outline" >이메일 인증</button>
