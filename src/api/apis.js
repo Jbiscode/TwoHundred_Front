@@ -40,7 +40,6 @@ export const logout = async () => {
     const response = await auth.post('/api/logout', {
       withCredentials: true,
     });
-    useAuthStore.getState().removeToken();
 
     return response;
   } catch (error) {
@@ -61,7 +60,7 @@ export const refreshToken = async () => {
       return newToken;
     } else {
       console.log("토큰 재발급 실패");
-      useAuthStore.getState().logout();
+
     }
   } catch (refreshError) {
     console.error("토큰 재발급 중 에러 발생:", refreshError);

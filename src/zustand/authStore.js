@@ -38,8 +38,10 @@ export const useAuthStore = create(
       },
       logout: async () => {
         try {
-          await logout();
-          set({ token: null, isLoggedin: false, user: null, id: 0 });
+          const response = await logout();
+          if(response.resultCode == 200){
+            set({ token: null, isLoggedin: false, user: null, id: 0 });
+          }
         } catch (error) {
           console.error(error);
           throw error;

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import useAuthStore from "@zustand/authStore";
 import useModalStore from "@zustand/modalStore";
-import {logout} from "@api/apis"
 import toast, { Toaster } from "react-hot-toast";
 import {Link, useNavigate} from "react-router-dom";
 
@@ -13,7 +12,7 @@ function BasicHeader() {
 
 
     const handleLogout = () => {
-        toast.promise(logout(),
+        toast.promise(useAuthStore.getState().logout(),
             {
                 loading: 'loading...',
                 success: <b>로그아웃 되었습니다.</b>,
