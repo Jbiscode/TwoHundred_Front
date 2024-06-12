@@ -27,3 +27,4 @@ dist-ssr
 .env.base64
 nginx.conf
 nginx.conf.base64
+yarn.lock
