@@ -1,9 +1,25 @@
 import { useState } from "react";
+import useAuthStore from "@zustand/authStore";
+import useModalStore from "@zustand/modalStore";
+import {logout} from "@api/apis"
+import toast, { Toaster } from "react-hot-toast";
 import {Link, useNavigate} from "react-router-dom";
 
 function BasicHeader() {
     const [searchContent, setSearchContent] = useState('');
     const navigate = useNavigate();
+    const { openLoginModal } = useModalStore();
+    const {isLoggedin}  = useAuthStore(state => state)
+
+
+    const handleLogout = () => {
+        toast.promise(logout(),
+            {
+                loading: 'loading...',
+                success: <b>로그아웃 되었습니다.</b>,
+                error: <b>로그아웃에 실패하였습니다.</b>,
+            })
+    }
 
     const handleSearchChange = (e) => {
         setSearchContent(e.target.value);
@@ -25,7 +41,9 @@ function BasicHeader() {
         navigate(`/search?content=${searchContent}`);
     };
 
-    return (
+    return (<>
+        <Toaster></Toaster>
+        <div className="sticky top-0 z-20">
         <div className="bg-white w-full h-full">
             <div className="hidden sm:block">
                 <div className="navbar bg-white mb-2">
@@ -68,10 +86,10 @@ function BasicHeader() {
                                     <summary>마이페이지</summary>
                                     <ul className="p-2 rounded-t-none bg-white">
                                         <li>
-                                            <a>프로필</a>
+                                            <Link to={'/users/me'}>프로필</Link>
                                         </li>
                                         <li>
-                                            <a>로그아웃</a>
+                                            <a onClick={handleLogout}>로그아웃</a>
                                         </li>
                                     </ul>
                                 </details>
@@ -94,28 +112,37 @@ function BasicHeader() {
                                 onChange={handleSearchChange}
                                 onKeyDown={handleKeyDown}/>
                         </div>
-                        <div className="dropdown dropdown-end mr-10">
-                            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                                <div className="w-10 rounded-full">
-                                    <img alt="Tailwind CSS Navbar component" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                                </div>
+                        <div className="flex-none gap-2">
+                            <div className="form-control mr-4">
+                                <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto bg-white" />
                             </div>
-                            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-white rounded-box w-52">
-                                <li>
-                                    <Link to={'/post/add'} className="justify-between">
-                                        판매하기
-                                    </Link>
-                                </li>
-                                <li><a>프로필</a></li>
-                                <li><a>로그아웃</a></li>
-                            </ul>
+                            <div className="dropdown dropdown-end mr-10">
+                                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                                    <div className="w-10 rounded-full">
+                                        <img alt="Tailwind CSS Navbar component" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                                    </div>
+                                </div>
+                                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-white rounded-box w-52">
+                                    <li>
+                                        <Link to={'/post/add'} className="justify-between">
+                                            판매하기
+                                        </Link>
+                                    </li>
+                                    <li><Link to={'/users/me'}>프로필</Link></li>
+                                    {
+                                       isLoggedin ? <li onClick={handleLogout}><a>로그아웃</a></li> : <li onClick={openLoginModal}><a>로그인</a></li>     
+                                    }
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div>
-
+        </div>  
+</div>
+        
+        </>
 
     );
 }

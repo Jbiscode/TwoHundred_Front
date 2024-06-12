@@ -1,3 +1,6 @@
+import { refreshToken } from "@api/apis.js";
+import useAuthStore from "@zustand/authStore";
+
 export const convertResponse = async (res) => {
   const response = {
     resultCode: "",
@@ -6,97 +9,92 @@ export const convertResponse = async (res) => {
     headers: null,
   };
 
+  console.log("2. 응답 제조중", res.status);
+
   if (res.ok) {
     try {
-      const resJson = await res.json();
-      if (!resJson.resultCode) {
-        throw new Error("404 Error");
-      }
-      response.resultCode = resJson.resultCode;
-      response.msg = resJson.msg;
-      response.data = resJson.data;
-      response.headers = res.headers;
+      const { resultCode, msg, data } = await res.json();
+      Object.assign(response, { resultCode, msg, data, headers: res.headers });
     } catch (e) {
-      console.log(e);
-      response.resultCode = "600";
-      response.msg = "알 수 없는 에러가 발생했습니다!";
-      response.data = null;
-      response.headers = null;
+      Object.assign(response, {
+        resultCode: "600",
+        msg: "알 수 없는 에러가 발생했습니다!",
+        data: null,
+        headers: null,
+      });
     }
   } else {
-    response.resultCode = res.status.toString();
-    response.msg = res.statusText;
-    response.data = null;
-    response.headers = res.headers;
+    if (res.status === 400) {
+      Object.assign(response, {
+        resultCode: res.status,
+        msg: "잘못된 요청입니다!",
+        data: res.statusText,
+        headers: res.headers,
+      });
+    }else if (res.status === 401) {
+      console.log("401 에러 발생");
+      Object.assign(response, {
+        resultCode: res.status,
+        msg: "접근 권한이 없습니다.",
+        data: res.statusText,
+        headers: res.headers,
+      });
+    }else if(res.status === 409){
+      const { timestamp, message, details } = await res.json();
+
+      Object.assign(response, {
+        resultCode:res.status, 
+        msg:message, 
+        data:details, 
+        headers: res.headers }
+      );
+    }else{
+      Object.assign(response, {
+        resultCode: res.status,
+        msg: null,
+        data: res.statusText,
+        headers: res.headers,
+      });
+    }
   }
-  console.log(response, "interceptor.js에서 response")
   return response;
 };
 
-// export const convertResponse = (res) => {
-//   const response = {
-//     resultCode: '',
-//     msg: '',
-//     data: null,
-//   };
-
-//   try {
-//     if (res instanceof Response) {
-//       if (res.ok) {
-//         response.resultCode = '200';
-//         response.msg = 'Success';
-//         response.data = res;
-//       } else {
-//         response.resultCode = res.status.toString();
-//         response.msg = res.statusText;
-//         response.data = null;
-//       }
-//     } else {
-//       console.log("res.data 속에 데이터", res.data);
-//       if (!res.data.resultCode) {
-//         throw new Error('404 Error');
-//       }
-//       response.resultCode = res.data.resultCode;
-//       response.msg = res.data.msg;
-//       response.data = res.data.data;
-//     }
-//   } catch (e) {
-//     console.log(e);
-//     response.resultCode = '600';
-//     response.msg = '알 수 없는 에러가 발생했습니다!';
-//     response.data = null;
-//   }
-
-//   return response;
-// };
-
 export const setInterceptors = (withAuth, fetchInstance) => {
-  const originalFetch = fetchInstance;
-
-  fetchInstance = async (endpoint, method, requestOptions) => {
+  return async (endpoint, method, requestOptions) => {
     let config = {
       ...requestOptions,
       method,
     };
 
     if (withAuth) {
-      const token = localStorage.getItem("Authorization")
-        ? localStorage.getItem("Authorization").replaceAll('"', "")
-        : null;
+      const token = useAuthStore.getState().getToken()
+        ? useAuthStore.getState().getToken()
+        : "";
 
       config.headers = {
         ...config.headers,
         Authorization: token,
       };
-      console.log("config.headers", config.headers);
+
+    } else {
+      config.headers = {
+        ...config.headers,
+        Authorization: "",
+      };
     }
 
     try {
-      return await originalFetch(endpoint, method, config);
+      const response = await fetchInstance(endpoint, method, config);
+      // console.log("3.인스턴스에서 응답 확인(from index.js -> convertResponse)",response);
+      console.log(response)
+      if (withAuth && response.resultCode == 401) {
+        console.log("401 에러 발생");
+        refreshToken();
+      }
+      return response;
     } catch (error) {
       return convertResponse(error);
     }
   };
-
-  return fetchInstance;
 };

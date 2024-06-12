@@ -1,24 +1,94 @@
-function ReadComponent() {
+import {useEffect, useState} from "react";
+import {auth} from "@api/index.js";
+import useAuthStore from "@zustand/authStore.js";
+
+function ReadComponent({aid}) {
+
+    const tradeMethodMap = {
+        'FACE_TO_FACE': '직거래',
+        'DELIVERY': '택배거래',
+        'NO_MATTER': '상관없음'
+    };
+
+
+    const initState = {
+        thumbnailUrl: "",
+        writerProfileImageUrl: "",
+        writerUsername: "",
+        title: "",
+        content: "",
+        price: 0,
+        addr1: "",
+        addr2: "",
+        tradeMethod: "",
+        createdDate: "",
+        offers: [],
+        imageUrls: [],
+        writerId: "",
+    }
+
+    const loggedInUserId = useAuthStore(state => state.getId());
+
+    const [article, setArticle] = useState(initState);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await auth.get(`/api/v1/articles/${aid}`, {withCredentials: true});
+                console.log("response:", response);
+
+                if (response.resultCode === "200") {
+                    setArticle(response.data);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData().then(r => console.log(r));
+    }, [aid]); // aid가 변경될 때마다 useEffect 실행
+
+    function timeAgo(dateParam) {
+        const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
+        const now = new Date();
+        const secondsPast = (now.getTime() - date.getTime()) / 1000;
+
+        if (secondsPast < 60) {
+            return parseInt(secondsPast) + '초 전';
+        }
+        if (secondsPast < 3600) {
+            return parseInt(secondsPast / 60) + '분 전';
+        }
+        if (secondsPast <= 86400) {
+            return parseInt(secondsPast / 3600) + '시간 전';
+        }
+        if (secondsPast > 86400) {
+            const day = parseInt(secondsPast / 86400);
+            return day + '일 전';
+        }
+    }
+
     return (
         <div className="mx-auto w-fit bg-white py-8 px-10">
             <div className="flex flex-col bg-white p-5 flex-wrap gap-10">
                 <div className="flex gap-10 flex-col md:flex-row m-auto md:m-0">
-                    <img src="https://avatars.githubusercontent.com/u/117346967?v=4" alt="프로필"
-                         className="w-[300px] aspect-square"/>
+                    <img
+                        src={`https://kr.object.ncloudstorage.com/kjwtest/article/${article.thumbnailUrl}`}
+                        alt={"프로필"}
+                        className="w-[300px] aspect-square"/>
                     <div className="w-[300px]">
                         <div className="flex items-center">
-                            <img src="https://avatars.githubusercontent.com/u/117346967?v=4" alt="프로필"
+                            <img src={`${article.writerProfileImageUrl}`} alt="프로필"
                                  className="w-[50px] h-[50px] rounded-full mr-4"/>
-                            <h1 className="text-4xl text-[#EFA43D] mt-5 mb-5">오렌지 미쳐따</h1>
+                            <h1 className="text-4xl text-[#EFA43D] mt-5 mb-5">{article.writerUsername}</h1>
                         </div>
                         <hr className="mt-4"/>
                         <ul className="space-y-2 mt-4 mb-10">
-                            <li><i className="fas fa-envelope text-gray-400 mr-1"></i> 싱싱한 오렌지 팔아요</li>
-                            <li><i className="fas fa-phone text-gray-400 mr-1"></i>4000원</li>
-                            <li><p className="text-gray-400 text-sm">작성 시간 1시간 전</p></li>
-                            <li><p className="text-gray-400 text-sm">거래 지역 동작구 사당동</p></li>
-                            <li><p className="text-gray-400 text-sm">상품 상태 새 상품</p></li>
-                            <li><p className="text-gray-400 text-sm">거래 방식 직거래</p></li>
+                            <li><i className="fas fa-envelope text-gray-400 mr-1"></i> {article.title}</li>
+                            <li><i className="fas fa-phone text-gray-400 mr-1"></i>{article.price}</li>
+                            <li><p className="text-gray-400 text-sm">작성 시간 {timeAgo(article.createdDate)}</p></li>
+                            <li><p className="text-gray-400 text-sm">거래 지역 {article.addr1} {article.addr2}</p></li>
+                            <li><p className="text-gray-400 text-sm">거래 방식 {tradeMethodMap[article.tradeMethod]}</p></li>
                         </ul>
                     </div>
                 </div>
@@ -27,36 +97,56 @@ function ReadComponent() {
             <div className="flex flex-col bg-white p-5 flex-wrap gap-10">
                 <div className="flex gap-10 flex-col md:flex-row m-auto md:m-0">
                     <div className="w-[300px]">
-                        <h1 className="text-4xl text-black md:mt-10 mb-4">상품 정보 </h1>
+                        <h1 className="text-4xl text-black md:mt-10 mb-4">상품 정보</h1>
                         <hr className="border-2 border-black"/>
-                        <p className="space-y-2 mt-4 mb-10">맛도 좋고 </p>
+                        <p className="space-y-2 mt-4 mb-10">{article.content}</p>
+                        {article.imageUrls.map((imageUrl, index) => (
+                            <img
+                                key={index}
+                                src={`https://kr.object.ncloudstorage.com/kjwtest/article/${imageUrl}`}
+                                alt={`이미지 ${index + 1}`}
+                                className="w-full mb-4"
+                            />
+                        ))}
                     </div>
                     <div className="w-[300px]">
                         <h1 className="text-4xl text-black md:mt-10 mb-4">가격 제안 </h1>
                         <hr className="border-2 border-black"/>
                         <ul className="space-y-2 mt-4 mb-10">
-                            <li className="flex justify-between items-center">
-                                <div>
-                                    <p className="text-black">싱싱한 오렌지 팔아요</p>
-                                    <p className="text-gray-400 text-sm">동작구 사당동 | 1시간 전</p>
-                                </div>
-                                <p className="text-black">500원</p>
-                            </li>
-                            <hr/>
-                            <li className="flex justify-between items-center">
-                                <div>
-                                    <p className="text-black">싱싱한 오렌지 팔아요</p>
-                                    <p className="text-gray-400 text-sm">동작구 사당동 | 1시간 전</p>
-                                </div>
-                                <p className="text-black">500원</p>
-                            </li>
-                            <hr/>
+                            {article.offers.map((offer) => (
+                                <li key={offer.id} className="flex justify-between items-center">
+                                    <div>
+                                        <p className="text-black">{offer.offererUsername}</p>
+                                        <p className="text-gray-400 text-sm">{timeAgo(offer.createdDate)}</p>
+                                    </div>
+                                    <p className="text-black">{offer.offerPrice}원</p>
+                                </li>
+                            ))}
                         </ul>
-                        <div className="flex justify-center">
-                            <button
-                                className="btn btn-ghost bg-orange-400 text-white mb-10">
-                                거래 제안하기
-                            </button>
+                        <div className="flex justify-between md:justify-end">
+                            {loggedInUserId === article.writerId ? (
+                                <>
+                                    <button
+                                        className="btn btn-ghost bg-violet-500 text-white mb-10">
+                                        수정하기
+                                    </button>
+                                    <button
+                                        className="btn btn-ghost bg-orange-500 text-white mb-10 md:mx-1">
+                                        삭제하기
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button
+                                        className="btn btn-ghost bg-violet-500 text-white mb-10">
+                                        1:1 채팅하기
+                                    </button>
+                                    <button
+                                        className="btn btn-ghost bg-orange-500 text-white mb-10 md:mx-1">
+                                        거래 제안하기
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

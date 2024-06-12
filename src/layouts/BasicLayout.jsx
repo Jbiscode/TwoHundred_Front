@@ -1,16 +1,16 @@
-import { Outlet } from "react-router-dom";
+
 import BasicHeader from "@layouts/BasicHeader";
 import BasicFooter from "@layouts/BasicFooter";
 
-function BasicLayout({children}) {
+function BasicLayout({ children }) {
     return (
+    <>
+        <BasicHeader />
         <div className="flex flex-col min-h-screen">
-            <BasicHeader />
-            <main className="flex-grow mx-auto">
-                {children}
-            </main>
-            <BasicFooter />
+            <main className="flex-grow mx-auto w-full">{children}</main>
         </div>
+        <BasicFooter />
+    </>
     );
 }
 
