@@ -20,6 +20,7 @@ import BasicLayout from '@layouts/BasicLayout';
 import useSocketStore from '@zustand/useSocketStore';
 import { toast } from 'react-hot-toast';
 import ChatAlarm from '@components/chat/ChatAlarm';
+import {instance} from '@api/index.js';
 
 
 function IndexPage() {
@@ -103,16 +104,14 @@ function IndexPage() {
 
 
     useEffect(() => {
-        fetch('/api/v1/search')
+        instance.get('/api/v1/search')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+                console.log(response);
+                return response.data;
             })
             .then(data => {
                 console.log('Fetched data:', data);
-                const allGoods = data.data || [];
+                const allGoods = data || [];
                 const shuffledGoods = allGoods.sort(() => 0.5 - Math.random());
                 const selectedGoods = shuffledGoods.slice(0, 60);
                 setGoodsList(selectedGoods);
