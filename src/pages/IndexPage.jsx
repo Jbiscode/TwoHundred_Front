@@ -27,6 +27,11 @@ function IndexPage() {
     //배너
     const [currentSlide, setCurrentSlide] = useState(0);
     const { socket } = useSocketStore();
+    //추천상품-페이징
+    const [goodsList, setGoodsList] = useState([]);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 20;
 
     const handleSlideChange = (direction) => {
         if (direction === 'prev') {
@@ -95,15 +100,10 @@ function IndexPage() {
     ]
 
 
-    //추천상품-페이징
-    const [goodsList, setGoodsList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 20;
+
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/v1/search')
+        fetch('/api/v1/search')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -116,18 +116,13 @@ function IndexPage() {
                 const shuffledGoods = allGoods.sort(() => 0.5 - Math.random());
                 const selectedGoods = shuffledGoods.slice(0, 60);
                 setGoodsList(selectedGoods);
-                setLoading(false);
             })
             .catch(error => {
                 console.error('Error fetching goods data:', error);
                 setError(error);
-                setLoading(false);
             });
     }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
 
     if (error) {
         return <div>Error: {error.message}</div>;
@@ -220,7 +215,7 @@ function IndexPage() {
                                 </div>
                             ))
                         ) : (
-                            <div>추천 상품이 없습니다.</div>
+                            <div>로딩중...</div>
                         )}
                     </div>
                 </div>
