@@ -83,7 +83,7 @@ const SignupModal = () => {
         }
 
         // userSignUp(formData);
-        axios.post(`http://localhost:3000/api/v1/auth`, formData, {
+        axios.post(`/api/v1/auth`, formData, {
             headers : {
                 "Content-Type" : 'multipart/form-data'
             }
