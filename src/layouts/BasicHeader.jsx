@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import {Link, useNavigate} from "react-router-dom";
 
 function BasicHeader() {
-    const [searchContent, setSearchContent] = useState('');
+    const [content, setContent] = useState('');
     const navigate = useNavigate();
     const { openLoginModal } = useModalStore();
     const {isLoggedin}  = useAuthStore(state => state)
@@ -21,7 +21,7 @@ function BasicHeader() {
     }
 
     const handleSearchChange = (e) => {
-        setSearchContent(e.target.value);
+        setContent(e.target.value);
     };
 
     const handleKeyDown = (e) => {
@@ -37,7 +37,7 @@ function BasicHeader() {
     };
 
     const searchClick = () => {
-        navigate(`/search?content=${searchContent}`);
+        navigate(`/search?content=${content}`);
     };
 
     return (<>
@@ -54,7 +54,7 @@ function BasicHeader() {
                                 type="text"
                                 className="grow"
                                 placeholder="상품명을 입력해주세요."
-                                value={searchContent}
+                                value={content}
                                 onChange={handleSearchChange}
                                 //onKeyDown={handleKeyDown}
                             />
@@ -107,7 +107,7 @@ function BasicHeader() {
                     <div className="flex-none gap-2">
                         <div className="form-control mr-4">
                             <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto bg-white" 
-                                value={searchContent}
+                                value={content}
                                 onChange={handleSearchChange}
                                 onKeyDown={handleKeyDown}/>
                         </div>
