@@ -1,5 +1,6 @@
 import { instance, auth } from '@api/index';
 import useAuthStore from "@zustand/authStore";
+import axios from 'axios';
 
 
 export const login = async (email, password) => {
@@ -81,26 +82,28 @@ export const moveuserpage = () => {
 
 export const naverlogin = async () => {
   try {
-    await instance.get('/api/v1/oauth2/redirect/naver',{
+     await instance.get('/api/v1/oauth2/redirect/naver',{
       withCredentials: true,
     });
-
+    return response
   } catch (error) {
     console.error('네이버 로그인 실패:', error);
     throw error;
   }
 };
 
-export const userSignUp = async(userSignupDTO) => {
+export const userSignUp = async(formData) => {
+  try {
+    const response = await axios.post(`/api/v1/auth`, formData, {
+      headers: {
+        "Content-Type": 'multipart/form-data'
+      }
+    });
+    console.log(response)
+    return response.status;
+  } catch (error) {
+    console.log("error" + error.response.request.status)
+    return error.response.status;
+  }
    
-    
-    try{
-      await instance.post('/api/v1/auth', {
-        body: JSON.stringify(userSignupDTO),
-        withCredentials: true,
-      })
-    }catch(error){
-      console.log("회원가입 실패:", error)
-      throw error;
-    }
 }
