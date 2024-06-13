@@ -82,19 +82,15 @@ const SignupModal = () => {
             }
         }
 
-        // userSignUp(formData);
-        axios.post(`/api/v1/auth`, formData, {
-            headers : {
-                "Content-Type" : 'multipart/form-data'
+        const singUp = async() => {
+            const status = await userSignUp(formData);
+            if(status == 201){
+                closeSignupModal();
             }
-        })
-        .then(res => {
-            alert('이미지 업로드 완료')
-        })
-        .catch(error => console.log(error))
-
-
-        closeSignupModal();
+            console.log(status)
+        }
+         
+        singUp();
     }   
 
     const onImgInput = (e) => {
