@@ -13,7 +13,7 @@ const profileRouter = () => {
             element: <Navigate replace={true} to="me"/>
         },
         {
-            path: ":user_id",
+            path: ":userId",
             element: <Suspense fallback={Loading}><UserProfilePage/></Suspense>
         },
         {

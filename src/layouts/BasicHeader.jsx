@@ -76,23 +76,23 @@ function BasicHeader() {
                     </div>
                 </div>
                 <div className="sm:hidden">
-                    <div className="navbar bg-white mb-2">
-                        <div className="flex-1 ml-4">
+                    <div className="navbar bg-white">
+                        <div className="flex ml-4">
                             <Link to={'/'}
                                 className="btn btn-ghost text-xl"
                             >Bid&Buy</Link>
                         </div>
-                        <div className="flex-none gap-2">
-                            <div className="form-control mr-4">
-                                <input type="text" placeholder="Search" className="input input-bordered w-24 md:w-auto bg-white" />
+                        <div className="flex flex-grow gap-2">
+                            <div className="form-control mr-4 flex-grow">
+                                <input type="text" placeholder="Search" className="w-full input input-bordered w-24 md:w-auto bg-white h-10" />
                             </div>
-                            <div className="dropdown dropdown-end mr-10">
+                            <div className="dropdown dropdown-end mr-10 ">
                                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                                     <div className="w-10 rounded-full">
-                                        <img alt="Tailwind CSS Navbar component" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                                        <img alt="Tailwind CSS Navbar component" src={`https://kr.object.ncloudstorage.com/kjwtest/article/${isLoggedin ? {} : "s_uuid_7adc2b20-82c8-4f14-96f0-f68aa2613ac0"}`} />
                                     </div>
                                 </div>
-                                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-white rounded-box w-52">
+                                <ul tabIndex={0} className="mt-2 z-[1] p-2 shadow menu menu-sm dropdown-content bg-white rounded-box w-52">
                                     <li>
                                         <Link to={'/post/add'} className="justify-between">
                                             판매하기

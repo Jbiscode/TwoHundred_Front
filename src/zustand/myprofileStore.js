@@ -10,6 +10,7 @@ const usemyprofileStore = create(
             setLikesView: () => set({ currentView: 'likes' }),
             setOffersView: () => set({ currentView: 'offers' }),
             setBuyView: () => set({ currentView: 'buy' }),
+            setReviewsView : () => set({currentView : 'reviews'}),
             setSelectReviewId : (reviewId) => set({ selectReviewId : reviewId}),
             updateMyProfileInfo: () => set((state) => ({ updateMyProfile: !state.updateMyProfile })),
         })
