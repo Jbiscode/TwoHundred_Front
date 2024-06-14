@@ -82,10 +82,10 @@ export const moveuserpage = () => {
 
 export const naverlogin = async () => {
   try {
-     await instance.get('/api/v1/oauth2/redirect/naver',{
+    await instance.get('/api/v1/oauth2/redirect/naver',{
       withCredentials: true,
     });
-    return response
+
   } catch (error) {
     console.error('네이버 로그인 실패:', error);
     throw error;
@@ -105,5 +105,4 @@ export const userSignUp = async(formData) => {
     console.log("error" + error.response.request.status)
     return error.response.status;
   }
-   
 }

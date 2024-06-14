@@ -24,7 +24,7 @@ const ChatListItem = ({ chat, user, lastMessage, unreadCount,modifiedDate }) => 
       onClick={() => handleChatClick(chat.id)}>
       <div className="flex-shrink-0">
         <img
-          src={chat.profileImage}
+          src={`https://kr.object.ncloudstorage.com/kjwtest/article/${user == chat.user_name ? chat.writer_profile_image_url : chat.user_profile_image_url}`}
           alt="Profile"
           className="w-12 h-12 rounded-full"
         />
