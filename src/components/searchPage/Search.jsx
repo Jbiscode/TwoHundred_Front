@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import filter from '@assets/images/icon/filter.svg';
 import { useLocation } from 'react-router-dom';
 import {instance} from '@api/index.js';
@@ -14,13 +14,19 @@ const Search = () => {
     const [category, setCategory] = useState(null);
     const [tradeMethod, setTradeMethod] = useState(null);
 
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+
     useEffect(() => {
         if (query !== content) {
             setContent(query || '');
         }
     }, [query]);
 
-    const fetchArticles = () => {
+    const fetchArticles = (reset = false) => {
+        setLoading(true);
         let url = `/api/v1/search`;
         let params = [];
 
@@ -36,6 +42,8 @@ const Search = () => {
         if (tradeMethod) {
             params.push(`tradeMethod=${tradeMethod}`);
         }
+        params.push(`page=${page}`);
+        params.push(`size=10`);
 
         if (params.length > 0) {
             url += `?${params.join('&')}`;
@@ -45,24 +53,48 @@ const Search = () => {
 
         instance.get(url)
             .then(response => {
-                console.log('Fetched categories:', response);
+                console.log('Fetched articles:', response);
                 return response.data;
             })
             .then(data => {
                 if (Array.isArray(data)) {
-                    setArticleDTO(data);
+                    setArticleDTO(prev => reset ? data : [...prev, ...data]);
+                    setHasMore(data.length === 10);
                 } else {
                     console.error('Expected an array but got:', data);
                 }
             })
             .catch(error => {
-                console.error('Error fetching categories:', error);
+                console.error('Error fetching articles:', error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
     useEffect(() => {
-        fetchArticles();
-    }, [content, orderBy]);
+        setPage(1);
+        fetchArticles(true);
+    }, [content, orderBy, category, tradeMethod]);
+
+    useEffect(() => {
+        if (page > 1) fetchArticles();
+    }, [page]);
+
+    const observer = useRef();
+    const lastItemRef = useCallback(
+        (node) => {
+            if (loading || !hasMore) return;
+            if (observer.current) observer.current.disconnect();
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    setPage(prev => prev + 1);
+                }
+            });
+            if (node) observer.current.observe(node);
+        },
+        [loading, hasMore]
+    );
     
     const articleCount = articleDTO.length;
 
@@ -136,32 +168,35 @@ const Search = () => {
         setTradeMethod(item.id); 
     };
 
+    //정렬 선택
+    const handleOrderBy = (value) => {
+        setOrderBy(value);
+    }
+
 
     
     const [isopenedFilter, setIsopenedFilter] = useState(false);
     
     const handleFilter = () => {
-        fetchArticles(); // 필터 적용 버튼을 클릭했을 때 데이터를 가져옵니다.
+        setPage(1);
+        fetchArticles(true);
         setIsopenedFilter(!isopenedFilter);
     }
 
-        const handleReset = () => {
+    const handleReset = () => {
         setCategory(null);
         setTradeMethod(null);
-        fetchArticles(); // 초기화 후에도 데이터를 다시 가져옵니다.
-    }
-
+        setPage(1);
+        fetchArticles(true);
+    };
 
     return (
-        <div  className=''>
+        <div>
             {/* filter */}
             <div className={isopenedFilter ? '!m-0' : ''}>
             <div className={`absolute bg-white top-0 left-0 rounded-lg shadow-lg h-full transition-opacity duration-500 ${isopenedFilter ? 'opacity-100 visible z-30' : 'opacity-0 invisible'}`}>
                 <div className="overflow-hidden ">
-                    <form
-                    //onSubmit={filterFormik.handleSubmit}
-                    //method="post"
-                    encType="multipart/form-data">
+                    <form encType="multipart/form-data">
                         <div className="inset-y-0 right-0">
                             {/* 카테고리 */}
                             <div className="px-8 pt-10 w-screen">
@@ -313,22 +348,27 @@ const Search = () => {
                     <div className="goods-wrapper w-full grid justify-center box-border">
                         {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
                             <div className="goods-list mr-7 ml-3 w-full grid box-border list-none grid-cols-2">
-                                {articleDTO.map((item) => (
-                                    <div key={item.id} className="goods-cont mb-4">
+                                {articleDTO.map((item, index) => (
+                                    <div 
+                                        ref={index === articleDTO.length - 1 ? lastItemRef : null} 
+                                        key={item.id} 
+                                        className="goods-cont mb-4"
+                                    >
                                         <a href="#"><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="goods-icn items-center max-w-[165px] h-[211px]" /></a>
-                                        <span className="w-full text-base font-medium  truncate h-5 break-words inline-block line-clamp-1">
+                                        <span className="w-full text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
                                             {item.title}
                                         </span>
-                                        <span className="text-sm  text-gray-500">{item.addr1} {item.addr2}</span>
+                                        <span className="text-sm text-gray-500">{item.addr1} {item.addr2}</span>
                                         <span className="flex justify-between goods-cont_bottom"></span>
                                         <span className="text-lg font-extrabold goods-cont_price">{item.price}</span>
                                     </div>
                                 ))}
+                                {loading && <div>Loading...</div>}
                             </div>
                         ) : (
                             <p>
-                                <br/>
-                                {content} 와 관련된 상품이 존재하지 않습니다.                      
+                                <br />
+                                {content} 와 관련된 상품이 존재하지 않습니다.
                             </p>
                         )}
                     </div>
@@ -340,5 +380,4 @@ const Search = () => {
 
     );
 };
-
 export default Search;
