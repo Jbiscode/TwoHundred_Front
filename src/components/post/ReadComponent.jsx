@@ -36,7 +36,7 @@ function ReadComponent({ aid }) {
         const fetchData = async () => {
             try {
                 const response = await instance.get(
-                    `/api/v1/articles/read/${aid}`,
+                    `/api/v1/articles/${aid}`,
                     { withCredentials: true }
                 );
                 console.log("response:", response);
