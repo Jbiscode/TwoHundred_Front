@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import useAuthStore from "@zustand/authStore.js";
 import { instance } from "@api/index.js";
 import useModalStore from "@zustand/modalStore.js";
+import { Link } from "react-router-dom";
+import { auth } from "@api/index.js";
 
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
@@ -35,10 +37,9 @@ function ReadComponent({ aid }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await instance.get(
-                    `/api/v1/articles/${aid}`,
-                    { withCredentials: true }
-                );
+                const response = await instance.get(`/api/v1/articles/${aid}`, {
+                    withCredentials: true,
+                });
                 console.log("response:", response);
 
                 if (response.resultCode === "200") {
@@ -51,6 +52,21 @@ function ReadComponent({ aid }) {
 
         fetchData().then((r) => console.log(r));
     }, [aid]); // aid가 변경될 때마다 useEffect 실행
+
+    //게시글 삭제
+    const handleDelete = async () => {
+        try {
+            const response = await auth.delete(`/api/v1/articles/${aid}`, {
+                withCredentials: true,
+            });
+            console.log("response:", response);
+            if (response.resultCode === "200") {
+                console.log("게시글 삭제 성공");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     function timeAgo(dateParam) {
         const date =
@@ -172,9 +188,14 @@ function ReadComponent({ aid }) {
                             {loggedInUserId === article.writerId ? (
                                 <>
                                     <button className="btn btn-ghost bg-violet-500 text-white mb-10">
-                                        수정하기
+                                        <Link to={`/post/modify/${aid}`}>
+                                            수정하기
+                                        </Link>
                                     </button>
-                                    <button className="btn btn-ghost bg-orange-500 text-white mb-10 md:mx-1">
+                                    <button
+                                        className="btn btn-ghost bg-orange-500 text-white mb-10 md:mx-1"
+                                        onClick={handleDelete}
+                                    >
                                         삭제하기
                                     </button>
                                 </>
