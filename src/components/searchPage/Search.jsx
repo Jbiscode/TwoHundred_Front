@@ -11,7 +11,8 @@ const Search = () => {
     const query = new URLSearchParams(location.search).get('content');
     const [content, setContent] = useState(query || '');
     const [orderBy, setOrderBy] = useState('latest');
-    const [category, setCategory] = useState(null);
+    const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
+    const [category, setCategory] = useState(initialCategory);
     const [tradeMethod, setTradeMethod] = useState(null);
 
     const [page, setPage] = useState(1);
@@ -24,6 +25,10 @@ const Search = () => {
             setContent(query || '');
         }
     }, [query]);
+
+    useEffect(() => {
+        console.log('Category state:', category);
+    }, [category]);
 
     const fetchArticles = (reset = false) => {
         setLoading(true);
