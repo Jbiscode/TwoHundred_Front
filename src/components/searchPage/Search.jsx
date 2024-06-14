@@ -7,18 +7,87 @@ import {instance} from '@api/index.js';
 
 const Search = () => {
     const [articleDTO, setArticleDTO] = useState([]);
+    //검색 결과
     const location = useLocation();
     const query = new URLSearchParams(location.search).get('content');
     const [content, setContent] = useState(query || '');
+    
+    //정렬
     const [orderBy, setOrderBy] = useState('latest');
+
+    //필터
     const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
     const [category, setCategory] = useState(initialCategory);
     const [tradeMethod, setTradeMethod] = useState(null);
-    const[totalCount, setTotalCount] = useState(0);
 
+    //검색결과 총 개수
+    const [totalCount, setTotalCount] = useState(0);
+
+    //페이징
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+
+    //필터 구분
+    const categoryCode = [
+        {
+            id : 'MEMBERSHIP',
+            value : false,
+            htmlFor: '회원권',
+            key: 1,
+        },
+        {
+            id : 'PT',
+            value : false,
+            htmlFor: 'PT',
+            key: 2,
+        },
+        {
+            id : 'HEALTH_SUPPLIES',
+            value : false,
+            htmlFor: '헬스용품',
+            key: 3,
+        },
+        {
+            id : 'HEALTH_EQUIPMENT',
+            value : false,
+            htmlFor: '헬스장비',
+            key: 4,
+        },
+        {
+            id : 'SPORT_WEAR',
+            value : false,
+            htmlFor: '스포츠웨어',
+            key: 5,
+        },
+        {
+            id : 'FOOD',
+            value : false,
+            htmlFor: '건강식품',
+            key: 6,
+        },
+    ]
+
+    const tradeMethodCode = [
+        {
+            htmlFor: '상관없음',
+            key: 1,
+            value: false,
+            id: 'NO_MATTER'  
+        },
+        {
+            htmlFor: '직거래',
+            key: 2,
+            value: false,
+            id: 'FACE_TO_FACE'
+        },
+        {
+            htmlFor: '택배 거래',
+            key: 3,
+            value: false,
+            id: 'DELIVERY'
+        }
+    ]
 
 
     useEffect(() => {
@@ -79,7 +148,8 @@ const Search = () => {
                 setLoading(false);
             });
     };
-
+    
+    //페이징
     useEffect(() => {
         setPage(1);
         fetchArticles(true);
@@ -103,67 +173,6 @@ const Search = () => {
         },
         [loading, hasMore]
     );
-
-
-    const categoryCode = [
-        {
-            id : 'MEMBERSHIP',
-            value : false,
-            htmlFor: '회원권',
-            key: 1,
-        },
-        {
-            id : 'PT',
-            value : false,
-            htmlFor: 'PT',
-            key: 2,
-        },
-        {
-            id : 'HEALTH_SUPPLIES',
-            value : false,
-            htmlFor: '헬스용품',
-            key: 3,
-        },
-        {
-            id : 'HEALTH_EQUIPMENT',
-            value : false,
-            htmlFor: '헬스장비',
-            key: 4,
-        },
-        {
-            id : 'SPORT_WEAR',
-            value : false,
-            htmlFor: '스포츠웨어',
-            key: 5,
-        },
-        {
-            id : 'FOOD',
-            value : false,
-            htmlFor: '건강식품',
-            key: 6,
-        },
-    ]
-
-    const tradeMethodCode = [
-        {
-            htmlFor: '상관없음',
-            key: 1,
-            value: false,
-            id: 'NO_MATTER'  
-        },
-        {
-            htmlFor: '직거래',
-            key: 2,
-            value: false,
-            id: 'FACE_TO_FACE'
-        },
-        {
-            htmlFor: '택배 거래',
-            key: 3,
-            value: false,
-            id: 'DELIVERY'
-        }
-    ]
 
     //카테고리 선택
     const handleCategory = (item) => {
@@ -350,24 +359,30 @@ const Search = () => {
             </div>
 
             {/* body */}
-            <div className='w-[90%] mx-auto mt-5'>
+            <div className='mt-5'>
                 <div className="goods">
                     <div className="goods-wrapper w-full grid justify-center box-border">
                         {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
-                            <div className="goods-list mr-7 ml-3 w-full grid box-border list-none grid-cols-2">
+                            <div className="goods-list  w-full grid box-border list-none grid-cols-2">
                                 {articleDTO.map((item, index) => (
                                     <div 
                                         ref={index === articleDTO.length - 1 ? lastItemRef : null} 
-                                        key={item.id} 
-                                        className="goods-cont mb-4"
+                                        key={`${item.id} + ${Math.random().toString(36).substr(2, 9)}`}
+                                        className="goods-cont mb-7"
                                     >
-                                        <a href="#"><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="goods-icn items-center max-w-[165px] h-[211px]" /></a>
-                                        <span className="w-full text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
+                                        <a href="#">
+                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
+                                                alt={item.imageId} 
+                                                className="goods-icn mb-3 items-center max-w-[194px] h-[194px]"/>
+                                        </a>
+                                        <span className="w-full ml-2  text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
                                             {item.title}
                                         </span>
-                                        <span className="text-sm text-gray-500">{item.addr1} {item.addr2}</span>
-                                        <span className="flex justify-between goods-cont_bottom"></span>
-                                        <span className="text-lg font-extrabold goods-cont_price">{item.price}</span>
+                                        <span className="text-sm font-extralight ml-2">{item.addr1} {item.addr2}</span>
+                                        <span className="flex justify-between goods-cont_bottom mb-3"></span>
+                                        <span className="text-lg font-extrabold goods-cont_price ml-2">
+                                            {Number(item.price).toLocaleString()}
+                                        </span>
                                     </div>
                                 ))}
                                 {loading && <div>Loading...</div>}
