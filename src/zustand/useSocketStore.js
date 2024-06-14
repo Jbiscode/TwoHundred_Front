@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import io from "socket.io-client";
+const SOCKET_API_URL = import.meta.env.VITE_SOCKET_API_URL;
 
 const useSocketStore = create((set) => ({
     socket: null,
@@ -7,10 +8,11 @@ const useSocketStore = create((set) => ({
     setSocket: (newSocket) => set({ socket: newSocket }),
     setOnlineUsers: (users) => set({ onlineUsers: users }),
     initializeSocket: (userId) => {
-        const newSocket = io("http://localhost:5000", {
+        const newSocket = io(SOCKET_API_URL, {
             query: { userId },
         });
 
+        console.log("API URL: ", SOCKET_API_URL);
         newSocket.on("getOnlineUsers", (users) => {
         set({ onlineUsers: users });
         });

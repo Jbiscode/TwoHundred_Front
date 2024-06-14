@@ -6,7 +6,7 @@ import { useAuthStore } from '@zustand/authStore';
 function useGetMessages() {
   const [loading, setLoading] = useState(false);
   const { messages, setMessages, selectedConversation } = conversationStore();
-  const {token, id} = useAuthStore();
+  const {token, id, refreshToken} = useAuthStore();
 
   useEffect(() => {
     const getMessages = async () => {
@@ -19,8 +19,10 @@ function useGetMessages() {
           },
         }
         );
+        
         if(response.status === 401){
           setMessages([]);
+          refreshToken();
           toast.error("로그인이 필요합니다.");
         }
         if(response.status === 403){

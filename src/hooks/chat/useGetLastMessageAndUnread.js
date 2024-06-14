@@ -2,13 +2,19 @@ import { useEffect, useState } from "react";
 import conversationStore from "@zustand/conversationStore";
 import toast from "react-hot-toast";
 import { useAuthStore } from '@zustand/authStore';
+import useSocketStore from '@zustand/useSocketStore';
 
 const useGetLastMessageAndUnread = (conversations) => {
+  const {socket} = useSocketStore();
+  const {newMessage, setNewMessage} = conversationStore();
   const [loading, setLoading] = useState(false);
-  const { setLastMessage, setUnreadCount, lastMessage, unreadCount } = conversationStore();
+  const { setLastMessage, setUnreadCount, setModifiedDate, lastMessage, unreadCount, modifiedDate } = conversationStore();
   const { token, id } = useAuthStore();
 
   useEffect(() => {
+    socket?.on("newMessage", () => {
+      setNewMessage();
+    });
     const getLastMessageAndUnread = async () => {
       setLoading(true);
       try {
@@ -31,7 +37,7 @@ const useGetLastMessageAndUnread = (conversations) => {
           const data = await response.json();
           if (data.error) throw new Error(data.error);
 
-          return { roomId: conversation.id, lastMessage: data.lastMessage, unreadCount: data.unreadCount };
+          return { roomId: conversation.id, lastMessage: data.lastMessage, unreadCount: data.unreadCount, modifiedDate: data.modifiedDate };
         });
 
         const results = await Promise.all(fetchPromises);
@@ -40,6 +46,7 @@ const useGetLastMessageAndUnread = (conversations) => {
         validResults.forEach(result => {
           setLastMessage(result.roomId, result.lastMessage);
           setUnreadCount(result.roomId, result.unreadCount);
+          setModifiedDate(result.roomId, result.modifiedDate);
         });
       } catch (error) {
         toast.error(error.message + " 대화방을 선택해주세요.");
@@ -51,9 +58,12 @@ const useGetLastMessageAndUnread = (conversations) => {
     if (conversations.length > 0 && id) {
       getLastMessageAndUnread();
     }
-  }, [conversations, id, token]);
+    return () => {
+      socket?.off("newMessage");
+    };
+  }, [conversations, id, token, newMessage]);
 
-  return { loading, lastMessage, unreadCount };
+  return { loading, lastMessage, unreadCount, modifiedDate };
 };
 
 export default useGetLastMessageAndUnread;
