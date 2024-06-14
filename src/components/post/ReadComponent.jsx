@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useAuthStore from "@zustand/authStore.js";
 import { instance } from "@api/index.js";
 import useModalStore from "@zustand/modalStore.js";
+import PostButton from "@components/post/PostButton.jsx";
 
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
@@ -171,24 +172,21 @@ function ReadComponent({ aid }) {
                         <div className="flex justify-between md:justify-end">
                             {loggedInUserId === article.writerId ? (
                                 <>
-                                    <button className="btn btn-ghost bg-violet-500 text-white mb-10">
+                                    <PostButton className="bg-violet-500">
                                         수정하기
-                                    </button>
-                                    <button className="btn btn-ghost bg-orange-500 text-white mb-10 md:mx-1">
+                                    </PostButton>
+                                    <PostButton className="bg-orange-500">
                                         삭제하기
-                                    </button>
+                                    </PostButton>
                                 </>
                             ) : (
                                 <>
-                                    <button className="btn btn-ghost bg-violet-500 text-white mb-10">
+                                    <PostButton className="bg-violet-500">
                                         1:1 채팅하기
-                                    </button>
-                                    <button
-                                        className="btn btn-ghost bg-orange-500 text-white mb-10 md:mx-1"
-                                        onClick={openOfferModal}
-                                    >
+                                    </PostButton>
+                                    <PostButton className="bg-orange-500" onClick={openOfferModal}>
                                         거래 제안하기
-                                    </button>
+                                    </PostButton>
                                 </>
                             )}
                         </div>
