@@ -14,6 +14,7 @@ const Search = () => {
     const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
     const [category, setCategory] = useState(initialCategory);
     const [tradeMethod, setTradeMethod] = useState(null);
+    const[totalCount, setTotalCount] = useState(0);
 
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -54,7 +55,8 @@ const Search = () => {
             url += `?${params.join('&')}`;
         }
 
-        window.history.replaceState(null, '', params.length > 0 ? `?${params.join('&')}` : '');
+        const urlParams = params.filter(param => !param.startsWith('page=') && !param.startsWith('size='));
+        window.history.replaceState(null, '', urlParams.length > 0 ? `?${urlParams.join('&')}` : '');
 
         instance.get(url)
             .then(response => {
@@ -62,9 +64,10 @@ const Search = () => {
                 return response.data;
             })
             .then(data => {
-                if (Array.isArray(data)) {
-                    setArticleDTO(prev => reset ? data : [...prev, ...data]);
-                    setHasMore(data.length === 10);
+                if (Array.isArray(data.searchResult)) {
+                    setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
+                    setTotalCount(data.totalCount);
+                    setHasMore(data.searchResult.length === 10);
                 } else {
                     console.error('Expected an array but got:', data);
                 }
@@ -100,8 +103,7 @@ const Search = () => {
         },
         [loading, hasMore]
     );
-    
-    const articleCount = articleDTO.length;
+
 
     const categoryCode = [
         {
@@ -176,7 +178,7 @@ const Search = () => {
     //정렬 선택
     const handleOrderBy = (value) => {
         setOrderBy(value);
-    }
+    };
 
 
     
@@ -186,7 +188,7 @@ const Search = () => {
         setPage(1);
         fetchArticles(true);
         setIsopenedFilter(!isopenedFilter);
-    }
+    };
 
     const handleReset = () => {
         setCategory(null);
@@ -305,7 +307,7 @@ const Search = () => {
                     "전체 검색 결과"
                 )}
                 </h3>
-                <span className="ml-2 text-red-500 text-[20px]">{articleCount}</span>
+                <span className="ml-2 text-red-500 text-[20px]">{totalCount}</span>
             </div>
             <div className="mt-5 w-full flex justify-between items-center">
                 <div className="">
