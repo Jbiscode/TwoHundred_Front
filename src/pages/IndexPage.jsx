@@ -31,7 +31,6 @@ function IndexPage() {
 
     //추천상품-페이징
     const [goodsList, setGoodsList] = useState([]);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6;
 
@@ -110,13 +109,8 @@ function IndexPage() {
             })
             .catch(error => {
                 console.error('Error fetching goods data:', error);
-                setError(error);
             });
     }, []);
-
-    if (error) {
-        return <div>Error: {error.message}</div>;
-    }
 
     const currentGoods = goodsList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const totalPages = Math.ceil(goodsList.length / itemsPerPage);
