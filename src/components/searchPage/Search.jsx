@@ -7,97 +7,28 @@ import {instance} from '@api/index.js';
 
 const Search = () => {
     const [articleDTO, setArticleDTO] = useState([]);
+    //검색 결과
     const location = useLocation();
     const query = new URLSearchParams(location.search).get('content');
     const [content, setContent] = useState(query || '');
+    
+    //정렬
     const [orderBy, setOrderBy] = useState('latest');
-    const [category, setCategory] = useState(null);
+
+    //필터
+    const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
+    const [category, setCategory] = useState(initialCategory);
     const [tradeMethod, setTradeMethod] = useState(null);
 
+    //검색결과 총 개수
+    const [totalCount, setTotalCount] = useState(0);
+
+    //페이징
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
 
-
-    useEffect(() => {
-        if (query !== content) {
-            setContent(query || '');
-        }
-    }, [query]);
-
-    const fetchArticles = (reset = false) => {
-        setLoading(true);
-        let url = `/api/v1/search`;
-        let params = [];
-
-        if (orderBy) {
-            params.push(`orderBy=${orderBy}`);
-        }
-        if (content) {
-            params.push(`content=${content}`);
-        }
-        if (category) {
-            params.push(`category=${category}`);
-        }
-        if (tradeMethod) {
-            params.push(`tradeMethod=${tradeMethod}`);
-        }
-        params.push(`page=${page}`);
-        params.push(`size=10`);
-
-        if (params.length > 0) {
-            url += `?${params.join('&')}`;
-        }
-
-        window.history.replaceState(null, '', params.length > 0 ? `?${params.join('&')}` : '');
-
-        instance.get(url)
-            .then(response => {
-                console.log('Fetched articles:', response);
-                return response.data;
-            })
-            .then(data => {
-                if (Array.isArray(data)) {
-                    setArticleDTO(prev => reset ? data : [...prev, ...data]);
-                    setHasMore(data.length === 10);
-                } else {
-                    console.error('Expected an array but got:', data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching articles:', error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
-
-    useEffect(() => {
-        setPage(1);
-        fetchArticles(true);
-    }, [content, orderBy, category, tradeMethod]);
-
-    useEffect(() => {
-        if (page > 1) fetchArticles();
-    }, [page]);
-
-    const observer = useRef();
-    const lastItemRef = useCallback(
-        (node) => {
-            if (loading || !hasMore) return;
-            if (observer.current) observer.current.disconnect();
-            observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    setPage(prev => prev + 1);
-                }
-            });
-            if (node) observer.current.observe(node);
-        },
-        [loading, hasMore]
-    );
-    
-    const articleCount = articleDTO.length;
-
+    //필터 구분
     const categoryCode = [
         {
             id : 'MEMBERSHIP',
@@ -158,6 +89,91 @@ const Search = () => {
         }
     ]
 
+
+    useEffect(() => {
+        if (query !== content) {
+            setContent(query || '');
+        }
+    }, [query]);
+
+    useEffect(() => {
+        console.log('Category state:', category);
+    }, [category]);
+
+    const fetchArticles = (reset = false) => {
+        setLoading(true);
+        let url = `/api/v1/search`;
+        let params = [];
+
+        if (orderBy) {
+            params.push(`orderBy=${orderBy}`);
+        }
+        if (content) {
+            params.push(`content=${content}`);
+        }
+        if (category) {
+            params.push(`category=${category}`);
+        }
+        if (tradeMethod) {
+            params.push(`tradeMethod=${tradeMethod}`);
+        }
+        params.push(`page=${page}`);
+        params.push(`size=10`);
+
+        if (params.length > 0) {
+            url += `?${params.join('&')}`;
+        }
+
+        const urlParams = params.filter(param => !param.startsWith('page=') && !param.startsWith('size='));
+        window.history.replaceState(null, '', urlParams.length > 0 ? `?${urlParams.join('&')}` : '');
+
+        instance.get(url)
+            .then(response => {
+                console.log('Fetched articles:', response);
+                return response.data;
+            })
+            .then(data => {
+                if (Array.isArray(data.searchResult)) {
+                    setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
+                    setTotalCount(data.totalCount);
+                    setHasMore(data.searchResult.length === 10);
+                } else {
+                    console.error('Expected an array but got:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching articles:', error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
+    
+    //페이징
+    useEffect(() => {
+        setPage(1);
+        fetchArticles(true);
+    }, [content, orderBy, category, tradeMethod]);
+
+    useEffect(() => {
+        if (page > 1) fetchArticles();
+    }, [page]);
+
+    const observer = useRef();
+    const lastItemRef = useCallback(
+        (node) => {
+            if (loading || !hasMore) return;
+            if (observer.current) observer.current.disconnect();
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    setPage(prev => prev + 1);
+                }
+            });
+            if (node) observer.current.observe(node);
+        },
+        [loading, hasMore]
+    );
+
     //카테고리 선택
     const handleCategory = (item) => {
         setCategory(item.id);
@@ -171,7 +187,7 @@ const Search = () => {
     //정렬 선택
     const handleOrderBy = (value) => {
         setOrderBy(value);
-    }
+    };
 
 
     
@@ -181,7 +197,7 @@ const Search = () => {
         setPage(1);
         fetchArticles(true);
         setIsopenedFilter(!isopenedFilter);
-    }
+    };
 
     const handleReset = () => {
         setCategory(null);
@@ -300,7 +316,7 @@ const Search = () => {
                     "전체 검색 결과"
                 )}
                 </h3>
-                <span className="ml-2 text-red-500 text-[20px]">{articleCount}</span>
+                <span className="ml-2 text-red-500 text-[20px]">{totalCount}</span>
             </div>
             <div className="mt-5 w-full flex justify-between items-center  pb-2 px-3">
                 <div className="">
@@ -344,7 +360,7 @@ const Search = () => {
             </div>
             <div className='h-[8px] bg-[#ececec] w-full'></div>
             {/* body */}
-            <div className='w-[90%] mx-auto mt-5'>
+            <div className='mt-5'>
                 <div className="goods">
                     <div className="goods-wrapper w-full justify-center box-border">
                         {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
@@ -352,7 +368,7 @@ const Search = () => {
                                 {articleDTO.map((item, index) => (
                                     <Link 
                                         ref={index === articleDTO.length - 1 ? lastItemRef : null} 
-                                        key={item.id} 
+                                        key={`${item.id} + ${Math.random().toString(36).substr(2, 9)}`}
                                         className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow  "
                                         to={`/post/${item.id}`}
                                     >

@@ -1,30 +1,39 @@
-import {useRef, useState} from "react";
+import { useState, useEffect } from "react";
+import { auth } from "@api/index.js";
+import axios from "axios";
+import { addArticle } from "@api/apis.js";
 
-const initState = {
-    title: "",
-    files: [],
-    category_code: "",
-    trade_area: "",
-    product_status_code: "",
-    trade_method_code: "",
-    quantity: "",
-    price: "",
-    content: "",
-};
-
-function AddComponent(props) {
-    const [article, setArticle] = useState(initState);
+function AddComponent() {
     const [imageFiles, setImageFiles] = useState([]);
 
-    const uploadRef = useRef();
+    const [addr2Options, setAddr2Options] = useState([]);
 
-    const [fetching, setFetching] = useState(false);
-    const [result, setResult] = useState(null);
+    const [articleRequestDTO, setArticleRequestDTO] = useState({
+        title: "",
+        content: "",
+        price: "",
+        quantity: "",
+        category: "",
+        tradeMethod: "",
+        tradeStatus: "ON_SALE",
+        addr1: "",
+        addr2: "",
+        writerId: "",
+    });
+
+    useEffect(() => {
+        if (articleRequestDTO.addr1) {
+            setAddr2Options(regions[articleRequestDTO.addr1]);
+        } else {
+            setAddr2Options([]);
+        }
+    }, [articleRequestDTO.addr1]);
 
     const handleChangeArticle = (e) => {
-        article[e.target.name] = e.target.value;
-
-        setArticle({...article});
+        setArticleRequestDTO({
+            ...articleRequestDTO,
+            [e.target.name]: e.target.value,
+        });
     };
 
     const handleImageUpload = (e) => {
@@ -32,52 +41,71 @@ function AddComponent(props) {
         setImageFiles([...imageFiles, ...files]);
     };
 
+    const handleImageRemove = (index) => {
+        const updatedImageFiles = [...imageFiles];
+        updatedImageFiles.splice(index, 1);
+        setImageFiles(updatedImageFiles);
+    };
+
     // 버튼을 누르면 실행되는 함수
-    const handleClickAdd = (e) => {
-        console.log(article);
+    const handleClickAdd = async (e) => {
+        e.preventDefault();
+        console.log(articleRequestDTO);
 
         const formData = new FormData();
 
-        imageFiles.forEach((file) => {
-            formData.append("files", file);
-        });
+        formData.append(
+            "articleRequestDTO",
+            new Blob([JSON.stringify(articleRequestDTO)], {
+                type: "application/json",
+            })
+        );
 
-        formData.append("title", article.title);
-        formData.append("category_code", article.category_code);
-        formData.append("trade_area", article.trade_area);
-        formData.append("product_status_code", article.product_status_code);
-        formData.append("trade_method_code", article.trade_method_code);
-        formData.append("quantity", article.quantity);
-        formData.append("price", article.price);
-        formData.append("content", article.content);
+        if (imageFiles.length > 0) {
+            for (var i = 0; i < imageFiles.length; i++) {
+                formData.append("files", imageFiles[i]);
+            }
+        }
 
-        console.log(formData);
+        try {
+            const data = await addArticle(formData);
+            console.log("게시글 작성 성공:", data);
+            // 게시글 작성 성공 후 처리할 로직 추가
+        } catch (error) {
+            console.error("게시글 작성 실패:", error);
+            // 게시글 작성 실패 후 처리할 로직 추가
+        }
+    };
 
-        setFetching(true);
+    const categories = [
+        { name: "회원권", value: "MEMBERSHIP" },
+        { name: "PT", value: "PT" },
+        { name: "운동용품", value: "HEALTH_SUPPLIES" },
+        { name: "운동기구", value: "HEALTH_EQUIPMENT" },
+        { name: "음식", value: "FOOD" },
+    ];
 
-        // post로 formData 전송하는 코드
-        // postAdd(formData).then((data) => {
-        //     setFetching(false);
-        //     setResult(data.result);
-        // });
+    const regions = {
+        서울시: ["강남구", "강동구", "강북구", "강서구", "관악구"],
+        경기도: ["수원시", "성남시", "안양시", "안산시", "용인시"],
+        경상북도: ["포항시", "경주시", "김천시", "안동시", "구미시"],
     };
 
     return (
-
         <div className="mx-auto w-fit bg-white py-8 px-20">
             <h2 className="text-2xl font-bold mb-4">상품정보</h2>
-            <hr className="border-2 mb-2"/>
+            <hr className="border-2 mb-2" />
             <div className="mb-4">
                 <label htmlFor="name" className="block mb-2">
-                    상품명
+                    제목
                 </label>
                 <input
                     type="text"
                     id="name"
                     name="title"
-                    value={article.title}
+                    value={articleRequestDTO.title}
                     onChange={handleChangeArticle}
-                    className="input input-bordered w-full"
+                    className="input input-bordered w-full bg-white"
                     placeholder="상품 제목을 입력해주세요."
                 />
             </div>
@@ -89,13 +117,22 @@ function AddComponent(props) {
                             <img
                                 src={URL.createObjectURL(file)}
                                 alt={`Uploaded ${index}`}
-                                className="w-24 h-24 object-cover  border-2"
+                                className="w-24 h-24 object-cover border-2"
                             />
                             <span className="text-sm">{file.name}</span>
+                            <button
+                                onClick={() => handleImageRemove(index)}
+                                className="mt-2 text-red-500"
+                            >
+                                삭제
+                            </button>
                         </div>
                     ))}
                     <div className="flex flex-col items-center">
-                        <label htmlFor="image-upload" className="cursor-pointer">
+                        <label
+                            htmlFor="image-upload"
+                            className="cursor-pointer"
+                        >
                             <div className="avatar placeholder">
                                 <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
                                     <span className="text-3xl">+</span>
@@ -115,9 +152,9 @@ function AddComponent(props) {
                 </div>
                 <p className="text-sm text-orange-400">
                     * 상품 이미지는 640x640에 최적화 되어 있습니다.
-                    <br/>
+                    <br />
                     - 이미지는 상품등록 시 정사각형으로 잘려서 등록됩니다.
-                    <br/>
+                    <br />
                     최대 지원 사이즈인 640 X 640 으로 리사이즈 해서 올려주세요.
                 </p>
             </div>
@@ -125,104 +162,48 @@ function AddComponent(props) {
                 <label htmlFor="category" className="block mb-2">
                     카테고리
                 </label>
-                <input
-                    type="text"
-                    id="category"
-                    name="category_code"
-                    value={article.category_code}
+                <select
+                    name="category"
                     onChange={handleChangeArticle}
-                    className="input input-bordered w-full"
-                    placeholder="카테고리를 선택해주세요."
-                />
+                    className="select select-bordered  w-full bg-white"
+                >
+                    <option value="">카테고리 선택</option>
+                    {categories.map((category) => (
+                        <option key={category.value} value={category.value}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
             </div>
             <div className="mb-4">
                 <label htmlFor="brand" className="block mb-2">
                     거래지역
                 </label>
-                <input
-                    type="text"
-                    id="brand"
-                    name="trade_area"
-                    value={article.trade_area}
+                <select
+                    name="addr1"
                     onChange={handleChangeArticle}
-                    className="input input-bordered w-full"
-                    placeholder="동작구 사당동"
-                />
-            </div>
-            <div className="mb-4">
-                <span>상품상태</span>
-                <div className="flex space-x-4 mt-2">
-                    <div className="form-control">
-                        <label className="label cursor-pointer">
-                            <input
-                                type="radio"
-                                name="product_status_code"
-                                value="USED"
-                                checked={article.product_status_code === "USED"}
-                                onChange={handleChangeArticle}
-                                className="radio checked:bg-orange-400"
-                            />
-                            <span className="label-text ml-2">중고상품</span>
-                        </label>
-                    </div>
-                    <div className="form-control">
-                        <label className="label cursor-pointer">
-                            <input
-                                type="radio"
-                                name="product_status_code"
-                                value="NEW"
-                                checked={article.product_status_code === "NEW"}
-                                onChange={handleChangeArticle}
-                                className="radio checked:bg-orange-400"
-                            />
-                            <span className="label-text ml-2">새상품</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div className="mb-4">
-                <span>거래방식</span>
-                <div className="flex space-x-4 mt-2">
-                    <div className="form-control">
-                        <label className="label cursor-pointer">
-                            <input
-                                type="radio"
-                                name="trade_method_code"
-                                value="DIRECT"
-                                checked={article.trade_method_code === "DIRECT"}
-                                onChange={handleChangeArticle}
-                                className="radio checked:bg-orange-400"
-                            />
-                            <span className="label-text ml-2">직거래</span>
-                        </label>
-                    </div>
-                    <div className="form-control">
-                        <label className="label cursor-pointer">
-                            <input
-                                type="radio"
-                                name="trade_method_code"
-                                value="PARCEL"
-                                checked={article.trade_method_code === "PARCEL"}
-                                onChange={handleChangeArticle}
-                                className="radio checked:bg-orange-400"
-                            />
-                            <span className="label-text ml-2">택배거래</span>
-                        </label>
-                    </div>
-                    <div className="form-control">
-                        <label className="label cursor-pointer">
-                            <input
-                                type="radio"
-                                name="trade_method_code"
-                                value="ANY"
-                                checked={article.trade_method_code === "ANY"}
-                                onChange={handleChangeArticle}
-                                className="radio checked:bg-orange-400"
-                            />
-                            <span className="label-text ml-2">상관없음</span>
-                        </label>
-                    </div>
-                </div>
+                    className="select select-bordered bg-white w-1/2"
+                >
+                    <option value="">시/도 선택</option>
+                    {Object.keys(regions).map((region) => (
+                        <option key={region} value={region}>
+                            {region}
+                        </option>
+                    ))}
+                </select>
+
+                <select
+                    name="addr2"
+                    onChange={handleChangeArticle}
+                    className="select select-bordered bg-white w-1/2"
+                >
+                    <option value="">시/군/구 선택</option>
+                    {addr2Options.map((option) => (
+                        <option key={option} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
             </div>
             <div className="mb-4">
                 <label htmlFor="quantity" className="block mb-2">
@@ -233,12 +214,12 @@ function AddComponent(props) {
                         type="number"
                         id="quantity"
                         name="quantity"
-                        value={article.quantity}
+                        value={articleRequestDTO.quantity}
                         onChange={handleChangeArticle}
-                        className="input input-bordered w-24"
+                        className="input input-bordered w-24 bg-white"
                         placeholder="1"
                     />
-                    <span className="ml-2">개</span>
+                    <span className="ml-2 my-auto">개</span>
                 </div>
             </div>
             <div className="mb-4">
@@ -250,30 +231,83 @@ function AddComponent(props) {
                         type="number"
                         id="price"
                         name="price"
-                        value={article.price}
+                        value={articleRequestDTO.price}
                         onChange={handleChangeArticle}
-                        className="input input-bordered w-full"
+                        className="input input-bordered w-full bg-white"
                         placeholder="숫자만 입력해주세요."
                     />
-                    <span className="ml-2">원</span>
+                    <span className="ml-2 my-auto">원</span>
                 </div>
             </div>
             <div className="mb-8">
-
                 <textarea
                     id="content"
                     name="content"
-                    value={article.content}
+                    value={articleRequestDTO.content}
                     onChange={handleChangeArticle}
                     rows={5}
-                    className="textarea textarea-bordered w-full"
+                    className="textarea textarea-bordered w-full bg-white"
                     placeholder={"상품 설명을 입력해주세요."}
                 />
+            </div>
+            {/* ... */}
+            <div className="mb-4">
+                <span>거래방식</span>
+                <div className="flex space-x-4 mt-2">
+                    <div className="form-control">
+                        <label className="label cursor-pointer">
+                            <input
+                                type="radio"
+                                name="tradeMethod"
+                                value="FACE_TO_FACE"
+                                checked={
+                                    articleRequestDTO.tradeMethod ===
+                                    "FACE_TO_FACE"
+                                }
+                                onChange={handleChangeArticle}
+                                className="radio checked:bg-orange-400"
+                            />
+                            <span className="label-text ml-2">직거래</span>
+                        </label>
+                    </div>
+                    <div className="form-control">
+                        <label className="label cursor-pointer">
+                            <input
+                                type="radio"
+                                name="tradeMethod"
+                                value="DELIVERY"
+                                checked={
+                                    articleRequestDTO.tradeMethod === "DELIVERY"
+                                }
+                                onChange={handleChangeArticle}
+                                className="radio checked:bg-orange-400"
+                            />
+                            <span className="label-text ml-2">택배거래</span>
+                        </label>
+                    </div>
+                    <div className="form-control">
+                        <label className="label cursor-pointer">
+                            <input
+                                type="radio"
+                                name="tradeMethod"
+                                value="NO_MATTER"
+                                checked={
+                                    articleRequestDTO.tradeMethod ===
+                                    "NO_MATTER"
+                                }
+                                onChange={handleChangeArticle}
+                                className="radio checked:bg-orange-400"
+                            />
+                            <span className="label-text ml-2">상관없음</span>
+                        </label>
+                    </div>
+                </div>
             </div>
             <div className="flex justify-end">
                 <button
                     className="btn btn-ghost bg-orange-400 text-white mb-10"
-                    onClick={handleClickAdd}>
+                    onClick={handleClickAdd}
+                >
                     등록하기
                 </button>
             </div>

@@ -106,3 +106,36 @@ export const userSignUp = async(formData) => {
     return error.response.status;
   }
 }
+
+export const addArticle = async (formData) => {
+  try {
+    const response = await axios.post(`/api/v1/articles`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": useAuthStore.getState().getToken()
+      },
+      withCredentials: true
+    });
+    console.log(response);
+    return response.status;
+  } catch (error) {
+    console.log("error: ", error);
+    throw error;
+  }
+}
+export const updateArticle = async (aid, formData) => {
+  try {
+    const response = await axios.put(`/api/v1/articles/${aid}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": useAuthStore.getState().getToken()
+      },
+      withCredentials: true
+  });
+  console.log(response);
+  return response.status;
+  } catch(error) {
+  console.log("error: ", error);
+  throw error;
+  }
+};
