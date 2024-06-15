@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 
 const BuyComponent = ({updateMyProfileInfo }) => {
-    const {openLoginModal, openWriteReviewModal} = useModalStore(state => state)
+    const {openLoginModal, openWriteReviewModal, openReviewModal } = useModalStore(state => state)
     const {setSelectReviewId} = usemyprofileStore(state => state)
 
     const [sortBy, setSortBy] = useState('latest')
@@ -51,6 +51,11 @@ const BuyComponent = ({updateMyProfileInfo }) => {
     const handleClickReview = (articleId) => {
         setSelectReviewId(articleId)
         openWriteReviewModal();
+    }
+
+    const handleClickGetReview = (articleId) => {
+        setSelectReviewId(articleId)
+        openReviewModal();
     }
 
     const handleTradeStatusChangeSoldOut = () => {
@@ -141,7 +146,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                             <div className="flex justify-between items-center">
                                 <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
                                 {
-                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral">작성완료</button>
+                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral" onClick={() => {handleClickGetReview(item.id)}}>작성완료</button>
                                 }
                                 {
                                     item.isReviewed ||  <button className="btn btn-sm btn-secondary" onClick={() => {handleClickReview(item.id)}}>리뷰작성</button>

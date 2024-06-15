@@ -8,6 +8,7 @@ const useModalStore = create(
             isSignupModalOpen: false,
             isWriteReviewModalOpen: false,
             isOfferModalOpen: false,
+            isReviewModalOpen: false,
             openLoginModal: () => set(state => ({ isLoginModalOpen: true })),
             closeLoginModal: () => set(state => ({ isLoginModalOpen: false })),
             openSignupModal: () => set(state => ({ isSignupModalOpen: true })),
@@ -15,7 +16,9 @@ const useModalStore = create(
             openWriteReviewModal: () => set(state => ({ isWriteReviewModalOpen: true })),
             closeWriteReviewModal : () => set(state => ({ isWriteReviewModalOpen: false })),
             openOfferModal: () => set(state => ({ isOfferModalOpen: true })),
-            closeOfferModal: () => set(state => ({ isOfferModalOpen: false }))
+            closeOfferModal: () => set(state => ({ isOfferModalOpen: false })),
+            openReviewModal: () => set(state => ({ isReviewModalOpen: true})),
+            closeReviewModal : () => set(state => ({ isReviewModalOpen: false })),
         })
     
 )
