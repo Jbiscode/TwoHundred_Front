@@ -21,6 +21,8 @@ import useSocketStore from '@zustand/useSocketStore';
 import { toast } from 'react-hot-toast';
 import ChatAlarm from '@components/chat/ChatAlarm';
 import {instance} from '@api/index.js';
+import { Link } from 'react-router-dom';
+import {auth} from '@api/index'
 
 
 function IndexPage() {
@@ -28,11 +30,13 @@ function IndexPage() {
     //배너
     const [currentSlide, setCurrentSlide] = useState(0);
     const { socket } = useSocketStore();
+    
 
     //추천상품-페이징
     const [goodsList, setGoodsList] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [like, setLike] = useState(false)
     const itemsPerPage = 6;
 
 
@@ -112,7 +116,7 @@ function IndexPage() {
                 console.error('Error fetching goods data:', error);
                 setError(error);
             });
-    }, []);
+    }, [like]);
 
     if (error) {
         return <div>Error: {error.message}</div>;
@@ -132,6 +136,32 @@ function IndexPage() {
             setCurrentPage(currentPage - 1);
         }
     };
+
+    const handleLikeChange = (e,id) => {
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('왜 안눌리누?')
+        console.log(id)
+        const fetch = async() => {
+            try{
+                const response = await auth.put(
+                    `/api/v1/users/me/likes/${id}`,
+                    {withCredentials: true}
+                )
+                if(response.resultCode == '401'){
+                    openLoginModal()
+                }
+                if(response.resultCode == '200'){
+                    console.log("click")
+                    setLike(prev => !prev)
+                    updateMyProfileInfo();
+                }
+            }catch(error){
+                console.log(error)
+            }
+        }
+        fetch()
+    }
 
 
     return (
@@ -185,32 +215,35 @@ function IndexPage() {
             </div>
                 
             {/* 추천상품 */}
-            <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
-            <div className="goods">
-                <div className="goods-wrapper w-full  grid justify-center box-border">
-                    <div className="goods-list  w-full grid box-border list-none grid-cols-2 ">
+            <div className="goods px-6">
+                <div className="goods-wrapper -mx-2 w-full  grid justify-center box-border">
+                    <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
+                    <div className="goods-list  w-full grid box-border list-none grid-cols-2">
                         {currentGoods.length > 0 ? (
                             currentGoods.map((item) => (
-                                <div key={item.id} className="goods-cont mb-7">
-                                    <a href="#">
+                                <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>
+                                    <div className='rounded-[10%] relative'>
                                         <img 
                                             src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
                                             alt={item.imageId} 
-                                            className="goods-icn mb-3 items-center max-w-[194px] h-[194px]" 
+                                            className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] h-[194px] block w-full" 
                                             //onError={(e) => { e.target.onerror = null; e.target.src = 'default-image-url'; }} // 이미지 로드 실패 시 대체 이미지 설정
                                         />
-                                    </a>
-                                    <span className="w-full ml-2  text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
-                                        {item.title}
-                                    </span>
-                                    <span className="text-sm font-extralight ml-2">
-                                        {item.content}
-                                    </span>
-                                    <span className="flex justify-between goods-cont_bottom mb-3"></span>
-                                    <span className="text-lg font-extrabold goods-cont_price ml-2">
-                                        {Number(item.price).toLocaleString()}
-                                    </span>               
-                                </div>
+                                        
+                                        <img className="absolute top-2 right-2" alt='frfrf' src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
+                                    </div>
+                                    <div className='pl-1'>
+                                        <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-1">
+                                            {item.title}
+                                        </p>
+                                        <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">
+                                            {item.content}
+                                        </p>
+                                        <div className="text-lx font-bold">
+                                            {Number(item.price).toLocaleString()}원
+                                        </div>
+                                    </div>               
+                                </Link>
                             ))
                         ) : (
                             <div>로딩중...</div>

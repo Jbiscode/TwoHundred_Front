@@ -150,9 +150,9 @@ const SaleComponent = ({userId}) => {
             <div className="flex flex-wrap -mx-2">
                 {
                     mySalesDTO.map(item => (
-                        <div className="w-1/2 px-2 mb-4" key={item.id}>
+                        <Link className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`}>
                             <div className="relative">
-                                <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} />
+                                <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1]"/>
                                 {
                                         item.tradeStatus === 'SOLD_OUT' &&
                                         <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0">
@@ -164,14 +164,14 @@ const SaleComponent = ({userId}) => {
                                 }
                                
                             </div>
-                            <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-2">{item.title}</p>
-                            <div className="my-2 flex text-sm gap-1 font-bold text-gray-400">
+                            <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold mt-2 mb-1 pl-1">{item.title}</p>
+                            <div className=" mb-1 flex text-sm gap-1 font-bold text-gray-400 pl-1">
                                 <p>{`${item.addr1} ${item.addr2}`}</p>
                                 <p>|</p>
                                 <p>{item.timeAgo}</p>
                             </div>
-                            <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
-                        </div>
+                            <div className="text-lx font-bold pl-1">{item.price.toLocaleString()}원</div>
+                        </Link>
                     ))
                 }
             </div>

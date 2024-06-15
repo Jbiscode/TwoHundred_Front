@@ -5,7 +5,7 @@ import usemyprofileStore from "@zustand/myprofileStore"
 import {auth} from "@api/index"
 
 const MyProfileInfoComponent = () => {
-    const {token, user} = useAuthStore()
+    const {token, user, refreshToken} = useAuthStore()
     const {updateMyProfile, setSalesView, setLikesView, setOffersView, setBuyView, currentView} = usemyprofileStore(state => state)
 
     const [userDTO, setUserDTO] = useState({
@@ -33,6 +33,7 @@ const MyProfileInfoComponent = () => {
                 )
             if(response.resultCode == '401'){
                 setIsModalOpen(true)
+                // refreshToken();
             }
             if(response.resultCode == '200'){
                 setUserDTO(response.data)

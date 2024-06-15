@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import filter from '@assets/images/icon/filter.svg';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {instance} from '@api/index.js';
 
 
@@ -288,9 +288,9 @@ const Search = () => {
             </div>
 
             {/* header */}
-            <div className="w-[90%] mx-auto ">
+            <div className="w-full mx-auto">
             <div className="text-2xl">
-            <div className="text-2xl">
+            <div className="text-2xl px-3">
                 <h3 className="inline-block m-0 text-m font-bold border-b-2 border-gray-300">
                 {content ? (
                     <>
@@ -302,7 +302,7 @@ const Search = () => {
                 </h3>
                 <span className="ml-2 text-red-500 text-[20px]">{articleCount}</span>
             </div>
-            <div className="mt-5 w-full flex justify-between items-center">
+            <div className="mt-5 w-full flex justify-between items-center  pb-2 px-3">
                 <div className="">
                 <div
                     className="border-solid border border-gray-300 cursor-pointer p-1 bg-white rounded-lg flex items-center text-sm"
@@ -315,6 +315,7 @@ const Search = () => {
                     alt='filter' />
                 </div>
                 </div>
+                
                 <div className="flex justify-end items-center mt-2">
                     <div
                         className={`text-[12px] after:content-[''] after:mx-2 after:border after:border-gray-300 cursor-pointer ${orderBy === 'latest' ? 'text-red-500' : ''}`}
@@ -341,27 +342,32 @@ const Search = () => {
             </div>
             </div>
             </div>
-
+            <div className='h-[8px] bg-[#ececec] w-full'></div>
             {/* body */}
             <div className='w-[90%] mx-auto mt-5'>
                 <div className="goods">
-                    <div className="goods-wrapper w-full grid justify-center box-border">
+                    <div className="goods-wrapper w-full justify-center box-border">
                         {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
-                            <div className="goods-list mr-7 ml-3 w-full grid box-border list-none grid-cols-2">
+                            <div className="goods-list w-full flex flex-col box-border list-none">
                                 {articleDTO.map((item, index) => (
-                                    <div 
+                                    <Link 
                                         ref={index === articleDTO.length - 1 ? lastItemRef : null} 
                                         key={item.id} 
-                                        className="goods-cont mb-4"
+                                        className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow  "
+                                        to={`/post/${item.id}`}
                                     >
-                                        <a href="#"><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="goods-icn items-center max-w-[165px] h-[211px]" /></a>
-                                        <span className="w-full text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
-                                            {item.title}
-                                        </span>
-                                        <span className="text-sm text-gray-500">{item.addr1} {item.addr2}</span>
-                                        <span className="flex justify-between goods-cont_bottom"></span>
-                                        <span className="text-lg font-extrabold goods-cont_price">{item.price}</span>
-                                    </div>
+                                        <div >
+                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
+                                        </div>
+                                        <div className='ml-3 flex-grow'>
+                                            <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
+                                                {item.title}
+                                            </p>
+                                            <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">{item.addr1} {item.addr2}</p>
+                                            <p className="flex justify-between goods-cont_bottom"></p>
+                                            <p className="text-lx font-bold">{Number(item.price).toLocaleString()}원</p>
+                                        </div>
+                                    </Link>
                                 ))}
                                 {loading && <div>Loading...</div>}
                             </div>
