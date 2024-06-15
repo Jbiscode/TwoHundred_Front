@@ -4,10 +4,11 @@ import SignupModal from '@components/modal/SignupModal';
 import WriteReviewModal from '@components/modal/WriteReviewModal'
 import Modal from '@components/templates/Modal';
 import OfferModal from '@components/modal/OfferModal';
+import MyReviewModal from '@components/modal/MyReviewModal';
 
 
 const ParentModal = () => {
-  const { isLoginModalOpen, isSignupModalOpen, isWriteReviewModalOpen, closeLoginModal, closeSignupModal,closeWriteReviewModal, isOfferModalOpen, closeOfferModal } = useModalStore();
+  const { isLoginModalOpen, isSignupModalOpen, isWriteReviewModalOpen, closeLoginModal, closeSignupModal,closeWriteReviewModal, isOfferModalOpen, closeOfferModal, isReviewModalOpen, closeReviewModal } = useModalStore();
     
   return (
     <>
@@ -22,6 +23,9 @@ const ParentModal = () => {
       </Modal>
       <Modal isOpen={isOfferModalOpen} onClose={closeOfferModal}>
         <OfferModal />
+      </Modal>
+      <Modal isOpen={isReviewModalOpen} onClose={closeReviewModal}>
+        <MyReviewModal />
       </Modal>
     </>
   );
