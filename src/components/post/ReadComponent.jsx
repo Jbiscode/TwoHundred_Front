@@ -104,7 +104,7 @@ function ReadComponent({ aid }) {
                     <div className="w-[300px]">
                         <div className="flex items-center">
                             <img
-                                src={`${article.writerProfileImageUrl}`}
+                                src={`https://kr.object.ncloudstorage.com/kjwtest/article/${article.writerProfileImageUrl}`}
                                 alt="프로필"
                                 className="w-[50px] h-[50px] rounded-full mr-4"
                             />
