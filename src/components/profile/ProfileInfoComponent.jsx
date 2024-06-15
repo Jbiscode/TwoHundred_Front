@@ -4,7 +4,7 @@ import usemyprofileStore from "@zustand/myprofileStore"
 import {instance} from "@api/index"
 
 const ProfileInfoComponent = ({userId}) => {
-    const {setReviewsView, setSalesView} = usemyprofileStore(state => state)
+    const {setReviewsView, setSalesView, updateMyProfileInfo} = usemyprofileStore(state => state)
 
 
     const [userDTO, setUserDTO] = useState({
@@ -35,6 +35,7 @@ const ProfileInfoComponent = ({userId}) => {
             if(response.resultCode == '200'){
                 setUserDTO(response.data)
                 console.log(response.data)
+                updateMyProfileInfo();
             }
             console.log(response.data)
             }catch(error){
