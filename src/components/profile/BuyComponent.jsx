@@ -25,7 +25,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
             // 로그인이 필요한 정보받아오기
             try{
                 const response = await auth.get(
-                    `/api/v1/users/me/buys/${tradeStatus}/${sortBy}?page=${page}`,
+                    `/api/v1/users/me/buys?tradeStatus=${tradeStatus}&sorting=${sortBy}&page=${page}`,
                     {withCredentials: true}
                 )
             if(response.resultCode == '401'){
