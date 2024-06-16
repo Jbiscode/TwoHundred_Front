@@ -29,7 +29,7 @@ const SaleComponent = ({userId}) => {
                 // 로그인이 필요한 정보받아오기
                 try{
                     const response = await auth.get(
-                        `/api/v1/users/me/${tradeStatus}/${sortBy}?page=${page}`,
+                        `/api/v1/users/me/sales?tradeStatus=${tradeStatus}&sorting=${sortBy}&page=${page}`,
                         {withCredentials: true}
                     )
                 if(response.resultCode == '401'){
@@ -56,7 +56,7 @@ const SaleComponent = ({userId}) => {
                 // 로그인이 필요한 정보받아오기
                 try{
                     const response = await auth.get(
-                        `/api/v1/users/${userId}/${tradeStatus}/${sortBy}?page=${page}`,
+                        `/api/v1/users/${userId}/sales?tradeStatus=${tradeStatus}&sorting=${sortBy}&page=${page}`,
                         {withCredentials: true}
                     )
                 if(response.resultCode == '401'){
@@ -106,7 +106,9 @@ const SaleComponent = ({userId}) => {
         setPage(1)
     }
 
-    const handleLikeChange = (id) => {
+    const handleLikeChange = (e,id) => {
+        e.stopPropagation()
+        e.preventDefault()
         console.log('왜 안눌리누?')
         console.log(id)
         const fetch = async() => {
@@ -160,7 +162,7 @@ const SaleComponent = ({userId}) => {
                                         </div>
                                 }
                                 {
-                                    item.isLiked == null ? '' :  <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={()=>{handleLikeChange(item.id)}}/>
+                                    item.isLiked == null ? '' :  <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
                                 }
                                
                             </div>
