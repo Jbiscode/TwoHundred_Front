@@ -9,7 +9,7 @@ export const convertResponse = async (res) => {
     headers: null,
   };
 
-  console.log("2. 응답 제조중", res.status);
+  // console.log("2. 응답 제조중", res.status);
 
   if (res.ok) {
     try {

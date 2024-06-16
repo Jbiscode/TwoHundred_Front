@@ -32,11 +32,9 @@ const createFetchInstance = (url, options) => {
       method
     };
 
-    console.log(mergedRequestOptions)
-
     try {
       const response = await originalFetch(url, endpoint, method, mergedRequestOptions);
-      console.log("1. 여기서 기본적인 요청에 대한 응답(from createFetchInstance -> fetchInstance)", response);
+      // console.log("1. 여기서 기본적인 요청에 대한 응답(from createFetchInstance -> fetchInstance)", response);
 
       return convertResponse(response, endpoint, method, mergedRequestOptions);
     } catch (error) {
