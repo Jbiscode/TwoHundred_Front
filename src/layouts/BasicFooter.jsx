@@ -14,6 +14,7 @@ function BasicFooter() {
     useEffect(() => {
         if (currentPage!='') {
             navigate(`/${currentPage}`);
+            window.scrollTo({ top: 0 });
             useFooterStore.setState({ currentPage: '' });
         }
     }, [currentPage]);
