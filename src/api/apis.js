@@ -61,7 +61,7 @@ export const refreshToken = async () => {
       return newToken;
     } else if (refreshTokenResponse.resultCode == 400) {
       useAuthStore.getState().removeToken();
-      return;
+      return null;
     } else {
       console.log("토큰 재발급 실패");
 

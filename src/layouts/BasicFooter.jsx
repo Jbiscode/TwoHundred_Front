@@ -12,10 +12,11 @@ function BasicFooter() {
     const { currentPage, openHomePage, openSearchPage, openChatPage, openMyPage } = useFooterStore();
 
     useEffect(() => {
-        if (currentPage) {
+        if (currentPage!='') {
             navigate(`/${currentPage}`);
+            useFooterStore.setState({ currentPage: '' });
         }
-    }, [currentPage, navigate]);
+    }, [currentPage]);
 
 
     return (

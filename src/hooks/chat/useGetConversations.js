@@ -39,7 +39,7 @@ const useGetConversations = () => {
       
     };
     getConversation();
-  },[token, refreshToken]);
+  },[token]);
 
   return { loading, conversations };
 };
