@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuthStore from "@zustand/authStore.js";
 import { instance } from "@api/index.js";
 import useModalStore from "@zustand/modalStore.js";
@@ -31,11 +32,11 @@ function ReadComponent({ aid }) {
         writerId: "",
     };
 
-    const { isLoggedIn } = useAuthStore();
     const loggedInUserId = useAuthStore((state) => state.getId());
     const { openOfferModal, closeOfferModal } = useModalStore((state) => state);
 
     const [article, setArticle] = useState(initState);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -43,7 +44,6 @@ function ReadComponent({ aid }) {
                 const response = await instance.get(`/api/v1/articles/${aid}`, {
                     withCredentials: true,
                 });
-                console.log("response:", response);
 
                 if (response.resultCode === "200") {
                     setArticle(response.data);
@@ -53,7 +53,7 @@ function ReadComponent({ aid }) {
             }
         };
 
-        fetchData().then((r) => console.log(r));
+        fetchData();
     }, [aid]); // aid가 변경될 때마다 useEffect 실행
 
     //게시글 삭제
@@ -62,7 +62,6 @@ function ReadComponent({ aid }) {
             const response = await auth.delete(`/api/v1/articles/${aid}`, {
                 withCredentials: true,
             });
-            console.log("response:", response);
             if (response.resultCode === "200") {
                 console.log("게시글 삭제 성공");
             }
@@ -92,8 +91,17 @@ function ReadComponent({ aid }) {
         }
     }
 
+    async function navigateToChatRoom(articleId, userId) {
+        const response = await auth.post(`/api/v1/chatroom/enter`, {
+            body: JSON.stringify({ articleId, userId }),
+            withCredentials: true,
+        });
+        window.scrollTo({ top: 0 });
+        navigate(`/chat/room/${response.data.chatRoomId}`);
+    }
+
     return (
-        <div className="mx-auto w-fit bg-white py-8 px-10">
+        <div className="mx-auto w-fit bg-white py-8 px-6">
             <div className="flex flex-col bg-white p-5 flex-wrap gap-10">
                 <div className="flex gap-10 flex-col md:flex-row m-auto md:m-0">
                     <img
@@ -201,7 +209,7 @@ function ReadComponent({ aid }) {
                                 </>
                             ) : (
                                 <>
-                                    <PostButton className="bg-violet-500">
+                                    <PostButton className="bg-violet-500" onClick={() => navigateToChatRoom(aid, loggedInUserId)}>
                                         1:1 채팅하기
                                     </PostButton>
                                     <PostButton className="bg-orange-500" onClick={openOfferModal}>

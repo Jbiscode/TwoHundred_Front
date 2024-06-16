@@ -39,7 +39,7 @@ export const useAuthStore = create(
       logout: async () => {
         try {
           const response = await logout();
-          if(response.resultCode == 200){
+          if(response.resultCode == 200 || response.resultCode == 400){
             set({ token: null, isLoggedin: false, user: null, id: 0 });
           }
         } catch (error) {
