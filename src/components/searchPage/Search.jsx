@@ -95,16 +95,12 @@ const Search = () => {
             setContent(query || '');
         }
     }, [query]);
-
-    useEffect(() => {
-        console.log('Category state:', category);
-    }, [category]);
-
-    const fetchArticles = (reset = false) => {
+    
+    const fetchArticles = async (reset = false) => {
         setLoading(true);
         let url = `/api/v1/search`;
         let params = [];
-
+    
         if (orderBy) {
             params.push(`orderBy=${orderBy}`);
         }
@@ -119,14 +115,14 @@ const Search = () => {
         }
         params.push(`page=${page}`);
         params.push(`size=10`);
-
+    
         if (params.length > 0) {
             url += `?${params.join('&')}`;
         }
-
+    
         const urlParams = params.filter(param => !param.startsWith('page=') && !param.startsWith('size='));
         window.history.replaceState(null, '', urlParams.length > 0 ? `?${urlParams.join('&')}` : '');
-
+    
         instance.get(url)
             .then(response => {
                 console.log('Fetched articles:', response);
@@ -154,11 +150,11 @@ const Search = () => {
         setPage(1);
         fetchArticles(true);
     }, [content, orderBy, category, tradeMethod]);
-
+    
     useEffect(() => {
         if (page > 1) fetchArticles();
     }, [page]);
-
+    
     const observer = useRef();
     const lastItemRef = useCallback(
         (node) => {
@@ -173,6 +169,8 @@ const Search = () => {
         },
         [loading, hasMore]
     );
+    
+
 
     //카테고리 선택
     const handleCategory = (item) => {
@@ -181,12 +179,13 @@ const Search = () => {
     
     //거래방식 선택
     const handleTradeMethod = (item) => {
-        setTradeMethod(item.id); 
+        setTradeMethod(item.id);
     };
 
     //정렬 선택
     const handleOrderBy = (value) => {
         setOrderBy(value);
+        setPage(1)
     };
 
 
