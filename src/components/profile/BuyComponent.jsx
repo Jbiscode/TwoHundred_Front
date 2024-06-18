@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import {auth} from "@api/index"
 import useModalStore from "@zustand/modalStore"
 import usemyprofileStore from "@zustand/myprofileStore";
+import { Link } from "react-router-dom";
 
 
 const BuyComponent = ({updateMyProfileInfo }) => {
-    const {openLoginModal, openWriteReviewModal} = useModalStore(state => state)
+    const {openLoginModal, openWriteReviewModal, openReviewModal } = useModalStore(state => state)
     const {setSelectReviewId} = usemyprofileStore(state => state)
 
     const [sortBy, setSortBy] = useState('latest')
@@ -24,7 +25,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
             // 로그인이 필요한 정보받아오기
             try{
                 const response = await auth.get(
-                    `/api/v1/users/me/buys/${tradeStatus}/${sortBy}?page=${page}`,
+                    `/api/v1/users/me/buys?tradeStatus=${tradeStatus}&sorting=${sortBy}&page=${page}`,
                     {withCredentials: true}
                 )
             if(response.resultCode == '401'){
@@ -52,6 +53,11 @@ const BuyComponent = ({updateMyProfileInfo }) => {
         openWriteReviewModal();
     }
 
+    const handleClickGetReview = (articleId) => {
+        setSelectReviewId(articleId)
+        openReviewModal();
+    }
+
     const handleTradeStatusChangeSoldOut = () => {
         setTradeStatus('SOLD_OUT')
         setPage(1)
@@ -77,9 +83,9 @@ const BuyComponent = ({updateMyProfileInfo }) => {
         setPage(1)
     }
 
-    const handleLikeChange = (id,isLiked) => {
-        console.log('왜 안눌리누?')
-        console.log(id)
+    const handleLikeChange = (e,id) => {
+        e.stopPropagation()
+        e.preventDefault()
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -120,19 +126,19 @@ const BuyComponent = ({updateMyProfileInfo }) => {
             <div className="flex flex-wrap -mx-2">
                 {
                     mySalesDTO.map(item => (
-                        <div className="w-1/2 px-2 mb-4" key={item.id}>
+                        <div className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`}>
                             <div className="relative">
-                                <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} />
+                                <Link to={`/post/${item.id}`}><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1]"/></Link>
                                 {
                                         item.tradeStatus === 'SOLD_OUT' &&
                                         <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0">
                                             거래 완료
                                         </div>
                                 }
-                                <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={()=>{handleLikeChange(item.id, item.isLiked)}}/>
+                                <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
                             </div>
-                            <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-2">{item.title}</p>
-                            <div className="my-2 flex text-sm gap-1 font-bold text-gray-400">
+                            <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold mt-2 mb-1">{item.title}</p>
+                            <div className="mb-1 flex text-sm gap-1 font-bold text-gray-400">
                                 <p>{`${item.addr1} ${item.addr2}`}</p>
                                 <p>|</p>
                                 <p>{item.timeAgo}</p>
@@ -140,7 +146,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                             <div className="flex justify-between items-center">
                                 <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
                                 {
-                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral">작성완료</button>
+                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral" onClick={() => {handleClickGetReview(item.id)}}>작성완료</button>
                                 }
                                 {
                                     item.isReviewed ||  <button className="btn btn-sm btn-secondary" onClick={() => {handleClickReview(item.id)}}>리뷰작성</button>

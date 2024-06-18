@@ -41,6 +41,12 @@ function AddComponent() {
         setImageFiles([...imageFiles, ...files]);
     };
 
+    const handleImageRemove = (index) => {
+        const updatedImageFiles = [...imageFiles];
+        updatedImageFiles.splice(index, 1);
+        setImageFiles(updatedImageFiles);
+    };
+
     // 버튼을 누르면 실행되는 함수
     const handleClickAdd = async (e) => {
         e.preventDefault();
@@ -111,9 +117,15 @@ function AddComponent() {
                             <img
                                 src={URL.createObjectURL(file)}
                                 alt={`Uploaded ${index}`}
-                                className="w-24 h-24 object-cover  border-2"
+                                className="w-24 h-24 object-cover border-2"
                             />
                             <span className="text-sm">{file.name}</span>
+                            <button
+                                onClick={() => handleImageRemove(index)}
+                                className="mt-2 text-red-500"
+                            >
+                                삭제
+                            </button>
                         </div>
                     ))}
                     <div className="flex flex-col items-center">

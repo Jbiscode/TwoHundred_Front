@@ -13,6 +13,7 @@ import usemyprofileStore from "@zustand/myprofileStore";
 const WriteReviewModal = () => {
     const { isLoginModalOpen, isSignupModalOpen, isWriteReviewModalOpen, openLoginModal,closeLoginModal, closeSignupModal,closeWriteReviewModal } = useModalStore();
     const {selectReviewId} = usemyprofileStore(state => state)
+    const [charCount, setCharCount] = useState(0)
     const [reviewGrade, setReviewGrade] = useState({
         bad: false,
         soso: false,
@@ -133,8 +134,8 @@ const WriteReviewModal = () => {
                         </div>
                     </div>
                     <div className="mb-8">
-                        <textarea placeholder="상대방에게 거래 후기를 작성해주세요!" className="placeholder:text-base w-full min-h-64 border-solid border-black border p-5 text-base" name="" id="" onChange={(e) => {setReviewContent(e.target.value)}}></textarea>
-                        <p className="text-base font-bold text-end">0 / 100</p>
+                        <textarea placeholder="상대방에게 거래 후기를 작성해주세요!" className="placeholder:text-base w-full min-h-64 border-solid border-black border p-5 text-base" name="" id="" onChange={(e) => {setReviewContent(e.target.value); setCharCount(e.target.value.length)}}></textarea>
+                        <p className="text-base font-bold text-end">{charCount} / 100</p>
                     </div>
                     <div className="flex justify-center">
                         <div className="btn btn-primary w-3/5 text-lg mb-3 font-bold" onClick={handleSubmitReview}>거래후기 남기기</div>

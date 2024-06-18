@@ -1,14 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "@zustand/authStore";
 import useModalStore from "@zustand/modalStore";
 import toast, { Toaster } from "react-hot-toast";
 import {Link, useNavigate} from "react-router-dom";
+import {auth} from "@/api/index"
 
 function BasicHeader() {
     const [content, setContent] = useState('');
     const navigate = useNavigate();
     const { openLoginModal } = useModalStore();
     const {isLoggedin}  = useAuthStore(state => state)
+    const [userDTO, setUserDTO] = useState({
+        id : '',
+        name : '',
+        addr1 : '',
+        addr2 : '',
+        countBuy : '',
+        countLike : '',
+        countOffer : '',
+        countSale : '',
+        offerLevel : '',
+        profileImageUrl : ''
+    });
+    const { id } = userDTO;
+
+    useEffect(() => {
+        if (id) {
+            const params = new URLSearchParams(location.search);
+            if (!params.get('id')) {
+                params.set('id', id);
+                navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+            }
+        }
+    }, [id, location, navigate]);
 
 
     const handleLogout = () => {
@@ -40,6 +64,30 @@ function BasicHeader() {
         navigate(`/search?content=${content}`);
     };
 
+    useEffect(()=>{
+        if(isLoggedin){
+            const fetchData = async () => {
+                // 로그인이 필요한 정보받아오기
+                try{
+                    const response = await auth.get(
+                        '/api/v1/users/me',
+                        {withCredentials: true}
+                    )
+                if(response.resultCode == '401'){
+                    setIsModalOpen(true)
+                }
+                if(response.resultCode == '200'){
+                    setUserDTO(response.data)
+                }
+                }catch(error){
+                    // console.log(error)
+                }
+            }
+            
+            fetchData();
+        }
+    },[isLoggedin])
+    
     return (<>
         <Toaster></Toaster>
         <div className="sticky top-0 z-20">
@@ -117,7 +165,7 @@ function BasicHeader() {
 
                                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                                     <div className="w-10 rounded-full">
-                                        <img alt="Tailwind CSS Navbar component" src={`https://kr.object.ncloudstorage.com/kjwtest/article/${isLoggedin ? {} : "s_uuid_7adc2b20-82c8-4f14-96f0-f68aa2613ac0"}`} />
+                                        <img alt="Tailwind CSS Navbar component" src={`https://kr.object.ncloudstorage.com/kjwtest/article/${isLoggedin ? `${userDTO.profileImageUrl}` : "s_uuid_7adc2b20-82c8-4f14-96f0-f68aa2613ac0"}`} />
                                     </div>
                                 </div>
                                 <ul tabIndex={0} className="mt-2 z-[1] p-2 shadow menu menu-sm dropdown-content bg-white rounded-box w-52">

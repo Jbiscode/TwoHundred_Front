@@ -21,6 +21,8 @@ import useSocketStore from '@zustand/useSocketStore';
 import { toast } from 'react-hot-toast';
 import ChatAlarm from '@components/chat/ChatAlarm';
 import {instance} from '@api/index.js';
+import { Link } from 'react-router-dom';
+import {auth} from '@api/index'
 
 const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -35,6 +37,17 @@ function IndexPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
+
+    
+    //배너
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const { socket } = useSocketStore();
+    
+
+    //추천상품-페이징
+    const [goodsList, setGoodsList] = useState([]);
+    const [like, setLike] = useState(false)
+
     const itemsPerPage = 6;
     const maxItems = 60; // 최대 60개의 데이터만 요청
   
@@ -89,9 +102,43 @@ function IndexPage() {
         { value: CategoryEnum.FOOD, text: '건강식품', src: food },
     ];
 
+
     const handleCategoryClick = (category) => {
         console.log(`${category.text} 카테고리 클릭됨`);
       };
+
+//     const handleCategoryClick = async (category) => {
+//         try {
+//             const response = await instance(`/api/v1/search?category=${category.value}`);
+//             const data = await response.json();
+//             console.log(data);
+//         } catch (error) {
+//             console.error('Error fetching category data:', error);
+//         }
+//     };
+
+
+//     useEffect(() => {
+//         instance.get('/api/v1/search')
+//             .then(response => {
+//                 console.log(response);
+//                 return response.data;
+//             })
+//             .then(data => {
+//                 console.log('Fetched data:', data);
+//                 const allGoods = data || [];
+//                 const shuffledGoods = allGoods.sort(() => 0.5 - Math.random());
+//                 const selectedGoods = shuffledGoods.slice(0, 60);
+//                 setGoodsList(selectedGoods);
+//             })
+//             .catch(error => {
+//                 console.error('Error fetching goods data:', error);
+//             });
+//     }, [like]);
+
+//     const currentGoods = goodsList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+//     const totalPages = Math.ceil(goodsList.length / itemsPerPage);
+
 
     //추천상품-페이징
     const fetchData = useCallback(async (page, size) => {
@@ -132,9 +179,37 @@ function IndexPage() {
     }, [currentPage, fetchData]);
   
 
+
     const handlePageChange = useCallback((newPage) => {
       setCurrentPage(newPage);
     }, []);
+
+    const handleLikeChange = (e,id) => {
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('왜 안눌리누?')
+        console.log(id)
+        const fetch = async() => {
+            try{
+                const response = await auth.put(
+                    `/api/v1/users/me/likes/${id}`,
+                    {withCredentials: true}
+                )
+                if(response.resultCode == '401'){
+                    openLoginModal()
+                }
+                if(response.resultCode == '200'){
+                    console.log("click")
+                    setLike(prev => !prev)
+                    updateMyProfileInfo();
+                }
+            }catch(error){
+                console.log(error)
+            }
+        }
+        fetch()
+    }
+
 
     
     return (
@@ -193,6 +268,7 @@ function IndexPage() {
                 </div>
             </div>
                 
+
              {/* 추천상품 */}
             <div>
             <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
@@ -228,6 +304,41 @@ function IndexPage() {
                     ) : (
                         <div>데이터가 없습니다.</div>
                     )}
+
+//             {/* 추천상품 */}
+//             <div className="goods px-6">
+//                 <div className="goods-wrapper -mx-2 w-full  grid justify-center box-border">
+//                     <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
+//                     <div className="goods-list  w-full grid box-border list-none grid-cols-2">
+//                         {currentGoods.length > 0 ? (
+//                             currentGoods.map((item) => (
+//                                 <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>
+//                                     <div className='rounded-[10%] relative'>
+//                                         <img 
+//                                             src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
+//                                             alt={item.imageId} 
+//                                             className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] h-[194px] block w-full" 
+//                                             //onError={(e) => { e.target.onerror = null; e.target.src = 'default-image-url'; }} // 이미지 로드 실패 시 대체 이미지 설정
+//                                         />
+                                        
+//                                         <img className="absolute top-2 right-2" alt='frfrf' src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
+//                                     </div>
+//                                     <div className='pl-1'>
+//                                         <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-1">
+//                                             {item.title}
+//                                         </p>
+//                                         <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">
+//                                             {item.content}
+//                                         </p>
+//                                         <div className="text-lx font-bold">
+//                                             {Number(item.price).toLocaleString()}원
+//                                         </div>
+//                                     </div>               
+//                                 </Link>
+//                             ))
+//                         ) : (
+//                             <div>로딩중...</div>
+//                         )}
                     </div>
                 </div>
                 </div>

@@ -13,7 +13,9 @@ const ChatMessages = () => {
   useEffect(() => {
     // setTimeout이 없으면 메시지가 렌더링되기 전에 scrollIntoView가 실행되어 제대로 작동하지 않음
     setTimeout(() => {
-    lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+      if (messages.length > 3) {
+        lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
     }, 100);
   }, [messages]);
 

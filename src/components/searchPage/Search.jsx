@@ -1,108 +1,34 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import filter from '@assets/images/icon/filter.svg';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {instance} from '@api/index.js';
 
 
 
 const Search = () => {
     const [articleDTO, setArticleDTO] = useState([]);
+    //검색 결과
     const location = useLocation();
     const query = new URLSearchParams(location.search).get('content');
     const [content, setContent] = useState(query || '');
+    
+    //정렬
     const [orderBy, setOrderBy] = useState('latest');
+
+    //필터
     const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
     const [category, setCategory] = useState(initialCategory);
     const [tradeMethod, setTradeMethod] = useState(null);
 
+    //검색결과 총 개수
+    const [totalCount, setTotalCount] = useState(0);
+
+    //페이징
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
 
-
-    useEffect(() => {
-        if (query !== content) {
-            setContent(query || '');
-        }
-    }, [query]);
-
-    useEffect(() => {
-        console.log('Category state:', category);
-    }, [category]);
-
-    const fetchArticles = (reset = false) => {
-        setLoading(true);
-        let url = `/api/v1/search`;
-        let params = [];
-
-        if (orderBy) {
-            params.push(`orderBy=${orderBy}`);
-        }
-        if (content) {
-            params.push(`content=${content}`);
-        }
-        if (category) {
-            params.push(`category=${category}`);
-        }
-        if (tradeMethod) {
-            params.push(`tradeMethod=${tradeMethod}`);
-        }
-        params.push(`page=${page}`);
-        params.push(`size=10`);
-
-        if (params.length > 0) {
-            url += `?${params.join('&')}`;
-        }
-
-        window.history.replaceState(null, '', params.length > 0 ? `?${params.join('&')}` : '');
-
-        instance.get(url)
-            .then(response => {
-                console.log('Fetched articles:', response);
-                return response.data;
-            })
-            .then(data => {
-                if (Array.isArray(data)) {
-                    setArticleDTO(prev => reset ? data : [...prev, ...data]);
-                    setHasMore(data.length === 10);
-                } else {
-                    console.error('Expected an array but got:', data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching articles:', error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
-
-    useEffect(() => {
-        setPage(1);
-        fetchArticles(true);
-    }, [content, orderBy, category, tradeMethod]);
-
-    useEffect(() => {
-        if (page > 1) fetchArticles();
-    }, [page]);
-
-    const observer = useRef();
-    const lastItemRef = useCallback(
-        (node) => {
-            if (loading || !hasMore) return;
-            if (observer.current) observer.current.disconnect();
-            observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    setPage(prev => prev + 1);
-                }
-            });
-            if (node) observer.current.observe(node);
-        },
-        [loading, hasMore]
-    );
-    
-    const articleCount = articleDTO.length;
-
+    //필터 구분
     const categoryCode = [
         {
             id : 'MEMBERSHIP',
@@ -163,20 +89,109 @@ const Search = () => {
         }
     ]
 
+
+    useEffect(() => {
+        if (query !== content) {
+            setContent(query || '');
+        }
+    }, [query]);
+    
+    const fetchArticles = async (reset = false) => {
+        if(loading) return;
+        setLoading(true);
+        let url = `/api/v1/search`;
+        let params = [];
+    
+        if (orderBy) {
+            params.push(`orderBy=${orderBy}`);
+        }
+        if (content) {
+            params.push(`content=${content}`);
+        }
+        if (category) {
+            params.push(`category=${category}`);
+        }
+        if (tradeMethod) {
+            params.push(`tradeMethod=${tradeMethod}`);
+        }
+        params.push(`page=${page}`);
+        params.push(`size=10`);
+    
+        if (params.length > 0) {
+            url += `?${params.join('&')}`;
+        }
+    
+        const urlParams = params.filter(param => !param.startsWith('page=') && !param.startsWith('size='));
+        window.history.replaceState(null, '', urlParams.length > 0 ? `?${urlParams.join('&')}` : '');
+    
+        try {
+            const response = await instance.get(url);
+            const data = response.data;
+            if (Array.isArray(data.searchResult)) {
+                setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
+                console.log('articleDTO:', data.searchResult); 
+                setTotalCount(data.totalCount);
+                setLikeArticle(data.likeResult);
+                console.log('likeArticle:', data.likeResult); 
+
+                setHasMore(data.searchResult.length === 10);
+               
+            } else {
+                console.error('Expected an array but got:', data);
+                setHasMore(false); 
+            }
+        } catch (error) {
+            console.error('Error fetching articles:', error);
+            setHasMore(false); 
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    //페이징
+    useEffect(() => {
+        setPage(1);
+        fetchArticles(true);
+    }, [content, orderBy, category, tradeMethod]);
+    
+    useEffect(() => {
+        if (page > 1) fetchArticles();
+    }, [page]);
+    
+    const observer = useRef();
+    const lastItemRef = useCallback(
+        (node) => {
+            if (loading || !hasMore) return;
+            if (observer.current) observer.current.disconnect();
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !loading) {
+                    setPage(prev => prev + 1);
+                }
+            });
+            if (node) observer.current.observe(node);
+        },
+        [loading, hasMore]
+    );
+    
+
+
     //카테고리 선택
     const handleCategory = (item) => {
         setCategory(item.id);
+        setPage(1);
     };
     
     //거래방식 선택
     const handleTradeMethod = (item) => {
-        setTradeMethod(item.id); 
+        setTradeMethod(item.id);
+        setPage(1);
     };
 
     //정렬 선택
     const handleOrderBy = (value) => {
         setOrderBy(value);
-    }
+        setPage(1);
+    };
 
 
     
@@ -186,13 +201,35 @@ const Search = () => {
         setPage(1);
         fetchArticles(true);
         setIsopenedFilter(!isopenedFilter);
-    }
+    };
 
     const handleReset = () => {
         setCategory(null);
         setTradeMethod(null);
         setPage(1);
         fetchArticles(true);
+    };
+
+    //로그인했을 경우 userId 값 가져오기
+    const [userId, setUserId] = useState(null);
+    const [likeArticle, setLikeArticle] = useState([]);
+
+    useEffect(() => {
+        // 쿼리 파라미터에서 userId를 가져와 설정
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+        setUserId(id);
+    }, [location]);
+    
+
+    // 좋아요 확인
+    const isArticleLikedByUser = (articleId) => {
+        if (!userId) return false; 
+
+        const isLiked = likeArticle.some(like => {
+            return like.user_id == userId && like.article_id == articleId;
+        });
+        return isLiked;
     };
 
     return (
@@ -293,9 +330,9 @@ const Search = () => {
             </div>
 
             {/* header */}
-            <div className="w-[90%] mx-auto ">
+            <div className="w-full mx-auto">
             <div className="text-2xl">
-            <div className="text-2xl">
+            <div className="text-2xl px-3">
                 <h3 className="inline-block m-0 text-m font-bold border-b-2 border-gray-300">
                 {content ? (
                     <>
@@ -305,9 +342,9 @@ const Search = () => {
                     "전체 검색 결과"
                 )}
                 </h3>
-                <span className="ml-2 text-red-500 text-[20px]">{articleCount}</span>
+                <span className="ml-2 text-red-500 text-[20px]">{totalCount}</span>
             </div>
-            <div className="mt-5 w-full flex justify-between items-center">
+            <div className="mt-5 w-full flex justify-between items-center  pb-2 px-3">
                 <div className="">
                 <div
                     className="border-solid border border-gray-300 cursor-pointer p-1 bg-white rounded-lg flex items-center text-sm"
@@ -320,6 +357,7 @@ const Search = () => {
                     alt='filter' />
                 </div>
                 </div>
+                
                 <div className="flex justify-end items-center mt-2">
                     <div
                         className={`text-[12px] after:content-[''] after:mx-2 after:border after:border-gray-300 cursor-pointer ${orderBy === 'latest' ? 'text-red-500' : ''}`}
@@ -346,27 +384,36 @@ const Search = () => {
             </div>
             </div>
             </div>
-
+            <div className='h-[8px] bg-[#ececec] w-full'></div>
             {/* body */}
-            <div className='w-[90%] mx-auto mt-5'>
+            <div className='mt-5'>
                 <div className="goods">
-                    <div className="goods-wrapper w-full grid justify-center box-border">
+                    <div className="goods-wrapper w-full justify-center box-border">
                         {Array.isArray(articleDTO) && articleDTO.length > 0 ? (
-                            <div className="goods-list mr-7 ml-3 w-full grid box-border list-none grid-cols-2">
+                            <div className="goods-list w-full flex flex-col box-border list-none">
                                 {articleDTO.map((item, index) => (
-                                    <div 
+                                    <Link 
                                         ref={index === articleDTO.length - 1 ? lastItemRef : null} 
-                                        key={item.id} 
-                                        className="goods-cont mb-4"
+                                        key={`${item.id} + ${Math.random().toString(36).substr(2, 9)}`}
+                                        className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow  "
+                                        to={`/post/${item.id}`}
                                     >
-                                        <a href="#"><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="goods-icn items-center max-w-[165px] h-[211px]" /></a>
-                                        <span className="w-full text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
-                                            {item.title}
-                                        </span>
-                                        <span className="text-sm text-gray-500">{item.addr1} {item.addr2}</span>
-                                        <span className="flex justify-between goods-cont_bottom"></span>
-                                        <span className="text-lg font-extrabold goods-cont_price">{item.price}</span>
-                                    </div>
+                                        <div >
+                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
+                                        </div>
+                                        <div className='ml-3 flex-grow'>
+                                            <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
+                                                {item.title}
+                                            </p>
+                                            <img 
+                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
+                                                alt='like' 
+                                            />
+                                            <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">{item.addr1} {item.addr2}</p>
+                                            <p className="flex justify-between goods-cont_bottom"></p>
+                                            <p className="text-lx font-bold">{Number(item.price).toLocaleString()}원</p>
+                                        </div>
+                                    </Link>
                                 ))}
                                 {loading && <div>Loading...</div>}
                             </div>

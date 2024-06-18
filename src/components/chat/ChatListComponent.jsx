@@ -28,7 +28,7 @@ const ChatListComponent = () => {
                             user={user}
                             lastMessage={lastMessage[chat.id]}
                             unreadCount={unreadCount[chat.id]}
-                            modifiedDate={modifiedDate[chat.id]}
+                            modifiedDate={modifiedDate[chat.id]==null ? chat.chat_modified_date : modifiedDate[chat.id]}
                         />
                     ))
                 )}
