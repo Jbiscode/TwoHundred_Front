@@ -97,6 +97,7 @@ const Search = () => {
     }, [query]);
     
     const fetchArticles = async (reset = false) => {
+        if(loading) return;
         setLoading(true);
         let url = `/api/v1/search`;
         let params = [];
@@ -123,26 +124,23 @@ const Search = () => {
         const urlParams = params.filter(param => !param.startsWith('page=') && !param.startsWith('size='));
         window.history.replaceState(null, '', urlParams.length > 0 ? `?${urlParams.join('&')}` : '');
     
-        instance.get(url)
-            .then(response => {
-                console.log('Fetched articles:', response);
-                return response.data;
-            })
-            .then(data => {
-                if (Array.isArray(data.searchResult)) {
-                    setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
-                    setTotalCount(data.totalCount);
-                    setHasMore(data.searchResult.length === 10);
-                } else {
-                    console.error('Expected an array but got:', data);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching articles:', error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        try {
+            const response = await instance.get(url);
+            const data = response.data;
+            if (Array.isArray(data.searchResult)) {
+                setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
+                setTotalCount(data.totalCount);
+                setHasMore(data.searchResult.length === 10);
+            } else {
+                console.error('Expected an array but got:', data);
+                setHasMore(false); 
+            }
+        } catch (error) {
+            console.error('Error fetching articles:', error);
+            setHasMore(false); 
+        } finally {
+            setLoading(false);
+        }
     };
     
     //페이징
@@ -161,7 +159,7 @@ const Search = () => {
             if (loading || !hasMore) return;
             if (observer.current) observer.current.disconnect();
             observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
+                if (entries[0].isIntersecting && !loading) {
                     setPage(prev => prev + 1);
                 }
             });
@@ -175,17 +173,19 @@ const Search = () => {
     //카테고리 선택
     const handleCategory = (item) => {
         setCategory(item.id);
+        setPage(1);
     };
     
     //거래방식 선택
     const handleTradeMethod = (item) => {
         setTradeMethod(item.id);
+        setPage(1);
     };
 
     //정렬 선택
     const handleOrderBy = (value) => {
         setOrderBy(value);
-        setPage(1)
+        setPage(1);
     };
 
 
@@ -378,6 +378,7 @@ const Search = () => {
                                             <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
                                                 {item.title}
                                             </p>
+                                            <img src='/src/assets/images/icon/heart_blank.svg' alt='like'/>
                                             <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">{item.addr1} {item.addr2}</p>
                                             <p className="flex justify-between goods-cont_bottom"></p>
                                             <p className="text-lx font-bold">{Number(item.price).toLocaleString()}원</p>
