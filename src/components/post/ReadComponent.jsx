@@ -33,8 +33,10 @@ function ReadComponent({ aid }) {
 
     const isLoggedIn = useAuthStore((state) => state);
     const loggedInUserId = useAuthStore((state) => state.getId());
-    const { openOfferModal, closeOfferModal } = useModalStore((state) => state);
+    const { openOfferModal, closeOfferModal, selectedArticleId } =
+        useModalStore((state) => state);
     const { openLoginModal, closeLoginModal } = useModalStore((state) => state);
+    const { setSelectedArticleId } = useModalStore((state) => state);
 
     const [article, setArticle] = useState(initState);
     const navigate = useNavigate();
@@ -94,6 +96,90 @@ function ReadComponent({ aid }) {
             });
             if (response.resultCode === "200") {
                 console.log("게시글 삭제 성공");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleAcceptOffer = async (offerId) => {
+        try {
+            const response = await auth.put(
+                `/api/v1/offers/${aid}/${offerId}`,
+                {
+                    withCredentials: true,
+                }
+            );
+            if (response.resultCode === "200") {
+                // 제안 수락 후 상태 업데이트
+                setArticle((prevArticle) => ({
+                    ...prevArticle,
+                    offers: prevArticle.offers.map((offer) =>
+                        offer.id === offerId
+                            ? { ...offer, selected: true }
+                            : offer
+                    ),
+                }));
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleCancelAcceptedOffer = async (offerId) => {
+        try {
+            const response = await auth.put(
+                `/api/v1/offers/${aid}/${offerId}/cancel`,
+                {
+                    withCredentials: true,
+                }
+            );
+            if (response.resultCode === "200") {
+                // 수락한 제안 취소 후 상태 업데이트
+                setArticle((prevArticle) => ({
+                    ...prevArticle,
+                    offers: prevArticle.offers.map((offer) =>
+                        offer.id === offerId
+                            ? { ...offer, selected: false }
+                            : offer
+                    ),
+                }));
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleCompleteSale = async () => {
+        try {
+            const response = await auth.put(`/api/v1/offers/${aid}/complete`, {
+                withCredentials: true,
+            });
+            if (response.resultCode === "200") {
+                // 판매 완료 후 상태 업데이트
+                setArticle((prevArticle) => ({
+                    ...prevArticle,
+                    tradeStatus: "SOLD_OUT",
+                }));
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleCancelOffer = async (offerId) => {
+        try {
+            const response = await auth.delete(`/api/v1/offers/${offerId}`, {
+                withCredentials: true,
+            });
+            if (response.resultCode === "200") {
+                // 제안 취소 후 상태 업데이트
+                setArticle((prevArticle) => ({
+                    ...prevArticle,
+                    offers: prevArticle.offers.filter(
+                        (offer) => offer.id !== offerId
+                    ),
+                }));
             }
         } catch (error) {
             console.error(error);
@@ -219,7 +305,7 @@ function ReadComponent({ aid }) {
                     </div>
                     <div className="w-[300px]">
                         <h1 className="text-4xl text-black md:mt-10 mb-4">
-                            가격 제안{" "}
+                            가격 제안
                         </h1>
                         <hr className="border-2 border-black" />
                         <ul className="space-y-2 mt-4 mb-10">
@@ -236,9 +322,50 @@ function ReadComponent({ aid }) {
                                             {timeAgo(offer.createdDate)}
                                         </p>
                                     </div>
-                                    <p className="text-black">
-                                        {offer.offerPrice}원
-                                    </p>
+                                    <div className="flex items-center">
+                                        <p className="text-black">
+                                            {offer.offerPrice}원
+                                        </p>
+                                        {loggedInUserId === article.writerId &&
+                                            !offer.selected && (
+                                                <PostButton
+                                                    className="bg-violet-500 ml-2"
+                                                    onClick={() =>
+                                                        handleAcceptOffer(
+                                                            offer.id
+                                                        )
+                                                    }
+                                                >
+                                                    수락
+                                                </PostButton>
+                                            )}
+                                        {loggedInUserId === article.writerId &&
+                                            offer.selected && (
+                                                <PostButton
+                                                    className="bg-orange-500 ml-2"
+                                                    onClick={() =>
+                                                        handleCancelAcceptedOffer(
+                                                            offer.id
+                                                        )
+                                                    }
+                                                >
+                                                    취소
+                                                </PostButton>
+                                            )}
+                                        {loggedInUserId === offer.offererId &&
+                                            !offer.selected && (
+                                                <PostButton
+                                                    className="bg-red-500 ml-2"
+                                                    onClick={() =>
+                                                        handleCancelOffer(
+                                                            offer.id
+                                                        )
+                                                    }
+                                                >
+                                                    취소
+                                                </PostButton>
+                                            )}
+                                    </div>
                                 </li>
                             ))}
                         </ul>
@@ -256,23 +383,42 @@ function ReadComponent({ aid }) {
                                     >
                                         삭제하기
                                     </PostButton>
+                                    {article.tradeStatus !== "SOLD_OUT" && (
+                                        <PostButton
+                                            className="bg-green-500"
+                                            onClick={handleCompleteSale}
+                                        >
+                                            판매 완료
+                                        </PostButton>
+                                    )}
                                 </>
                             ) : (
                                 <>
                                     <PostButton
                                         className="bg-violet-500"
-                                        onClick={() =>
-                                            navigateToChatRoom(
-                                                aid,
-                                                loggedInUserId
-                                            )
-                                        }
+                                        onClick={() => {
+                                            if (!loggedInUserId) {
+                                                openLoginModal();
+                                            } else {
+                                                navigateToChatRoom(
+                                                    aid,
+                                                    loggedInUserId
+                                                );
+                                            }
+                                        }}
                                     >
                                         1:1 채팅하기
                                     </PostButton>
                                     <PostButton
                                         className="bg-orange-500"
-                                        onClick={openOfferModal}
+                                        onClick={() => {
+                                            if (!loggedInUserId) {
+                                                openLoginModal();
+                                            } else {
+                                                setSelectedArticleId(aid);
+                                                openOfferModal(selectedArticleId);
+                                            }
+                                        }}
                                     >
                                         거래 제안하기
                                     </PostButton>
