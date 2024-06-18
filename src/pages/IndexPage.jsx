@@ -53,8 +53,6 @@ function IndexPage() {
   
 
     //배너
-    const [currentSlide, setCurrentSlide] = useState(0);
-    const { socket } = useSocketStore();
 
     const handleSlideChange = (direction) => {
         if (direction === 'prev') {
@@ -105,7 +103,7 @@ function IndexPage() {
 
     const handleCategoryClick = (category) => {
         console.log(`${category.text} 카테고리 클릭됨`);
-      };
+    };
 
 //     const handleCategoryClick = async (category) => {
 //         try {
@@ -142,47 +140,47 @@ function IndexPage() {
 
     //추천상품-페이징
     const fetchData = useCallback(async (page, size) => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`/api/v1/search?page=${page}&size=${size}`);
-        const result = await response.json();
-        console.log('Fetched data:', result);
-    
-        if (result.data) {
-          console.log('result.data:', result.data);
-          console.log('result.data.searchResult:', result.data.searchResult);
+        setIsLoading(true);
+        try {
+            const response = await fetch(`/api/v1/search?page=${page}&size=${size}`);
+            const result = await response.json();
+            console.log('Fetched data:', result);
+        
+            if (result.data) {
+            console.log('result.data:', result.data);
+            console.log('result.data.searchResult:', result.data.searchResult);
+            }
+        
+            if (result.data && Array.isArray(result.data.searchResult)) {
+            const totalCount = result.data.totalCount > maxItems ? maxItems : result.data.totalCount;
+            
+            const shuffledData = shuffleArray(result.data.searchResult);
+            setData(shuffledData);
+            
+            setTotalPages(Math.ceil(totalCount / size));
+            } else {
+            console.error('searchResult가 배열이 아닙니다:', result.data.searchResult);
+            setData([]);
+            setTotalPages(1);
+            }
+        } catch (error) {
+            console.error('API 요청 실패:', error);
+            setData([]);
+            setTotalPages(1);
+        } finally {
+            setIsLoading(false);
         }
-    
-        if (result.data && Array.isArray(result.data.searchResult)) {
-          const totalCount = result.data.totalCount > maxItems ? maxItems : result.data.totalCount;
-          
-          const shuffledData = shuffleArray(result.data.searchResult);
-          setData(shuffledData);
-          
-          setTotalPages(Math.ceil(totalCount / size));
-        } else {
-          console.error('searchResult가 배열이 아닙니다:', result.data.searchResult);
-          setData([]);
-          setTotalPages(1);
-        }
-      } catch (error) {
-        console.error('API 요청 실패:', error);
-        setData([]);
-        setTotalPages(1);
-      } finally {
-        setIsLoading(false);
-      }
-    }, []);
-  
-    useEffect(() => {
-      fetchData(currentPage, itemsPerPage);
-    }, [currentPage, fetchData]);
-  
+        }, []);
+
+        useEffect(() => {
+            fetchData(currentPage, itemsPerPage);
+        }, [currentPage, fetchData]);
 
 
-    const handlePageChange = useCallback((newPage) => {
-      setCurrentPage(newPage);
-    }, []);
+
+        const handlePageChange = useCallback((newPage) => {
+        setCurrentPage(newPage);
+        }, []);
 
     const handleLikeChange = (e,id) => {
         e.stopPropagation()
@@ -196,7 +194,7 @@ function IndexPage() {
                     {withCredentials: true}
                 )
                 if(response.resultCode == '401'){
-                    openLoginModal()
+                    openLoginModal();
                 }
                 if(response.resultCode == '200'){
                     console.log("click")
@@ -269,81 +267,50 @@ function IndexPage() {
             </div>
                 
 
-             {/* 추천상품 */}
-            <div>
-            <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
-            {isLoading ? (
-                <div>로딩 중...</div>
-            ) : (
-                <div className="goods">
-                <div className="goods-wrapper w-full grid justify-center box-border">
-                    <div className="goods-list w-full grid box-border list-none grid-cols-2">
-                    {data.length > 0 ? (
-                        data.map((item) => (
-                        <div key={item.id} className="goods-cont mb-7">
-                            <a href="#">
-                            <img
-                                src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`}
-                                alt={item.imageId}
-                                className="goods-icn mb-3 items-center max-w-[194px] h-[194px]"
-                                style={{ display: 'block', border: '1px solid #ccc' }} // 스타일 추가
-                            />
-                            </a>
-                            <span className="w-full ml-2 text-base font-medium truncate h-5 break-words inline-block line-clamp-1">
-                            {item.title}
-                            </span>
-                            <span className="text-sm font-extralight ml-2">
-                            {item.content}
-                            </span>
-                            <span className="flex justify-between goods-cont_bottom mb-3"></span>
-                            <span className="text-lg font-extrabold goods-cont_price ml-2">
-                            {Number(item.price).toLocaleString()}
-                            </span>
-                        </div>
-                        ))
-                    ) : (
-                        <div>데이터가 없습니다.</div>
-                    )}
 
-//             {/* 추천상품 */}
-//             <div className="goods px-6">
-//                 <div className="goods-wrapper -mx-2 w-full  grid justify-center box-border">
-//                     <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
-//                     <div className="goods-list  w-full grid box-border list-none grid-cols-2">
-//                         {currentGoods.length > 0 ? (
-//                             currentGoods.map((item) => (
-//                                 <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>
-//                                     <div className='rounded-[10%] relative'>
-//                                         <img 
-//                                             src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
-//                                             alt={item.imageId} 
-//                                             className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] h-[194px] block w-full" 
-//                                             //onError={(e) => { e.target.onerror = null; e.target.src = 'default-image-url'; }} // 이미지 로드 실패 시 대체 이미지 설정
-//                                         />
+
+                {/* 추천상품 */}
+                <div className="goods px-6">
+                    <div className="goods-wrapper -mx-2 w-full  grid justify-center box-border">
+                        <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
+                        {isLoading ? (
+                            <div>로딩 중 ...</div>
+                        ) : (
+                        <div className="goods-list  w-full grid box-border list-none grid-cols-2">
+                        {data.length > 0 ? (
+                            data.map((item) => (
+                                <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>
+                                    <div className='rounded-[10%] relative'>
+                                        <img 
+                                            src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
+                                            alt={item.imageId} 
+                                            className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] h-[194px] block w-full" 
+                                            //onError={(e) => { e.target.onerror = null; e.target.src = 'default-image-url'; }} // 이미지 로드 실패 시 대체 이미지 설정
+                                        />
                                         
-//                                         <img className="absolute top-2 right-2" alt='frfrf' src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
-//                                     </div>
-//                                     <div className='pl-1'>
-//                                         <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-1">
-//                                             {item.title}
-//                                         </p>
-//                                         <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">
-//                                             {item.content}
-//                                         </p>
-//                                         <div className="text-lx font-bold">
-//                                             {Number(item.price).toLocaleString()}원
-//                                         </div>
-//                                     </div>               
-//                                 </Link>
-//                             ))
-//                         ) : (
-//                             <div>로딩중...</div>
-//                         )}
+                                        <img className="absolute top-2 right-2" alt='frfrf' src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
+                                    </div>
+                                    <div className='pl-1'>
+                                        <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-1">
+                                            {item.title}
+                                        </p>
+                                        <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">
+                                            {item.content}
+                                        </p>
+                                        <div className="text-lx font-bold">
+                                            {Number(item.price).toLocaleString()}원
+                                        </div>
+                                    </div>               
+                                </Link>
+                            ))
+                        ) : (
+                            <div>데이터가 없습니다 </div>
+                        )}
                     </div>
-                </div>
-                </div>
             )}
-             <div className="text-gray-500 flex justify-center items-center space-x-4">
+            </div>
+            </div>
+                <div className="text-gray-500 flex justify-center items-center space-x-4">
             <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}
                 className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -358,8 +325,7 @@ function IndexPage() {
             </div>
             </div>
         </div>
-        </div>
         </BasicLayout>
-  );
-};
+);
+}
 export default IndexPage;
