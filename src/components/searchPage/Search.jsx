@@ -129,8 +129,13 @@ const Search = () => {
             const data = response.data;
             if (Array.isArray(data.searchResult)) {
                 setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
+                console.log('articleDTO:', data.searchResult); 
                 setTotalCount(data.totalCount);
+                setLikeArticle(data.likeResult);
+                console.log('likeArticle:', data.likeResult); 
+
                 setHasMore(data.searchResult.length === 10);
+               
             } else {
                 console.error('Expected an array but got:', data);
                 setHasMore(false); 
@@ -203,6 +208,28 @@ const Search = () => {
         setTradeMethod(null);
         setPage(1);
         fetchArticles(true);
+    };
+
+    //로그인했을 경우 userId 값 가져오기
+    const [userId, setUserId] = useState(null);
+    const [likeArticle, setLikeArticle] = useState([]);
+
+    useEffect(() => {
+        // 쿼리 파라미터에서 userId를 가져와 설정
+        const params = new URLSearchParams(location.search);
+        const id = params.get('id');
+        setUserId(id);
+    }, [location]);
+    
+
+    // 좋아요 확인
+    const isArticleLikedByUser = (articleId) => {
+        if (!userId) return false; 
+
+        const isLiked = likeArticle.some(like => {
+            return like.user_id == userId && like.article_id == articleId;
+        });
+        return isLiked;
     };
 
     return (
@@ -378,7 +405,10 @@ const Search = () => {
                                             <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
                                                 {item.title}
                                             </p>
-                                            <img src='/src/assets/images/icon/heart_blank.svg' alt='like'/>
+                                            <img 
+                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
+                                                alt='like' 
+                                            />
                                             <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">{item.addr1} {item.addr2}</p>
                                             <p className="flex justify-between goods-cont_bottom"></p>
                                             <p className="text-lx font-bold">{Number(item.price).toLocaleString()}원</p>
