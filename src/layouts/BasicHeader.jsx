@@ -22,6 +22,17 @@ function BasicHeader() {
         offerLevel : '',
         profileImageUrl : ''
     });
+    const { id } = userDTO;
+
+    useEffect(() => {
+        if (id) {
+            const params = new URLSearchParams(location.search);
+            if (!params.get('id')) {
+                params.set('id', id);
+                navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+            }
+        }
+    }, [id, location, navigate]);
 
 
     const handleLogout = () => {
