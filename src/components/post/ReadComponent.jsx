@@ -8,7 +8,6 @@ import PostButton from "@components/post/PostButton.jsx";
 import { Link } from "react-router-dom";
 import { auth } from "@api/index.js";
 
-
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
         FACE_TO_FACE: "직거래",
@@ -32,21 +31,52 @@ function ReadComponent({ aid }) {
         writerId: "",
     };
 
+    const isLoggedIn = useAuthStore((state) => state);
     const loggedInUserId = useAuthStore((state) => state.getId());
     const { openOfferModal, closeOfferModal } = useModalStore((state) => state);
+    const { openLoginModal, closeLoginModal } = useModalStore((state) => state);
 
     const [article, setArticle] = useState(initState);
     const navigate = useNavigate();
 
+    const [liked, setLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
+
+    const handleLike = async () => {
+        if (!loggedInUserId) {
+            console.log("로그인이 필요합니다.");
+            openLoginModal();
+        } else {
+            try {
+                const response = await auth.post(
+                    `/api/v1/articles/${aid}/like`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if (response.resultCode === "200") {
+                    setLiked(!liked); // isLiked 대신 liked 사용
+                    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await instance.get(`/api/v1/articles/${aid}`, {
+                const response = await auth.get(`/api/v1/articles/${aid}`, {
                     withCredentials: true,
                 });
 
                 if (response.resultCode === "200") {
                     setArticle(response.data);
+                    console.log(response.data);
+                    setLiked(response.data.liked); // isLiked 대신 liked 사용
+                    console.log(response.data.liked);
+                    setLikeCount(response.data.likeCount);
                 }
             } catch (error) {
                 console.error(error);
@@ -54,7 +84,7 @@ function ReadComponent({ aid }) {
         };
 
         fetchData();
-    }, [aid]); // aid가 변경될 때마다 useEffect 실행
+    }, [aid, isLoggedIn]);
 
     //게시글 삭제
     const handleDelete = async () => {
@@ -104,11 +134,28 @@ function ReadComponent({ aid }) {
         <div className="mx-auto w-fit bg-white py-8 px-6">
             <div className="flex flex-col bg-white p-5 flex-wrap gap-10">
                 <div className="flex gap-10 flex-col md:flex-row m-auto md:m-0">
-                    <img
-                        src={`https://kr.object.ncloudstorage.com/kjwtest/article/${article.thumbnailUrl}`}
-                        alt={"프로필"}
-                        className="w-[300px] aspect-square"
-                    />
+                    <div className="relative">
+                        <img
+                            src={`https://kr.object.ncloudstorage.com/kjwtest/article/${article.thumbnailUrl}`}
+                            alt={"프로필"}
+                            className="w-[300px] aspect-square"
+                        />
+                        <button
+                            className={`absolute top-5 right-4 py-1.5 px-2.5 pl-1 pr-2 hover:scale-105 text-center border rounded-md h-8 text-sm flex items-center gap-1 lg:gap-2 ${
+                                liked ? "text-red-500" : "hover:text-gray-400"
+                            }`}
+                            onClick={handleLike}
+                        >
+                            <img
+                                className="w-6 h-6"
+                                src={`/src/assets/images/icon/${
+                                    liked ? "heart_fill.svg" : "heart_blank.svg"
+                                }`}
+                                alt={liked ? "좋아요 취소" : "좋아요"}
+                            />
+                            <span>{likeCount}</span>
+                        </button>
+                    </div>
                     <div className="w-[300px]">
                         <div className="flex items-center">
                             <img
@@ -203,16 +250,30 @@ function ReadComponent({ aid }) {
                                             수정하기
                                         </Link>
                                     </PostButton>
-                                    <PostButton className="bg-orange-500" onClick={handleDelete}>
+                                    <PostButton
+                                        className="bg-orange-500"
+                                        onClick={handleDelete}
+                                    >
                                         삭제하기
                                     </PostButton>
                                 </>
                             ) : (
                                 <>
-                                    <PostButton className="bg-violet-500" onClick={() => navigateToChatRoom(aid, loggedInUserId)}>
+                                    <PostButton
+                                        className="bg-violet-500"
+                                        onClick={() =>
+                                            navigateToChatRoom(
+                                                aid,
+                                                loggedInUserId
+                                            )
+                                        }
+                                    >
                                         1:1 채팅하기
                                     </PostButton>
-                                    <PostButton className="bg-orange-500" onClick={openOfferModal}>
+                                    <PostButton
+                                        className="bg-orange-500"
+                                        onClick={openOfferModal}
+                                    >
                                         거래 제안하기
                                     </PostButton>
                                 </>
