@@ -120,7 +120,7 @@ export const addArticle = async (formData) => {
       withCredentials: true
     });
     console.log(response);
-    return response.status;
+    return response.data;
   } catch (error) {
     console.log("error: ", error);
     throw error;

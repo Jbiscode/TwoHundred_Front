@@ -2,8 +2,15 @@ import { useState, useEffect } from "react";
 import { auth } from "@api/index.js";
 import axios from "axios";
 import { addArticle } from "@api/apis.js";
+import useAuthStore from "@zustand/authStore.js";
+import useModalStore from "@zustand/modalStore.js";
+import toast, { Toaster } from "react-hot-toast";
 
 function AddComponent() {
+    const loggedInUserId = useAuthStore((state) => state.getId());
+
+    const { openLoginModal, closeLoginModal } = useModalStore((state) => state);
+
     const [imageFiles, setImageFiles] = useState([]);
 
     const [addr2Options, setAddr2Options] = useState([]);
@@ -21,6 +28,25 @@ function AddComponent() {
         writerId: "",
     });
 
+    const [errors, setErrors] = useState({
+        title: "",
+        category: "",
+        addr1: "",
+        addr2: "",
+        quantity: "",
+        price: "",
+        content: "",
+        tradeMethod: "",
+        images: "",
+    });
+
+    useEffect(() => {
+        if (!loggedInUserId) {
+            console.log("로그인이 필요합니다.");
+            openLoginModal();
+        }
+    }, [loggedInUserId]);
+
     useEffect(() => {
         if (articleRequestDTO.addr1) {
             setAddr2Options(regions[articleRequestDTO.addr1]);
@@ -30,6 +56,11 @@ function AddComponent() {
     }, [articleRequestDTO.addr1]);
 
     const handleChangeArticle = (e) => {
+        if (!loggedInUserId) {
+            console.log("로그인이 필요합니다.");
+            openLoginModal();
+            return;
+        }
         setArticleRequestDTO({
             ...articleRequestDTO,
             [e.target.name]: e.target.value,
@@ -52,6 +83,43 @@ function AddComponent() {
         e.preventDefault();
         console.log(articleRequestDTO);
 
+        // 유효성 검사
+        let newErrors = {};
+        if (!articleRequestDTO.title) {
+            newErrors.title = "제목을 입력해주세요.";
+        }
+        if (!articleRequestDTO.category) {
+            newErrors.category = "카테고리를 선택해주세요.";
+        }
+        if (!articleRequestDTO.addr1) {
+            newErrors.addr1 = "거래지역을 선택해주세요.";
+        }
+        if (!articleRequestDTO.addr2) {
+            newErrors.addr2 = "거래지역을 선택해주세요.";
+        }
+        if (!articleRequestDTO.quantity || articleRequestDTO.quantity <= 0) {
+            newErrors.quantity = "수량을 올바르게 입력해주세요.";
+        }
+        if (!articleRequestDTO.price || articleRequestDTO.price <= 0) {
+            newErrors.price = "가격을 올바르게 입력해주세요.";
+        }
+        if (!articleRequestDTO.content) {
+            newErrors.content = "상품 설명을 입력해주세요.";
+        }
+        if (!articleRequestDTO.tradeMethod) {
+            newErrors.tradeMethod = "거래방식을 선택해주세요.";
+        }
+        if (imageFiles.length === 0) {
+            newErrors.images = "이미지를 최소 1개 등록해주세요.";
+        } else if (imageFiles.length > 3) {
+            newErrors.images = "이미지는 최대 3개까지 등록 가능합니다.";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
         const formData = new FormData();
 
         formData.append(
@@ -69,11 +137,10 @@ function AddComponent() {
 
         try {
             const data = await addArticle(formData);
-            console.log("게시글 작성 성공:", data);
-            // 게시글 작성 성공 후 처리할 로직 추가
+            toast.success("게시글이 성공적으로 작성되었습니다.");
+            location.href = `/post/${data.data.id}`;
         } catch (error) {
             console.error("게시글 작성 실패:", error);
-            // 게시글 작성 실패 후 처리할 로직 추가
         }
     };
 
@@ -108,6 +175,9 @@ function AddComponent() {
                     className="input input-bordered w-full bg-white"
                     placeholder="상품 제목을 입력해주세요."
                 />
+                {errors.title && (
+                    <p className="text-red-500 text-sm">{errors.title}</p>
+                )}
             </div>
             <div className="mb-4">
                 <p>상품 이미지</p>
@@ -119,7 +189,6 @@ function AddComponent() {
                                 alt={`Uploaded ${index}`}
                                 className="w-24 h-24 object-cover border-2"
                             />
-                            <span className="text-sm">{file.name}</span>
                             <button
                                 onClick={() => handleImageRemove(index)}
                                 className="mt-2 text-red-500"
@@ -128,35 +197,39 @@ function AddComponent() {
                             </button>
                         </div>
                     ))}
-                    <div className="flex flex-col items-center">
-                        <label
-                            htmlFor="image-upload"
-                            className="cursor-pointer"
-                        >
-                            <div className="avatar placeholder">
-                                <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
-                                    <span className="text-3xl">+</span>
+                    {imageFiles.length < 3 && (
+                        <div className="flex flex-col items-center">
+                            <label
+                                htmlFor="image-upload"
+                                className="cursor-pointer"
+                            >
+                                <div className="avatar placeholder">
+                                    <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
+                                        <span className="text-3xl">+</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <span className="text-sm">이미지 등록</span>
-                        </label>
-                        <input
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            multiple={true}
-                            onChange={handleImageUpload}
-                            className="hidden"
-                        />
-                    </div>
+                            </label>
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                multiple={true}
+                                onChange={handleImageUpload}
+                                className="hidden"
+                            />
+                        </div>
+                    )}
                 </div>
                 <p className="text-sm text-orange-400">
                     * 상품 이미지는 640x640에 최적화 되어 있습니다.
                     <br />
                     - 이미지는 상품등록 시 정사각형으로 잘려서 등록됩니다.
                     <br />
-                    최대 지원 사이즈인 640 X 640 으로 리사이즈 해서 올려주세요.
+                    이미지는 최소 1개, 최대 3개까지 등록 가능합니다.
                 </p>
+                {errors.images && (
+                    <p className="text-red-500 text-sm">{errors.images}</p>
+                )}
             </div>
             <div className="mb-4">
                 <label htmlFor="category" className="block mb-2">
@@ -174,6 +247,9 @@ function AddComponent() {
                         </option>
                     ))}
                 </select>
+                {errors.category && (
+                    <p className="text-red-500 text-sm">{errors.category}</p>
+                )}
             </div>
             <div className="mb-4">
                 <label htmlFor="brand" className="block mb-2">
@@ -191,7 +267,6 @@ function AddComponent() {
                         </option>
                     ))}
                 </select>
-
                 <select
                     name="addr2"
                     onChange={handleChangeArticle}
@@ -204,6 +279,10 @@ function AddComponent() {
                         </option>
                     ))}
                 </select>
+
+                {(errors.addr1 || errors.addr2) && (
+                    <p className="text-red-500 text-sm">{errors.addr2}</p>
+                )}
             </div>
             <div className="mb-4">
                 <label htmlFor="quantity" className="block mb-2">
@@ -221,6 +300,9 @@ function AddComponent() {
                     />
                     <span className="ml-2 my-auto">개</span>
                 </div>
+                {errors.quantity && (
+                    <p className="text-red-500 text-sm">{errors.quantity}</p>
+                )}
             </div>
             <div className="mb-4">
                 <label htmlFor="price" className="block mb-2">
@@ -238,6 +320,9 @@ function AddComponent() {
                     />
                     <span className="ml-2 my-auto">원</span>
                 </div>
+                {errors.price && (
+                    <p className="text-red-500 text-sm">{errors.price}</p>
+                )}
             </div>
             <div className="mb-8">
                 <textarea
@@ -249,8 +334,10 @@ function AddComponent() {
                     className="textarea textarea-bordered w-full bg-white"
                     placeholder={"상품 설명을 입력해주세요."}
                 />
+                {errors.content && (
+                    <p className="text-red-500 text-sm">{errors.content}</p>
+                )}
             </div>
-            {/* ... */}
             <div className="mb-4">
                 <span>거래방식</span>
                 <div className="flex space-x-4 mt-2">
@@ -302,6 +389,9 @@ function AddComponent() {
                         </label>
                     </div>
                 </div>
+                {errors.tradeMethod && (
+                    <p className="text-red-500 text-sm">{errors.tradeMethod}</p>
+                )}
             </div>
             <div className="flex justify-end">
                 <button
