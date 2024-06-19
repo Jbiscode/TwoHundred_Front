@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import filter from '@assets/images/icon/filter.svg';
 import { Link, useLocation } from 'react-router-dom';
-import {instance} from '@api/index.js';
+import {instance, auth} from '@api/index';
+import useModalStore from "@zustand/modalStore"
+import usemyprofileStore from "@zustand/myprofileStore"
+import useAuthStore from "@zustand/authStore"
 
 
 
@@ -210,27 +213,52 @@ const Search = () => {
         fetchArticles(true);
     };
 
-    //로그인했을 경우 userId 값 가져오기
-    const [userId, setUserId] = useState(null);
+    //로그인했을 경우 id 값 가져오기
+    const {id} = useAuthStore()
     const [likeArticle, setLikeArticle] = useState([]);
-
-    useEffect(() => {
-        // 쿼리 파라미터에서 userId를 가져와 설정
-        const params = new URLSearchParams(location.search);
-        const id = params.get('id');
-        setUserId(id);
-    }, [location]);
     
 
-    // 좋아요 확인
-    const isArticleLikedByUser = (articleId) => {
-        if (!userId) return false; 
-
-        const isLiked = likeArticle.some(like => {
-            return like.user_id == userId && like.article_id == articleId;
-        });
-        return isLiked;
+    // 좋아요 확인              
+    const [like, setLike] = useState(false);
+    const isArticleLikedByUser = (articleId) => { 
+        if (!id) return false;
+        return likeArticle.some(la => la.user_id === id && la.article_id === articleId);
     };
+
+
+    //좋아요 클릭
+    const { updateMyProfileInfo } = usemyprofileStore(state => state)
+    const {openLoginModal} = useModalStore(state => state)
+    
+
+
+    const handleLikeChange = (e, articleId) => {
+        e.stopPropagation()
+        e.preventDefault()
+        console.log('왜 안눌리누?')
+        console.log(articleId)
+        const fetch = async() => {
+            try{
+                const response = await auth.put(
+                    `/api/v1/users/me/likes/${articleId}`,
+                    {withCredentials: true}
+                )
+                if(response.resultCode == '401'){
+                    openLoginModal();
+                }
+                if(response.resultCode == '200'){
+                    console.log("click")
+                    setLike(prev => !prev)
+                    updateMyProfileInfo();
+
+                    await fetchArticles(true);
+                }
+            }catch(error){
+                console.log(error)
+            }
+        }
+        fetch()
+    }
 
     return (
         <div>
@@ -398,17 +426,19 @@ const Search = () => {
                                         className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow  "
                                         to={`/post/${item.id}`}
                                     >
-                                        <div >
-                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
+                                       <div className="relative">
+                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%] border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
+                                            <img 
+                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
+                                                alt='like' 
+                                                className="absolute top-2 right-2"
+                                                onClick={(e)=>{handleLikeChange(e, item.id)}}
+                                            />
                                         </div>
                                         <div className='ml-3 flex-grow'>
                                             <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
                                                 {item.title}
                                             </p>
-                                            <img 
-                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
-                                                alt='like' 
-                                            />
                                             <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">{item.addr1} {item.addr2}</p>
                                             <p className="flex justify-between goods-cont_bottom"></p>
                                             <p className="text-lx font-bold">{Number(item.price).toLocaleString()}원</p>
