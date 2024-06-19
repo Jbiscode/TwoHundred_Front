@@ -50,7 +50,7 @@ const MyProfileInfoComponent = () => {
 
 
     return (
-            <div className="border w-full border-gray-300 px-6 py-10 border-solid mt-8 mb-8">
+            <div className="border w-full border-gray-300 px-6 py-10 border-solid mt-8 mb-8 rounded-[10%]">
                 <div className="flex gap-4">
                     <div className="avatar">
                         <div className="w-32 rounded-full">
