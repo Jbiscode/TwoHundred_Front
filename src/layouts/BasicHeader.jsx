@@ -164,7 +164,7 @@ function BasicHeader() {
                             <div className="dropdown dropdown-end mr-10">
 
                                 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                                    <div className="w-10 rounded-full">
+                                    <div className="w-10 rounded-full border-gray-300 border-solid border-2">
                                         <img alt="Tailwind CSS Navbar component" src={`https://kr.object.ncloudstorage.com/kjwtest/article/${isLoggedin ? `${userDTO.profileImageUrl}` : "s_uuid_7adc2b20-82c8-4f14-96f0-f68aa2613ac0"}`} />
                                     </div>
                                 </div>

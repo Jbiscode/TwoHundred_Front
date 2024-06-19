@@ -253,7 +253,7 @@ function IndexPage() {
 
                     {/* 추천상품 */}
                     <div className="goods px-6">
-                        <div className="goods-wrapper -mx-2 w-full  grid justify-center box-border">
+                        <div className="goods-wrapper  w-full  grid justify-center box-border">
                             <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
                             {isLoading ? (
                                 <div>로딩 중 ...</div>
