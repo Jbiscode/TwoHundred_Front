@@ -126,12 +126,12 @@ const BuyComponent = ({updateMyProfileInfo }) => {
             <div className="flex flex-wrap -mx-2">
                 {
                     mySalesDTO.map(item => (
-                        <div className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`}>
+                        <Link className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`}>
                             <div className="relative">
-                                <Link to={`/post/${item.id}`}><img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1]"/></Link>
+                                <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1]  h-[180px]"/>
                                 {
                                         item.tradeStatus === 'SOLD_OUT' &&
-                                        <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0">
+                                        <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0 rounded-[10%]">
                                             거래 완료
                                         </div>
                                 }
@@ -153,7 +153,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                                 }
                                
                             </div>
-                        </div>
+                        </Link>
                     ))
                 }
             </div>

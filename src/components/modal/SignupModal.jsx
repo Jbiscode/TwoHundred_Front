@@ -8,6 +8,8 @@ import useModalStore from '@zustand/modalStore'
 import IMAGEUPLOAD from '@assets/images/icon/defaultprofileImg.png'
 import CAMERA from '@assets/images/icon/camera-solid.svg'
 import axios from "axios";
+import toast from "react-hot-toast";
+import {instance} from "@api/index"
 
 const SignupModal = () => {
     const {closeSignupModal } = useModalStore();
@@ -15,6 +17,15 @@ const SignupModal = () => {
     const [imgList, setImgList] = useState([])
     const [files,setFiles] = useState([])
     const imgRef = useRef();
+    const [emailAuthCode, setEmailAuthCode] = useState('')
+    const [emailCheckReq, setEmailCheckReq] = useState({
+        email : ''
+    })
+    const [inputEmailAuthCode, setInputEmailAuthCode] = useState('')
+    const [isverifiedCode, setIsverifiedCode] = useState(false)
+    const [authCodeInputTag, setAuthCodeInputTag] = useState(false)
+    const authCodeRef = useRef();
+    const [isReadOnly, setIsReadOnly] = useState(false)
 
     const [userSignupDTO, setUserSignupDTO] = useState({
         username : '',
@@ -45,6 +56,10 @@ const SignupModal = () => {
             ...userSignupDTO,
             [e.target.name] : e.target.value
         })
+        if(e.target.name=='email'){
+            setEmailCheckReq({email : e.target.value})
+            setIsValidEmail(emailRegex.test(e.target.value))
+        }
     }
 
     const onSignup = (e) => {
@@ -65,6 +80,10 @@ const SignupModal = () => {
         if (Object.values(newIsEmptyInput).some(value => value)) {
             return;
         }
+        if(!isverifiedCode){
+            toast.error("인증코드를 다시 확인해주세요.")
+            return;
+        } 
         
         console.log(userSignupDTO)
         // 모든 값이 false인 경우에만 회원가입 진행
@@ -111,13 +130,64 @@ const SignupModal = () => {
         imgRef.current.click()
     }
 
+    const handleEmailCheck = (e) => {
+        if(emailCheckReq.email == ''){
+            setIsValidEmail(false)
+            toast.error("이메일 형식을 입력해주세요");
+        } 
+        else{
+            if(!isValidEmail){ 
+                toast.error("이메일 형식을 입력해주세요")
+                return;
+            }
+            setAuthCodeInputTag(true)
+            const fetch = async() => {
+                try{
+                    const response = await instance.post(`/api/v1/auth/emailCheck`,
+                        { body : JSON.stringify(emailCheckReq)}
+                    )
+                    if(response.resultCode == 200){
+                        toast.success('이메일 인증코드를 전송하였습니다.')
+                        setEmailAuthCode(response.data)
+                        
+                    }
+                    if(response.resultCode === 409){
+                        toast.error('이미 존재하는 이메일입니다.')
+                    }
+                }catch(error){
+                    console.log(error)
+                }
+                
+            }
+            fetch();
+        }
+       
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+    }
+
+    const handleAuthCodeCheck = () => {
+        if(inputEmailAuthCode == emailAuthCode){
+            setIsverifiedCode(true)
+            toast.success("인증에 성공했습니다.")
+            setIsReadOnly(true)
+        }else{
+            setIsverifiedCode(false)
+            toast.error("인증코드를 다시 확인해주세요.")
+        }
+    
+    }
+
     return (
         <div>
+            
             <div className="text-center font-bold text-lg mb-6">
                 <p className="text-2xl mb-2">회원가입</p>
             </div>
             <div className="p-5">
-                <form action="">
+                <form action="" onSubmit={handleSubmit}>
                     <div className="h-96 overflow-y-auto px-2">
                         <div className="flex justify-center items-center relative" onClick={handleImgInputTrigger}>
                             {
@@ -174,8 +244,15 @@ const SignupModal = () => {
                             <p className="font-bold text-sm mb-2 pl-1 text-gray-400">* 로그인 시 사용할 이메일입니다.</p>
                             <div className="flex gap-3">
                                 <input type="text" placeholder="이메일" className={`input input-bordered w-full ${isEmptyInput.isEmailEmpty ? 'border-rose-600' : ''}`} name="email" value={userSignupDTO.email} onChange={onInputChange}/>
-                                <button className="btn btn-outline" >이메일 인증</button>
+                                <button className="btn btn-outline"  onClick={handleEmailCheck}>인증코드 발송</button>
                             </div>
+                            {
+                                authCodeInputTag && 
+                                    <div className="flex gap-3 mt-1">
+                                        <input type="text" placeholder="이메일" className={`input input-bordered w-full`} name="email" value={inputEmailAuthCode} onChange={(e) => {setInputEmailAuthCode(e.target.value)}} disabled={isReadOnly}/>
+                                        <button className={`btn  ${isReadOnly ? 'btn-success' : 'btn-outline'}`}  onClick={handleAuthCodeCheck}>인증코드 확인</button>
+                                    </div>
+                            }
                             {
                                 isEmptyInput.isEmailEmpty && <div className="mt-2 ml-1 text-rose-600">이메일을 입력하세요.</div>
                             }

@@ -30,7 +30,7 @@ function BasicFooter() {
         //     </footer>
         // </div>
 
-        <div className="sticky bottom-0 w-full z-10">
+        <div className="sticky -bottom-[0.6px] w-full z-10">
         <footer className="footer footer-center p-3 px-7 bg-white text-base-content shadow-lg border-solid border-t-[1px] border-gray-300">
             <aside className="flex justify-between w-full">
                 <div onClick={openHomePage} className="flex flex-col items-center">

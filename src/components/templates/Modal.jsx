@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom'
 const Modal = ({children, isOpen, onClose}) => {
     if(!isOpen) return null;
 
-   
+    if(isOpen){
+        document.body.style.overflow = 'hidden'
+    }
 
     return ReactDOM.createPortal(
         <>
