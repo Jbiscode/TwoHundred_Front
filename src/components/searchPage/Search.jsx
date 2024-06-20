@@ -22,6 +22,7 @@ const Search = () => {
     const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
     const [category, setCategory] = useState(initialCategory);
     const [tradeMethod, setTradeMethod] = useState(null);
+    const [tradeStatus, setTradeStatus] = useState(null);
 
     //검색결과 총 개수
     const [totalCount, setTotalCount] = useState(0);
@@ -92,6 +93,21 @@ const Search = () => {
         }
     ]
 
+    const tradeStatusCode = [
+        {
+            id: 'ON_SALE',
+            value: false,
+            htmlFor: "거래가능만 보기",
+            key: 1
+        },
+        {
+            id: 'ALL',
+            value: false,
+            htmlFor: "모든거래 보기",
+            key: 1
+        }
+    ]
+
 
     useEffect(() => {
         if (query !== content) {
@@ -116,6 +132,9 @@ const Search = () => {
         }
         if (tradeMethod) {
             params.push(`tradeMethod=${tradeMethod}`);
+        }
+        if (tradeStatus) {
+            params.push(`tradeStatus=${tradeStatus}`);
         }
         params.push(`page=${page}`);
         params.push(`size=10`);
@@ -187,6 +206,13 @@ const Search = () => {
     //거래방식 선택
     const handleTradeMethod = (item) => {
         setTradeMethod(item.id);
+        setPage(1);
+    };
+
+    //거래상태 선택
+    const handleTradeStatus = (item) => {
+        if(setTradeStatus(item.id) == 'ALL') {return;}
+        setTradeStatus(item.id);
         setPage(1);
     };
 
@@ -315,6 +341,23 @@ const Search = () => {
                                                 className="flex items-center cursor-pointer"
                                                 htmlFor={item.htmlFor}
                                                 onClick={() => handleTradeMethod(item)}>
+                                                <span className='text-sm'>{item.htmlFor}</span>
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 거래 상태 */}
+                            <div className="px-8 pt-10">
+                                <h3 className="font-bold pb-4 text-lg border-b-2 border-solid">거래상태</h3>
+                                <div className="flex flex-col space-y-4 mt-4">             
+                                    {tradeStatusCode.map((item) => (
+                                        <div key={item.id} className={tradeStatus === item.id ? 'text-green-700' : 'text-black'}>
+                                            <label
+                                                className="flex items-center cursor-pointer"
+                                                htmlFor={item.htmlFor}
+                                                onClick={() => handleTradeStatus(item)}>
                                                 <span className='text-sm'>{item.htmlFor}</span>
                                             </label>
                                         </div>
