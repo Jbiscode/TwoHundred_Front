@@ -12,7 +12,7 @@ import usemyprofileStore from "@zustand/myprofileStore";
 
 const WriteReviewModal = () => {
     const { isLoginModalOpen, isSignupModalOpen, isWriteReviewModalOpen, openLoginModal,closeLoginModal, closeSignupModal,closeWriteReviewModal } = useModalStore();
-    const {selectReviewId} = usemyprofileStore(state => state)
+    const {selectReviewId, updateMyProfileInfo} = usemyprofileStore(state => state)
     const [charCount, setCharCount] = useState(0)
     const [reviewGrade, setReviewGrade] = useState({
         bad: false,
@@ -99,7 +99,8 @@ const WriteReviewModal = () => {
             if(response.resultCode == '401'){
                 openLoginModal()
             }
-            if(response.resultCode == '200'){
+            if(response.resultCode == '201'){
+                updateMyProfileInfo();
                 closeWriteReviewModal()
             }
             console.log(response.data)

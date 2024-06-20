@@ -6,8 +6,10 @@ import REVIEW_SOSO from "@/assets/images/review_soso.svg"
 import REVIEW_GOOD_CHECKED from "@/assets/images/review_good_checked.svg"
 import REVIEW_BAD_CHECKED from "@/assets/images/review_bad_checked.svg"
 import REVIEW_SOSO_CHECKED from "@/assets/images/review_soso_checked.svg"
-import {instance} from "@api/index"
+import {instance, auth} from "@api/index"
 import usemyprofileStore from "@zustand/myprofileStore"
+import useModalStore from "@zustand/modalStore";
+import toast from "react-hot-toast";
 
 const MyReviewModal = () => {
     const [reviewGrade , setReviewGrade] = useState({
@@ -18,6 +20,8 @@ const MyReviewModal = () => {
     const [charCount, setCharCount] = useState(0)
     const {selectReviewId} = usemyprofileStore(state => state)
     const [reviewDTO, setReviewDTO] = useState({})
+    const {closeReviewModal,openUpdateReviewModal} = useModalStore(state => state)
+    const {updateMyProfileInfo} = usemyprofileStore(state => state)
 
     const {bad, soso, good} = reviewGrade
 
@@ -43,6 +47,36 @@ const MyReviewModal = () => {
         }
         fetch();
     },[])
+
+    const handleUpdateReviewBtn = () => {
+        closeReviewModal();
+        openUpdateReviewModal();
+    }
+
+    const handleDeleteReviewBtn = () => {
+        const fetch = async() => {
+            try{
+                const response = await auth.delete(
+                    `/api/v1/reviews/${selectReviewId}`,
+                    {
+                        withCredentials: true
+                    }
+                )
+                if(response.resultCode == '200'){
+                    console.log(response.data)
+                    toast.success("리뷰를 삭제했습니다.")
+                    closeReviewModal();
+                }
+            }catch(error){
+                console.log(error)
+            }
+        }
+        fetch();
+        updateMyProfileInfo();
+        closeReviewModal();
+    }
+
+
 
     return (
         <div>
@@ -73,7 +107,12 @@ const MyReviewModal = () => {
                         <p className="text-base font-bold text-end">{charCount} / 100</p>
                     </div>
                 </form>
+                <div className="flex justify-around">
+                    <button className="btn btn-error" onClick={handleDeleteReviewBtn}>삭제하기</button>
+                    <button className="btn btn-accent" onClick={handleUpdateReviewBtn}>수정하기</button>
+                </div>
             </div>
+            
         </div>          
     )
 }

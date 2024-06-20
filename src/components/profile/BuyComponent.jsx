@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const BuyComponent = ({updateMyProfileInfo }) => {
     const {openLoginModal, openWriteReviewModal, openReviewModal } = useModalStore(state => state)
-    const {setSelectReviewId} = usemyprofileStore(state => state)
+    const {setSelectReviewId,updateMyProfile} = usemyprofileStore(state => state)
 
     const [sortBy, setSortBy] = useState('latest')
     const [tradeStatus, setTradeStatus] = useState('ON_SALE')
@@ -46,14 +46,15 @@ const BuyComponent = ({updateMyProfileInfo }) => {
         }
         
         fetchData();
-    },[page,tradeStatus,sortBy,like])
+    },[page,tradeStatus,sortBy,like,updateMyProfile])
 
     const handleClickReview = (articleId) => {
         setSelectReviewId(articleId)
         openWriteReviewModal();
     }
 
-    const handleClickGetReview = (articleId) => {
+    const handleClickGetReview = (e,articleId) => {
+        e.stopPropagation();
         setSelectReviewId(articleId)
         openReviewModal();
     }
@@ -107,6 +108,17 @@ const BuyComponent = ({updateMyProfileInfo }) => {
         fetch()
     }
 
+    // Link 태그 클릭 핸들러
+    const handleLinkClick = (e, item) => {
+        if (e.target.tagName === 'BUTTON' && item.isReviewed) {
+          e.preventDefault(); // Link의 기본 동작을 막음
+          handleClickGetReview(e, item.id);
+        }else if(e.target.tagName === 'BUTTON' && !item.isReviewed){
+            e.preventDefault();
+            handleClickReview(item.id)
+        }
+      };
+
 
     return (
         <div>
@@ -126,7 +138,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
             <div className="flex flex-wrap -mx-2">
                 {
                     mySalesDTO.map(item => (
-                        <Link className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`}>
+                        <Link className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`} onClick={(e) => {handleLinkClick(e,item)}}>
                             <div className="relative">
                                 <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1]  h-[180px]"/>
                                 {
@@ -146,7 +158,7 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                             <div className="flex justify-between items-center">
                                 <div className="text-lx font-bold">{item.price.toLocaleString()}원</div>
                                 {
-                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral" onClick={() => {handleClickGetReview(item.id)}}>작성완료</button>
+                                    item.isReviewed &&  <button className="btn btn-sm btn-neutral">작성완료</button>
                                 }
                                 {
                                     item.isReviewed ||  <button className="btn btn-sm btn-secondary" onClick={() => {handleClickReview(item.id)}}>리뷰작성</button>
