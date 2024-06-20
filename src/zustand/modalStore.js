@@ -9,6 +9,7 @@ const useModalStore = create(
             isWriteReviewModalOpen: false,
             isOfferModalOpen: false,
             isReviewModalOpen: false,
+            isUpdateReviewModalOpen : false,
             selectedArticleId: null,
             openLoginModal: () => set((state) => ({ isLoginModalOpen: true })),
             closeLoginModal: () => set((state) => { document.body.style.overflow = 'auto'; return { isLoginModalOpen: false }; }),
@@ -21,6 +22,8 @@ const useModalStore = create(
             setSelectedArticleId: (articleId) => set({ selectedArticleId: articleId }),
             openReviewModal: () => set((state) => ({ isReviewModalOpen: true })),
             closeReviewModal: () => set((state) => { document.body.style.overflow = 'auto'; return { isReviewModalOpen: false }; }),
+            openUpdateReviewModal: () => set((state) => ({ isUpdateReviewModalOpen: true })),
+            closeUpdateReviewModal: () => set((state) => { document.body.style.overflow = 'auto'; return { isUpdateReviewModalOpen: false }; }),
         })
     
 )

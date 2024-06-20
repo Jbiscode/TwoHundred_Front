@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { instance } from "../../api";
+import { instance } from "@api";
+
 
 const ReviewComponent = ({userId}) => {
     const [reviewStatus, setReviewStatus] = useState('SALE')
@@ -11,6 +12,7 @@ const ReviewComponent = ({userId}) => {
     const [isExistNext, setIsExistNext] = useState(false)
     const [nextPage, setNextPage] = useState();
     const [prevPage, setPrevPage] = useState();
+    
 
 
     const handleReviewStatusChangeSale = () => {
