@@ -1,5 +1,5 @@
 // import { MainResponse } from "../api/mainApi.jsx";
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback} from 'react';
 
 import bannerImage1 from '@assets/images/banner/banner1.jpeg';
 import bannerImage2 from '@assets/images/banner/banner2.png';
@@ -15,7 +15,7 @@ import membership from '@assets/images/icon/membership8.png';
 import newest from '@assets/images/icon/newest.png';
 
 
-
+import Goods from '../components/goods';
 import BasicLayout from '@layouts/BasicLayout';
 import useSocketStore from '@zustand/useSocketStore';
 import { toast } from 'react-hot-toast';
@@ -24,6 +24,9 @@ import {instance} from '@api/index.js';
 import { Link } from 'react-router-dom';
 import {auth} from '@api/index'
 import useModalStore from '@zustand/modalStore';
+import usemyprofileStore from "@zustand/myprofileStore"
+import useAuthStore from "@zustand/authStore"
+
 
 const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -39,23 +42,17 @@ function IndexPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
 
-    const {openLoginModal} = useModalStore(state => state)
+    //const {openLoginModal} = useModalStore(state => state) -- 중복
     
     //배너
     const [currentSlide, setCurrentSlide] = useState(0);
     const { socket } = useSocketStore();
     
 
-    //추천상품-페이징
-    const [goodsList, setGoodsList] = useState([]);
-    const [like, setLike] = useState(false)
-
     const itemsPerPage = 6;
     const maxItems = 60; // 최대 60개의 데이터만 요청
-  
 
     //배너
-
     const handleSlideChange = (direction) => {
         if (direction === 'prev') {
         setCurrentSlide((prevSlide) => (prevSlide === 0 ? 2 : prevSlide - 1));
@@ -102,50 +99,26 @@ function IndexPage() {
         { value: CategoryEnum.FOOD, text: '건강식품', src: food },
     ];
 
-    useEffect(() => {
-        instance.get('/api/v1/search')
-            .then(response => {
-                console.log(response);
-                return response.data;
-            })
-            .then(data => {
-                console.log('Fetched data:', data);
-                const allGoods = data || [];
-                const shuffledGoods = allGoods.sort(() => 0.5 - Math.random());
-                const selectedGoods = shuffledGoods.slice(0, 60);
-                setGoodsList(selectedGoods);
-                setTotalPages(Math.ceil(goodsList.length / itemsPerPage))
-            })
-            .catch(error => {
-                console.error('Error fetching goods data:', error);
-            });
-    }, [like]);
-
 
     //추천상품-페이징
     const fetchData = useCallback(async (page, size) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`/api/v1/search?page=${page}&size=${size}`);
+            const response = await fetch(`/api/v1/search?page=${page}&size=${size}&tradeStatus=ON_SALE`);
             const result = await response.json();
             console.log('Fetched data:', result);
-        
-            if (result.data) {
-            console.log('result.data:', result.data);
-            console.log('result.data.searchResult:', result.data.searchResult);
-            }
-        
+            
             if (result.data && Array.isArray(result.data.searchResult)) {
-            const totalCount = result.data.totalCount > maxItems ? maxItems : result.data.totalCount;
-            
-            const shuffledData = shuffleArray(result.data.searchResult);
-            setData(shuffledData);
-            
-            setTotalPages(Math.ceil(totalCount / size));
+                const totalCount = result.data.totalCount > maxItems ? maxItems : result.data.totalCount;
+                const shuffledData = shuffleArray(result.data.searchResult);
+                setData(shuffledData);
+                setTotalPages(Math.ceil(totalCount / size));
+                setLikeArticle(data.likeResult);
+
             } else {
-            console.error('searchResult가 배열이 아닙니다:', result.data.searchResult);
-            setData([]);
-            setTotalPages(1);
+                console.error('searchResult가 배열이 아닙니다:', result.data.searchResult);
+                setData([]);
+                setTotalPages(1);
             }
         } catch (error) {
             console.error('API 요청 실패:', error);
@@ -154,34 +127,58 @@ function IndexPage() {
         } finally {
             setIsLoading(false);
         }
-        }, []);
+    }, []);
 
-        useEffect(() => {
-            fetchData(currentPage, itemsPerPage);
+    useEffect(() => {
+        fetchData(currentPage, itemsPerPage);
         }, [currentPage, fetchData]);
 
 
-
-        const handlePageChange = useCallback((newPage) => {
+    const handlePageChange = useCallback((newPage) => {
         setCurrentPage(newPage);
         }, []);
 
-    const handleLikeChange = (e,id) => {
+
+    //로그인했을 경우 id 값 가져오기
+    const {id} = useAuthStore()
+    const [likeArticle, setLikeArticle] = useState([]);
+
+    //좋아요 클릭
+    const { updateMyProfileInfo } = usemyprofileStore(state => state)
+    const {openLoginModal} = useModalStore(state => state)
+
+    const [likeState, setLikeState] = useState({});
+
+
+    const isArticleLikedByUser = (articleId) => { 
+        if (!id || !Array.isArray(likeArticle)) return false;
+        return likeArticle.some(la => la.user_id === id && la.article_id === articleId);
+    };
+
+
+    const handleLikeChange = (e, articleId) => {
         e.stopPropagation()
         e.preventDefault()
-        console.log('왜 안눌리누?')
-        console.log(id)
+        //console.log('왜 안눌리누?')
+        console.log(articleId)
         const fetch = async() => {
             try{
                 const response = await auth.put(
-                    `/api/v1/users/me/likes/${id}`,
+                    `/api/v1/users/me/likes/${articleId}`,
                     {withCredentials: true}
                 )
                 if(response.resultCode == '401'){
                     openLoginModal();
                 }
                 if(response.resultCode == '200'){
-                    setLike(prev => !prev)
+                    console.log("click")
+                    setLikeState(prevState => ({
+                        ...prevState,
+                        [articleId]: !prevState[articleId]
+                    }));
+                    updateMyProfileInfo();
+
+                    //await fetchArticles(true);
                 }
             }catch(error){
                 console.log(error)
@@ -189,8 +186,6 @@ function IndexPage() {
         }
         fetch()
     }
-
-
     
     return (
         <BasicLayout>
@@ -248,64 +243,31 @@ function IndexPage() {
                         </div>
                     </div>
                         
-
-
-
                     {/* 추천상품 */}
                     <div className="goods px-6">
-                        <div className="goods-wrapper  w-full  grid justify-center box-border">
-                            <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
-                            {isLoading ? (
-                                <div>로딩 중 ...</div>
-                            ) : (
-                            <div className="goods-list  w-full grid box-border list-none grid-cols-2">
-                                {data.length > 0 ? (
-                                    data.map((item) => (
-                                        <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>
-                                            <div className='rounded-[10%] relative'>
-                                                <img 
-                                                    src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
-                                                    alt={item.imageId} 
-                                                    className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] h-[194px] block w-full" 
-                                                />
-                                                
-                                                <img className="absolute top-2 right-2" alt='frfrf' src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
-                                            </div>
-                                            <div className='pl-1'>
-                                                <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold my-1">
-                                                    {item.title}
-                                                </p>
-                                                <p className="my-1 flex text-sm gap-1 font-bold text-gray-400">
-                                                    {item.content}
-                                                </p>
-                                                <div className="text-lx font-bold">
-                                                    {Number(item.price).toLocaleString()}원
-                                                </div>
-                                            </div>               
-                                        </Link>
-                                    ))
-                                ) : (
-                                    <div>데이터가 없습니다 </div>
-                                )}
-                            </div>
-                            )}
-                        </div>
-                    </div>
-                    {/* 페이징 버튼 */}
-                    <div className="text-gray-500 flex justify-center items-center space-x-4">
-                        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}
-                            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            &lt;
-                        </button>
-                        <span>{currentPage} / {totalPages}</span>
-                        <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}
-                            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            &gt;
-                        </button>
-                    </div>
+                        <Goods data={data}
+                                isLoading={isLoading}
+                                likeState={likeState}
+                                handleLikeChange={handleLikeChange}
+                                isArticleLikedByUser={isArticleLikedByUser} />
                     
+                        {/* 페이징 버튼 */}
+                        <div className="text-gray-500 flex justify-center items-center space-x-4">
+                            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}
+                                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                &lt;
+                            </button>
+                            <span>{currentPage} / {totalPages}</span>
+                            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}
+                                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                &gt;
+                            </button>
+                        </div>
+
+                    </div>{/* 추천상품 */}
+
                 </div>
             </div>
         </BasicLayout>
