@@ -7,6 +7,7 @@ import useModalStore from "@zustand/modalStore.js";
 import PostButton from "@components/post/PostButton.jsx";
 import { Link } from "react-router-dom";
 import { auth } from "@api/index.js";
+import toast, { Toaster } from "react-hot-toast";
 
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
@@ -44,10 +45,28 @@ function ReadComponent({ aid }) {
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    const handlePrevImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === 0 ? 0 : prevIndex - 1
+        );
+    };
+
+    const handleNextImage = () => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === article.imageUrls.length - 1
+                ? article.imageUrls.length - 1
+                : prevIndex + 1
+        );
+    };
+
     const handleLike = async () => {
         if (!loggedInUserId) {
             console.log("로그인이 필요합니다.");
             openLoginModal();
+        } else if (article.writerId === loggedInUserId) {
+            toast.error("본인의 게시글에는 좋아요를 누를 수 없습니다.");
         } else {
             try {
                 const response = await auth.post(
@@ -72,13 +91,15 @@ function ReadComponent({ aid }) {
                 const response = await auth.get(`/api/v1/articles/${aid}`, {
                     withCredentials: true,
                 });
-
                 if (response.resultCode === "200") {
                     setArticle(response.data);
-                    console.log(response.data);
                     setLiked(response.data.liked); // isLiked 대신 liked 사용
-                    console.log(response.data.liked);
                     setLikeCount(response.data.likeCount);
+                } else if (response.data) {
+                    toast.error("해당 게시물을 찾을 수 없습니다.");
+                    setTimeout(() => {
+                        navigate("/"); // 404 에러 시 메인 페이지로 이동
+                    }, 500);
                 }
             } catch (error) {
                 console.error(error);
@@ -86,7 +107,12 @@ function ReadComponent({ aid }) {
         };
 
         fetchData();
-    }, [aid, isLoggedIn]);
+    }, [
+        aid,
+        isLoggedIn,
+        navigate,
+        article.offers.filter((offer) => offer.selected).length,
+    ]);
 
     //게시글 삭제
     const handleDelete = async () => {
@@ -95,7 +121,10 @@ function ReadComponent({ aid }) {
                 withCredentials: true,
             });
             if (response.resultCode === "200") {
-                console.log("게시글 삭제 성공");
+                toast.success("게시글이 삭제되었습니다.");
+                setTimeout(() => {
+                    location.href = "/";
+                }, 1000);
             }
         } catch (error) {
             console.error(error);
@@ -103,47 +132,62 @@ function ReadComponent({ aid }) {
     };
 
     const handleAcceptOffer = async (offerId) => {
-        try {
-            const response = await auth.put(
-                `/api/v1/offers/${aid}/${offerId}`,
-                {
-                    withCredentials: true,
+        if (article.tradeStatus === "SOLD_OUT") {
+            toast.error("거래 완료된 상품은 제안을 수락할 수 없습니다.");
+            return;
+        } else if (article.offers.some((offer) => offer.selected)) {
+            toast.error("이미 수락된 제안이 있습니다.");
+            return;
+        } else {
+            try {
+                const response = await auth.put(
+                    `/api/v1/offers/${aid}/${offerId}`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if (response.resultCode === "200") {
+                    // 제안 수락 후 상태 업데이트
+                    setArticle((prevArticle) => ({
+                        ...prevArticle,
+                        offers: prevArticle.offers.map((offer) =>
+                            offer.id === offerId
+                                ? { ...offer, selected: true }
+                                : offer
+                        ),
+                    }));
                 }
-            );
-            if (response.resultCode === "200") {
-                // 제안 수락 후 상태 업데이트
-                setArticle((prevArticle) => ({
-                    ...prevArticle,
-                    offers: prevArticle.offers.map((offer) =>
-                        offer.id === offerId
-                            ? { ...offer, selected: true }
-                            : offer
-                    ),
-                }));
+            } catch (error) {
+                console.error(error);
             }
-        } catch (error) {
-            console.error(error);
         }
     };
 
     const handleCancelAcceptedOffer = async (offerId) => {
         try {
-            const response = await auth.put(
-                `/api/v1/offers/${aid}/${offerId}/cancel`,
-                {
-                    withCredentials: true,
+            if (article.tradeStatus === "SOLD_OUT") {
+                toast.error(
+                    "거래 완료된 상품은 제안 수락을 취소할 수 없습니다."
+                );
+                return;
+            } else {
+                const response = await auth.put(
+                    `/api/v1/offers/${aid}/${offerId}/cancel`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if (response.resultCode === "200") {
+                    // 수락한 제안 취소 후 상태 업데이트
+                    setArticle((prevArticle) => ({
+                        ...prevArticle,
+                        offers: prevArticle.offers.map((offer) =>
+                            offer.id === offerId
+                                ? { ...offer, selected: false }
+                                : offer
+                        ),
+                    }));
                 }
-            );
-            if (response.resultCode === "200") {
-                // 수락한 제안 취소 후 상태 업데이트
-                setArticle((prevArticle) => ({
-                    ...prevArticle,
-                    offers: prevArticle.offers.map((offer) =>
-                        offer.id === offerId
-                            ? { ...offer, selected: false }
-                            : offer
-                    ),
-                }));
             }
         } catch (error) {
             console.error(error);
@@ -151,35 +195,55 @@ function ReadComponent({ aid }) {
     };
 
     const handleCompleteSale = async () => {
-        try {
-            const response = await auth.put(`/api/v1/offers/${aid}/complete`, {
-                withCredentials: true,
-            });
-            if (response.resultCode === "200") {
-                // 판매 완료 후 상태 업데이트
-                setArticle((prevArticle) => ({
-                    ...prevArticle,
-                    tradeStatus: "SOLD_OUT",
-                }));
+        if (article.tradeStatus !== "RESERVED") {
+            toast.error("예약된 상품만 판매 완료할 수 있습니다.");
+            return;
+        } else {
+            try {
+                const response = await auth.put(
+                    `/api/v1/offers/${aid}/complete`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if (response.resultCode === "200") {
+                    // 판매 완료 후 상태 업데이트
+                    setArticle((prevArticle) => ({
+                        ...prevArticle,
+                        tradeStatus: "SOLD_OUT",
+                    }));
+                    toast.success("판매가 완료되었습니다.");
+                }
+            } catch (error) {
+                console.error(error);
             }
-        } catch (error) {
-            console.error(error);
         }
     };
 
     const handleCancelOffer = async (offerId) => {
         try {
-            const response = await auth.delete(`/api/v1/offers/${offerId}`, {
-                withCredentials: true,
-            });
-            if (response.resultCode === "200") {
-                // 제안 취소 후 상태 업데이트
-                setArticle((prevArticle) => ({
-                    ...prevArticle,
-                    offers: prevArticle.offers.filter(
-                        (offer) => offer.id !== offerId
-                    ),
-                }));
+            if (article.tradeStatus === "SOLD_OUT") {
+                toast.error("거래 완료된 상품은 제안을 취소할 수 없습니다.");
+                return;
+            } else if (article.tradeStatus === "RESERVED") {
+                toast.error("예약된 상품은 제안을 취소할 수 없습니다.");
+                return;
+            } else {
+                const response = await auth.delete(
+                    `/api/v1/offers/${offerId}`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+                if (response.resultCode === "200") {
+                    // 제안 취소 후 상태 업데이트
+                    setArticle((prevArticle) => ({
+                        ...prevArticle,
+                        offers: prevArticle.offers.filter(
+                            (offer) => offer.id !== offerId
+                        ),
+                    }));
+                }
             }
         } catch (error) {
             console.error(error);
@@ -226,6 +290,16 @@ function ReadComponent({ aid }) {
                             alt={"프로필"}
                             className="w-[300px] aspect-square"
                         />
+                        {article.tradeStatus === "SOLD_OUT" && (
+                            <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0 rounded-[10%]">
+                                거래 완료
+                            </div>
+                        )}
+                        {article.tradeStatus === "RESERVED" && (
+                            <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0 rounded-[10%]">
+                                예약 중
+                            </div>
+                        )}
                         <button
                             className={`absolute top-5 right-4 py-1.5 px-2.5 pl-1 pr-2 hover:scale-105 text-center border rounded-md h-8 text-sm flex items-center gap-1 lg:gap-2 ${
                                 liked ? "text-red-500" : "hover:text-gray-400"
@@ -249,32 +323,28 @@ function ReadComponent({ aid }) {
                                 alt="프로필"
                                 className="w-[50px] h-[50px] rounded-full mr-4"
                             />
-                            <h1 className="text-4xl text-[#EFA43D] mt-5 mb-5">
+                            <h2 className="text-3xl text-[#EFA43D] mt-5 mb-5">
                                 {article.writerUsername}
-                            </h1>
+                            </h2>
                         </div>
                         <hr className="mt-4" />
-                        <ul className="space-y-2 mt-4 mb-10">
+                        <h2 className="text-3xl mt-4 mb-2">{article.title}</h2>
+                        <h3 className="text-xl ">
+                            {article.price.toLocaleString("ko-KR")}원
+                        </h3>
+                        <ul className="space-y-2 mt-2 mb-10">
                             <li>
-                                <i className="fas fa-envelope text-gray-400 mr-1"></i>{" "}
-                                {article.title}
-                            </li>
-                            <li>
-                                <i className="fas fa-phone text-gray-400 mr-1"></i>
-                                {article.price}
-                            </li>
-                            <li>
-                                <p className="text-gray-400 text-sm">
+                                <p className="text-gray-400 text-sm mr-1 ml-1">
                                     작성 시간 {timeAgo(article.createdDate)}
                                 </p>
                             </li>
                             <li>
-                                <p className="text-gray-400 text-sm">
+                                <p className="text-gray-400 text-sm mr-1 ml-1">
                                     거래 지역 {article.addr1} {article.addr2}
                                 </p>
                             </li>
                             <li>
-                                <p className="text-gray-400 text-sm">
+                                <p className="text-gray-400 text-sm mr-1 ml-1">
                                     거래 방식{" "}
                                     {tradeMethodMap[article.tradeMethod]}
                                 </p>
@@ -294,14 +364,61 @@ function ReadComponent({ aid }) {
                         <p className="space-y-2 mt-4 mb-10">
                             {article.content}
                         </p>
-                        {article.imageUrls.map((imageUrl, index) => (
-                            <img
-                                key={index}
-                                src={`https://kr.object.ncloudstorage.com/kjwtest/article/${imageUrl}`}
-                                alt={`이미지 ${index + 1}`}
-                                className="w-full mb-4"
-                            />
-                        ))}
+                        <div
+                            className="relative w-full mb-4"
+                            style={{ paddingTop: "100%" }}
+                        >
+                            {article.imageUrls.map((imageUrl, index) => (
+                                <img
+                                    key={index}
+                                    src={`https://kr.object.ncloudstorage.com/kjwtest/article/${imageUrl}`}
+                                    alt={`이미지 ${index + 1}`}
+                                    className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 ${
+                                        index === currentImageIndex
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                    }`}
+                                />
+                            ))}
+                            <button
+                                className={`absolute top-1/2 left-0 transform bg-gray-200 -translate-y-1/2 text-white px-2 py-1 rounded ${
+                                    currentImageIndex === 0
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
+                                onClick={handlePrevImage}
+                                disabled={currentImageIndex === 0}
+                            >
+                                {"<"}
+                            </button>
+                            <button
+                                className={`absolute top-1/2 right-0 transform bg-gray-200 -translate-y-1/2 text-white px-2 py-1 rounded ${
+                                    currentImageIndex ===
+                                    article.imageUrls.length - 1
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
+                                onClick={handleNextImage}
+                                disabled={
+                                    currentImageIndex ===
+                                    article.imageUrls.length - 1
+                                }
+                            >
+                                {">"}
+                            </button>
+                            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                                {article.imageUrls.map((_, index) => (
+                                    <span
+                                        key={index}
+                                        className={`inline-block w-2 h-2 rounded-full mx-1 ${
+                                            index === currentImageIndex
+                                                ? "bg-white"
+                                                : "bg-gray-400"
+                                        }`}
+                                    ></span>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                     <div className="w-[300px]">
                         <h1 className="text-4xl text-black md:mt-10 mb-4">
@@ -322,14 +439,17 @@ function ReadComponent({ aid }) {
                                             {timeAgo(offer.createdDate)}
                                         </p>
                                     </div>
-                                    <div className="flex items-center">
+                                    <div className="flex place-items-center">
                                         <p className="text-black">
-                                            {offer.offerPrice}원
+                                            {offer.offerPrice.toLocaleString(
+                                                "ko-KR"
+                                            )}
+                                            원
                                         </p>
                                         {loggedInUserId === article.writerId &&
                                             !offer.selected && (
-                                                <PostButton
-                                                    className="bg-violet-500 ml-2"
+                                                <button
+                                                    className="btn btn-ghost text-white bg-violet-500 ml-2"
                                                     onClick={() =>
                                                         handleAcceptOffer(
                                                             offer.id
@@ -337,12 +457,12 @@ function ReadComponent({ aid }) {
                                                     }
                                                 >
                                                     수락
-                                                </PostButton>
+                                                </button>
                                             )}
                                         {loggedInUserId === article.writerId &&
                                             offer.selected && (
-                                                <PostButton
-                                                    className="bg-orange-500 ml-2"
+                                                <button
+                                                    className="btn btn-ghost text-white bg-orange-500 ml-2"
                                                     onClick={() =>
                                                         handleCancelAcceptedOffer(
                                                             offer.id
@@ -350,12 +470,12 @@ function ReadComponent({ aid }) {
                                                     }
                                                 >
                                                     취소
-                                                </PostButton>
+                                                </button>
                                             )}
                                         {loggedInUserId === offer.offererId &&
                                             !offer.selected && (
-                                                <PostButton
-                                                    className="bg-red-500 ml-2"
+                                                <span
+                                                    className=" text-red-500 ml-3 mr-2.5"
                                                     onClick={() =>
                                                         handleCancelOffer(
                                                             offer.id
@@ -363,7 +483,13 @@ function ReadComponent({ aid }) {
                                                     }
                                                 >
                                                     취소
-                                                </PostButton>
+                                                </span>
+                                            )}
+                                        {loggedInUserId === offer.offererId &&
+                                            offer.selected && (
+                                                <span className="text-green-500 ml-2">
+                                                    채택됨
+                                                </span>
                                             )}
                                     </div>
                                 </li>
@@ -372,14 +498,38 @@ function ReadComponent({ aid }) {
                         <div className="flex justify-between md:justify-end">
                             {loggedInUserId === article.writerId ? (
                                 <>
-                                    <PostButton className="bg-violet-500">
-                                        <Link to={`/post/modify/${aid}`}>
+                                    {article.tradeStatus === "SOLD_OUT" ? (
+                                        <PostButton
+                                            className="bg-violet-500"
+                                            onClick={() =>
+                                                toast.error(
+                                                    "거래 완료된 상품은 수정할 수 없습니다"
+                                                )
+                                            }
+                                        >
                                             수정하기
-                                        </Link>
-                                    </PostButton>
+                                        </PostButton>
+                                    ) : (
+                                        <PostButton className="bg-violet-500">
+                                            <Link to={`/post/modify/${aid}`}>
+                                                수정하기
+                                            </Link>
+                                        </PostButton>
+                                    )}
                                     <PostButton
                                         className="bg-orange-500"
-                                        onClick={handleDelete}
+                                        onClick={() => {
+                                            if (
+                                                article.tradeStatus ===
+                                                "SOLD_OUT"
+                                            ) {
+                                                toast.error(
+                                                    "거래 완료된 상품은 삭제할 수 없습니다"
+                                                );
+                                            } else {
+                                                handleDelete();
+                                            }
+                                        }}
                                     >
                                         삭제하기
                                     </PostButton>
@@ -414,9 +564,19 @@ function ReadComponent({ aid }) {
                                         onClick={() => {
                                             if (!loggedInUserId) {
                                                 openLoginModal();
+                                            } else if (
+                                                article.tradeStatus ===
+                                                "SOLD_OUT"
+                                            ) {
+                                                toast.error(
+                                                    "이미 거래가 완료된 상품입니다."
+                                                );
+                                                return;
                                             } else {
                                                 setSelectedArticleId(aid);
-                                                openOfferModal(selectedArticleId);
+                                                openOfferModal(
+                                                    selectedArticleId
+                                                );
                                             }
                                         }}
                                     >
