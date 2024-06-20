@@ -45,6 +45,20 @@ function ReadComponent({ aid }) {
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
 
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex(
+                (prevIndex) => (prevIndex + 1) % article.imageUrls.length
+            );
+        }, 3000); // 3초마다 이미지 변경
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [article.imageUrls]);
+
     const handleLike = async () => {
         if (!loggedInUserId) {
             console.log("로그인이 필요합니다.");
@@ -298,14 +312,46 @@ function ReadComponent({ aid }) {
                         <p className="space-y-2 mt-4 mb-10">
                             {article.content}
                         </p>
-                        {article.imageUrls.map((imageUrl, index) => (
-                            <img
-                                key={index}
-                                src={`https://kr.object.ncloudstorage.com/kjwtest/article/${imageUrl}`}
-                                alt={`이미지 ${index + 1}`}
-                                className="w-full mb-4"
-                            />
-                        ))}
+                        <div className="relative">
+                            {article.imageUrls.map((imageUrl, index) => (
+                                <img
+                                    key={index}
+                                    src={`https://kr.object.ncloudstorage.com/kjwtest/article/${imageUrl}`}
+                                    alt={`이미지 ${index + 1}`}
+                                    className={`w-full mb-4 ${
+                                        index === currentImageIndex
+                                            ? "block"
+                                            : "hidden"
+                                    }`}
+                                />
+                            ))}
+                            <button
+                                className="absolute top-1/2 left-0 transform bg-gray-200 -translate-y-1/2 text-white px-2 py-1 rounded"
+                                onClick={() =>
+                                    setCurrentImageIndex(
+                                        (prevIndex) =>
+                                            (prevIndex -
+                                                1 +
+                                                article.imageUrls.length) %
+                                            article.imageUrls.length
+                                    )
+                                }
+                            >
+                                {"<"}
+                            </button>
+                            <button
+                                className="absolute top-1/2 right-0 transform bg-gray-200 -translate-y-1/2 text-white px-2 py-1 rounded"
+                                onClick={() =>
+                                    setCurrentImageIndex(
+                                        (prevIndex) =>
+                                            (prevIndex + 1) %
+                                            article.imageUrls.length
+                                    )
+                                }
+                            >
+                                {">"}
+                            </button>
+                        </div>
                     </div>
                     <div className="w-[300px]">
                         <h1 className="text-4xl text-black md:mt-10 mb-4">
