@@ -7,6 +7,7 @@ import useModalStore from "@zustand/modalStore.js";
 import PostButton from "@components/post/PostButton.jsx";
 import { Link } from "react-router-dom";
 import { auth } from "@api/index.js";
+import toast, { Toaster } from "react-hot-toast";
 
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
@@ -95,7 +96,10 @@ function ReadComponent({ aid }) {
                 withCredentials: true,
             });
             if (response.resultCode === "200") {
-                console.log("게시글 삭제 성공");
+                toast.success("게시글이 삭제되었습니다.");
+                setTimeout(() => {
+                    location.href = "/";
+                }, 1000);
             }
         } catch (error) {
             console.error(error);
@@ -416,7 +420,9 @@ function ReadComponent({ aid }) {
                                                 openLoginModal();
                                             } else {
                                                 setSelectedArticleId(aid);
-                                                openOfferModal(selectedArticleId);
+                                                openOfferModal(
+                                                    selectedArticleId
+                                                );
                                             }
                                         }}
                                     >

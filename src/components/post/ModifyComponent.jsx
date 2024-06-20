@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { updateArticle } from "@api/apis.js";
 import { instance } from "@api/index.js";
 import { auth } from "@api/index.js";
+import toast, { Toaster } from "react-hot-toast";
 
 function ModifyComponent() {
     const { aid } = useParams();
@@ -107,6 +108,10 @@ function ModifyComponent() {
         try {
             const response = await updateArticle(aid, formData);
             console.log(response);
+            toast.success("게시글이 수정되었습니다.");
+            setTimeout(() => {
+                location.href = `/post/${aid}`;
+            }, 500);
         } catch (error) {
             console.error("게시글 수정 실패:", error);
         }
@@ -120,7 +125,10 @@ function ModifyComponent() {
             });
             console.log("response:", response);
             if (response.resultCode === "200") {
-                console.log("게시글 삭제 성공");
+                toast.success("게시글이 삭제되었습니다.");
+                setTimeout(() => {
+                    location.href = "/";
+                }, 1000);
             }
         } catch (error) {
             console.error(error);
