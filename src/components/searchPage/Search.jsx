@@ -215,11 +215,11 @@ const Search = () => {
 
     //로그인했을 경우 id 값 가져오기
     const {id} = useAuthStore()
+
     const [likeArticle, setLikeArticle] = useState([]);
     
 
     // 좋아요 확인              
-    const [like, setLike] = useState(false);
     const isArticleLikedByUser = (articleId) => { 
         if (!id) return false;
         return likeArticle.some(la => la.user_id === id && la.article_id === articleId);
@@ -233,10 +233,11 @@ const Search = () => {
 
 
     const handleLikeChange = (e, articleId) => {
-        e.stopPropagation()
-        e.preventDefault()
+        e.preventDefault();
+        e.stopPropagation();
         console.log('왜 안눌리누?')
         console.log(articleId)
+
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -248,10 +249,15 @@ const Search = () => {
                 }
                 if(response.resultCode == '200'){
                     console.log("click")
-                    setLike(prev => !prev)
                     updateMyProfileInfo();
 
-                    await fetchArticles(true);
+                    setLikeArticle(prev => {
+                        if (isArticleLikedByUser(articleId)) {
+                            return prev.filter(la => la.article_id !== articleId);
+                        } else {
+                            return [...prev, { user_id: id, article_id: articleId }];
+                        }
+                    });
                 }
             }catch(error){
                 console.log(error)
@@ -413,6 +419,7 @@ const Search = () => {
             </div>
             </div>
             <div className='h-[8px] bg-[#ececec] w-full'></div>
+
             {/* body */}
             <div className='mt-5'>
                 <div className="goods">
@@ -423,16 +430,25 @@ const Search = () => {
                                     <Link 
                                         ref={index === articleDTO.length - 1 ? lastItemRef : null} 
                                         key={`${item.id} + ${Math.random().toString(36).substr(2, 9)}`}
-                                        className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow  "
+                                        className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow"
                                         to={`/post/${item.id}`}
                                     >
-                                       <div className="relative">
+                                        <div className="relative">
                                             <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%] border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
+                                            {
+                                                item.tradeStatus === 'SOLD_OUT' &&
+                                                <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0 rounded-[10%]">
+                                                    거래 완료
+                                                </div>
+                                            }
                                             <img 
                                                 src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
                                                 alt='like' 
                                                 className="absolute top-2 right-2"
-                                                onClick={(e)=>{handleLikeChange(e, item.id)}}
+                                                onClick={ (e) => { 
+                                                    e.preventDefault();  // 기본 동작 막기
+                                                    handleLikeChange(e, item.id); 
+                                                }}
                                             />
                                         </div>
                                         <div className='ml-3 flex-grow'>
@@ -456,6 +472,7 @@ const Search = () => {
                     </div>
                 </div>
             </div>
+
             
         </div>
         
