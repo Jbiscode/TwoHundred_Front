@@ -301,7 +301,7 @@ function ReadComponent({ aid }) {
                             </div>
                         )}
                         <button
-                            className={`absolute top-5 right-4 py-1.5 px-2.5 pl-1 pr-2 hover:scale-105 text-center border rounded-md h-8 text-sm flex items-center gap-1 lg:gap-2 ${
+                            className={`absolute bg-white top-5 right-4 py-1.5 px-2.5 pl-1 pr-2 hover:scale-105 text-center border rounded-md h-8 text-sm flex items-center gap-1 lg:gap-2 ${
                                 liked ? "text-red-500" : "hover:text-gray-400"
                             }`}
                             onClick={handleLike}
@@ -313,7 +313,7 @@ function ReadComponent({ aid }) {
                                 }`}
                                 alt={liked ? "좋아요 취소" : "좋아요"}
                             />
-                            <span>{likeCount}</span>
+                            <span className="text-black">{likeCount}</span>
                         </button>
                     </div>
                     <div className="w-[300px]">
