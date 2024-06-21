@@ -157,6 +157,9 @@ function ReadComponent({ aid }) {
                         ),
                     }));
                 }
+                if (response.resultCode == "500") {
+                    toast.error("존재하지 않는 제안입니다.");
+                }
             } catch (error) {
                 console.error(error);
             }
