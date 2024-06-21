@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import useModalStore from "@zustand/modalStore.js";
 import { auth } from "@api/index.js";
+import toast, { Toaster } from "react-hot-toast";
 
 const OfferModal = () => {
     const [offerPrice, setOfferPrice] = useState("");
@@ -11,8 +12,8 @@ const OfferModal = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(offerPrice);
-        console.log(selectedArticleId);
+        // console.log(offerPrice);
+        // console.log(selectedArticleId);
 
         try {
             const response = await auth.post(
@@ -29,6 +30,9 @@ const OfferModal = () => {
                 console.log("가격 제안이 성공적으로 생성되었습니다.");
                 closeOfferModal();
                 location.href = `/post/${selectedArticleId}`;
+            }
+            if (response.resultCode == "409") {
+                toast.error(response.msg);
             }
         } catch (error) {
             console.error(error);
