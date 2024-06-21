@@ -133,7 +133,7 @@ const Search = () => {
         if (tradeMethod) {
             params.push(`tradeMethod=${tradeMethod}`);
         }
-        if (tradeStatus) {
+        if (tradeStatus == 'ON_SALE') {
             params.push(`tradeStatus=${tradeStatus}`);
         }
         params.push(`page=${page}`);
