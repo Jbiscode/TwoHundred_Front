@@ -10,7 +10,7 @@ import mypage from '@assets/images/icon/my.png';
 
 function BasicFooter() {
     const navigate = useNavigate();
-    const { currentPage, openHomePage, openSearchPage, openChatPage, openMyPage } = useFooterStore();
+    const { currentPage, openHomePage, openSearchPage, openMyLocationPage, openChatPage, openMyPage } = useFooterStore();
 
     useEffect(() => {
         if (currentPage!='') {
@@ -41,7 +41,7 @@ function BasicFooter() {
                     <img src={search} alt="search" className="w-6 h-6" />
                     <span></span>
                 </div>
-                <div onClick={openSearchPage} className="flex flex-col items-center">
+                <div onClick={openMyLocationPage} className="flex flex-col items-center">
                     <img src={location} alt="search" className="w-7 h-7" />
                     <span></span>
                 </div>

@@ -12,9 +12,10 @@ const Loading = <div>Loading....</div>;
 const ProfilePage = lazy(() => import("@pages/profile/IndexPage.jsx"))
 
 const IndexPage = lazy(() => import("@pages/IndexPage.jsx"));
-const SearchPage = lazy(() => import("@pages/SearchPage.jsx"));
+const SearchPage = lazy(() => import("@pages/search/IndexPage"));
 const PostPage = lazy(() => import("@pages/post/IndexPage"));
 const ChatPage = lazy(() => import("@pages/chat/IndexPage"));
+const MyLocationPage = lazy(() => import("@pages/myLocation/IndexPage"));
 
 
 const root = createBrowserRouter([
@@ -65,7 +66,17 @@ const root = createBrowserRouter([
             </Suspense>
         ),
         children: chatRouter(),
+    },
+    {
+        path: "/myLocation",
+        element: (
+            <Suspense fallback={Loading}>
+                <ParentModal/>
+                <MyLocationPage/>
+            </Suspense>
+        ),
     }
+
 ]);
 
 export default root;
