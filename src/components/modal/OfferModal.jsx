@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import useAuthStore from "@zustand/authStore.js";
 import useModalStore from "@zustand/modalStore.js";
 import { auth } from "@api/index.js";
 
 const OfferModal = () => {
     const [offerPrice, setOfferPrice] = useState("");
+    const { id, token } = useAuthStore();
     const { closeOfferModal, selectedArticleId } = useModalStore(
         (state) => state
     );
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(offerPrice);
-        console.log(selectedArticleId);
+        // console.log(offerPrice);
+        // console.log(selectedArticleId);
 
         try {
             const response = await auth.post(
@@ -27,8 +29,26 @@ const OfferModal = () => {
 
             if (response.resultCode === "201") {
                 console.log("가격 제안이 성공적으로 생성되었습니다.");
+                try{
+                    const {articleId, userId} = {articleId: selectedArticleId, userId: id}
+                    const getRoomId = await auth.post(`/api/v1/chatroom/enter`, {
+                        body: JSON.stringify({ articleId, userId }),
+                        withCredentials: true,
+                    });
+
+                    await fetch(`/socket/messages/send/${getRoomId.data.chatRoomId}/${userId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `${token}`,
+                        },
+                        body: JSON.stringify({message: "🔥 새로운 가격제안이 도착했습니다 !\n" + offerPrice + " 원은 어떠신가요?!"}),
+                        });
+                }catch(error){
+                    console.error(error);
+                }
                 closeOfferModal();
-                location.href = `/post/${selectedArticleId}`;
+                // location.href = `/post/${selectedArticleId}`;
             }
         } catch (error) {
             console.error(error);

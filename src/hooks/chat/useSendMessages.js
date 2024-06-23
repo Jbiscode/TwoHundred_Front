@@ -21,7 +21,7 @@ const useSendMessages = () => {
       const data = await response.json();
       setMessages([...messages, data]); // 여기서 data를 입력해야하는데 data.message로 입력해서 오류가 발생했었다.
 
-      toast.success(data.message);
+      // toast.success(data.message);
     } catch (error) {
       toast.error(error);
     } finally {
