@@ -13,7 +13,7 @@ const ChatMessageInput = () => {
     setMessage("");
   };
   return (
-    <div className="p-4 border-t border-gray-200 fixed bottom-[45.45px] bg-white w-full">
+    <div className="p-4 border-t border-gray-200 fixed bottom-[41.45px] bg-white w-full">
       <div className="flex space-x-2">
         <input
           type="text"

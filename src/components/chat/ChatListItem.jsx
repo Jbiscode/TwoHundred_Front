@@ -43,7 +43,14 @@ const ChatListItem = ({ chat, user, lastMessage, unreadCount,modifiedDate }) => 
             {chat.addr1} {chat.addr2} · {formattedDate}
           </div>
         </div>
-        <p className="text-gray-500">{lastMessage}</p>
+        <p className="text-gray-500"
+          style={{ 
+            display: '-webkit-box', 
+            WebkitBoxOrient: 'vertical', 
+            overflow: 'hidden', 
+            WebkitLineClamp: 1,
+            whiteSpace: 'pre-wrap'
+          }}>{lastMessage}</p>
       </div>
       <div className="flex-shrink-0 ml-4">
         <img

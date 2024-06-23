@@ -9,13 +9,15 @@ export const useAuthStore = create(
       isLoggedin: false,
       user: null,
       id: 0,
+      alarmCount: 0,
       getToken: () => get().token,
       getUser: () => get().user,
       getId: () => get().id,
-      
       setToken: (token) => set({ token, isLoggedin: true }),
       setUser: (user) => set({ user }),
       setId: (id) => set({ id }),
+      setAlarmCount: (alarmCount) => set({ alarmCount }),
+      setAlarmCountPlus: () => set((state) => ({ alarmCount: state.alarmCount + 1 })),
       removeToken: () => set({ token: null, isLoggedin: false, user: null, id: 0 }),
       login: async (username, password) => {
         try {
@@ -39,8 +41,8 @@ export const useAuthStore = create(
       logout: async () => {
         try {
           const response = await logout();
-          if(response.resultCode == 200 || response.resultCode == 400){
-            set({ token: null, isLoggedin: false, user: null, id: 0 });
+          if(response.resultCode == 200 || response.resultCode == 403){
+            set({ token: null, isLoggedin: false, user: null, id: 0, alarmCount: 0 });
           }
         } catch (error) {
           console.error(error);
