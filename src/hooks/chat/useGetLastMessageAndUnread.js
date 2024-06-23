@@ -8,7 +8,7 @@ const useGetLastMessageAndUnread = (conversations) => {
   const {socket} = useSocketStore();
   const {newMessage, setNewMessage} = conversationStore();
   const [loading, setLoading] = useState(false);
-  const { setLastMessage, setUnreadCount, setModifiedDate, lastMessage, unreadCount, modifiedDate } = conversationStore();
+  const { setLastMessage, setUnreadCount, setModifiedDate, lastMessage, unreadCount, modifiedDate,totalUnread } = conversationStore();
   const { token, id } = useAuthStore();
 
   useEffect(() => {
@@ -48,6 +48,7 @@ const useGetLastMessageAndUnread = (conversations) => {
           setUnreadCount(result.roomId, result.unreadCount);
           setModifiedDate(result.roomId, result.modifiedDate);
         });
+        
       } catch (error) {
         toast.error(error.message + " 대화방을 선택해주세요.");
       } finally {
@@ -58,12 +59,19 @@ const useGetLastMessageAndUnread = (conversations) => {
     if (conversations.length > 0 && id) {
       getLastMessageAndUnread();
     }
-    return () => {
-      socket?.off("newMessage");
-    };
-  }, [conversations, id, token, newMessage]);
+
+  }, [conversations, id, token, newMessage, totalUnread]);
+
+  useEffect(() => {
+    if (token!=null){
+      useAuthStore.getState().setAlarmCount(totalUnread);
+    }else{
+      useAuthStore.getState().setAlarmCount(0);
+    }
+  }, [totalUnread, token, id]);
 
   return { loading, lastMessage, unreadCount, modifiedDate };
 };
+
 
 export default useGetLastMessageAndUnread;
