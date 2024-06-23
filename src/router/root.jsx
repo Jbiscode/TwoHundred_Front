@@ -5,6 +5,7 @@ import postRouter from "@router/postRouter.jsx";
 import chatRouter from "@router/chatRouter.jsx";
 import profileRouter from "./profileRouter";
 import ParentModal from "@components/templates/ParentModal";
+import myLocationRouter from "./myLocationRouter";
 
 
 
@@ -75,6 +76,7 @@ const root = createBrowserRouter([
                 <MyLocationPage/>
             </Suspense>
         ),
+        children : myLocationRouter()
     }
 
 ]);
