@@ -1,8 +1,9 @@
 import useAuthStore from "@zustand/authStore";
 // import conversationStore from "../../zustand/conversationStore";
 import { extractTime } from "@utils/extractTime";
+import { Link } from "react-router-dom";
 
-const ChatMessage = ({ message }) => {
+const ChatMessage = ({ message, oppositeProfile }) => {
   const {id} = useAuthStore();
   // const {selectedConversation} = conversationStore();
   const FormmattedTime = extractTime(message.createdAt);
@@ -12,18 +13,18 @@ const ChatMessage = ({ message }) => {
   const ShakeClass = message.Shakeit ? "shake" : "";
   return (
     <div className={`chat ${chatClassName}`}>
-      <div className="chat-image avatar">
+      {!fromMe ? <Link to={`/users/${message.senderId}`} className="chat-image avatar">
         <div className="w-10 rounded-full">
           <img
             alt="Tailwind CSS chat bubble component"
             src={
-              "https://cdn0.iconfinder.com/data/icons/communication-line-10/24/account_profile_user_contact_person_avatar_placeholder-512.png"
+              `https://kr.object.ncloudstorage.com/kjwtest/article/${oppositeProfile}`
             }
           />
         </div>
-      </div>
-      <div className={`chat-bubble text-white ${bubbleClassName} ${ShakeClass}`}>
-        {message.message}
+      </Link>: null}
+      <div className={`chat-bubble text-white ${bubbleClassName} ${ShakeClass}`} style={{ whiteSpace: 'pre-wrap' }}>
+        <span>{message.message}</span>
       </div>
       <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
         {FormmattedTime}
