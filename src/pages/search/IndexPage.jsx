@@ -1,7 +1,7 @@
-import BasicLayout from "../layouts/BasicLayout.jsx";
-import Search from "../components/searchPage/Search.jsx";
+import BasicLayout from "../../layouts/BasicLayout.jsx";
+import Search from "./Search.jsx";
 
-function SearchPage() {
+function IndexPage() {
     return (
         <BasicLayout>
             <div className="!w-screen bg-white">
@@ -11,4 +11,4 @@ function SearchPage() {
     );
 }
 
-export default SearchPage;
+export default IndexPage;
