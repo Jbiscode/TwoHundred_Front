@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import useAuthStore from "@zustand/authStore.js";
 import useModalStore from "@zustand/modalStore.js";
 import { auth } from "@api/index.js";
+import toast, { Toaster } from "react-hot-toast";
 
 const OfferModal = () => {
     const [offerPrice, setOfferPrice] = useState("");
@@ -49,6 +50,9 @@ const OfferModal = () => {
                 }
                 closeOfferModal();
                 // location.href = `/post/${selectedArticleId}`;
+            }
+            if (response.resultCode == "409") {
+                toast.error(response.msg);
             }
         } catch (error) {
             console.error(error);
