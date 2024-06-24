@@ -1,100 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import {instance, auth} from '@api/index';
+import { useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import {auth} from '@api/index';
+import toast from 'react-hot-toast';
 import useModalStore from "@zustand/modalStore"
 import usemyprofileStore from "@zustand/myprofileStore"
 import useAuthStore from "@zustand/authStore"
-import searchStore from '../../zustand/searchStore';
 import HeartBlank from '@assets/images/icon/heart_blank.svg';
 import HeartFill from '@assets/images/icon/heart_fill.svg';
 
-const SearchArticleComponent = () => {
-    const {
-        category, tradeMethod, tradeStatus, orderBy
-    } = searchStore();
-
-    const [articleDTO, setArticleDTO] = useState([]);
-    //검색 결과
-    const location = useLocation();
-    const query = new URLSearchParams(location.search).get('content');
-    const [content, setContent] = useState(query || '');
-
-    //페이징
-    const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
-
-    useEffect(() => {
-        if (query !== content) {
-            setContent(query || '');
-        }
-    }, [query]);
-    
-    const fetchArticles = async (reset = false) => {
-        if(loading) return;
-        setLoading(true);
-        let url = `/api/v1/search`;
-        let params = [];
-    
-        if (orderBy) {
-            params.push(`orderBy=${orderBy}`);
-        }
-        if (content) {
-            params.push(`content=${content}`);
-        }
-        if (category) {
-            params.push(`category=${category}`);
-        }
-        if (tradeMethod) {
-            params.push(`tradeMethod=${tradeMethod}`);
-        }
-        if (tradeStatus == 'ON_SALE') {
-            params.push(`tradeStatus=${tradeStatus}`);
-        }
-        params.push(`page=${page}`);
-        params.push(`size=10`);
-    
-        if (params.length > 0) {
-            url += `?${params.join('&')}`;
-        }
-    
-        const urlParams = params.filter(param => !param.startsWith('page=') && !param.startsWith('size='));
-        window.history.replaceState(null, '', urlParams.length > 0 ? `?${urlParams.join('&')}` : '');
-    
-        try {
-            const response = await instance.get(url);
-            const data = response.data;
-            if (Array.isArray(data.searchResult)) {
-                setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
-                console.log('articleDTO:', data.searchResult); 
-                setLikeArticle(data.likeResult);
-                console.log('likeArticle:', data.likeResult); 
-
-                setHasMore(data.searchResult.length === 10);
-               
-            } else {
-                console.error('Expected an array but got:', data);
-                setHasMore(false); 
-            }
-        } catch (error) {
-            console.error('Error fetching articles:', error);
-            setHasMore(false); 
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    //페이징
-    useEffect(() => {
-        setPage(1);
-        fetchArticles(true);
-    }, [content, orderBy, category, tradeMethod, tradeStatus]);
-    
-    useEffect(() => {
-        if (page > 1) fetchArticles();
-    }, [page]);
-    
+const SearchArticleComponent = ({content, articleDTO, likeArticle, setLikeArticle, loading, hasMore, setPage}) => {
+    //로그인했을 경우 id 값 가져오기
+    const {id} = useAuthStore();
     const observer = useRef();
+
     const lastItemRef = useCallback(
         (node) => {
             if (loading || !hasMore) return;
@@ -109,13 +27,6 @@ const SearchArticleComponent = () => {
         [loading, hasMore]
     );
     
-
-    //로그인했을 경우 id 값 가져오기
-    const {id} = useAuthStore()
-
-    const [likeArticle, setLikeArticle] = useState([]);
-    
-
     // 좋아요 확인              
     const isArticleLikedByUser = (articleId) => { 
         if (!id) return false;
@@ -127,13 +38,9 @@ const SearchArticleComponent = () => {
     const { updateMyProfileInfo } = usemyprofileStore(state => state)
     const {openLoginModal} = useModalStore(state => state)
     
-
-
     const handleLikeChange = (e, articleId) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('왜 안눌리누?')
-        console.log(articleId)
 
         const fetch = async() => {
             try{
@@ -145,7 +52,6 @@ const SearchArticleComponent = () => {
                     openLoginModal();
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     updateMyProfileInfo();
 
                     setLikeArticle(prev => {
@@ -156,11 +62,14 @@ const SearchArticleComponent = () => {
                         }
                     });
                 }
+                if(response.resultCode == '403'){
+                    toast.error("자신의 게시글은 좋아요를 누를 수 없습니다.")
+                }
             }catch(error){
                 console.log(error)
             }
         }
-        fetch()
+        fetch();
     }
 
 

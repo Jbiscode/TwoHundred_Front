@@ -1,78 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { instance } from '@api/index';
 import filter from '@assets/images/icon/filter.svg';
 import searchStore from '../../zustand/searchStore';
 
-const HeaderComponent = () => {
-    const {
-        category, tradeMethod, tradeStatus,
-        isopenedFilter, setIsopenedFilter,
-        orderBy, setOrderBy
-    } = searchStore();
-
-    //검색결과 총 개수
-    const [totalCount, setTotalCount] = useState(0);
-    const location = useLocation();
-    const query = new URLSearchParams(location.search).get('content');
-    const [content, setContent] = useState(query || '');
-
-    useEffect(() => {
-        const query = new URLSearchParams(location.search).get('content');
-        setContent(query || '');
-    }, [location.search, setContent])
+const HeaderComponent = ({ orderBy, setOrderBy, totalCount, content}) => {
+    const { isopenedFilter, setIsopenedFilter } = searchStore();
 
     //정렬 선택
     const handleOrderBy = (value) => {
         setOrderBy(value);
     };
-
-    useEffect(() => {
-        if (query !== content) {
-            setContent(query || '');
-        }
-    }, [query]);
-
-    const fetchArticles = async (reset = false) => {
-        let url = `/api/v1/search/total`;
-        let params = [];
-    
-        if (orderBy) {
-            params.push(`orderBy=${orderBy}`);
-        }
-        if (content) {
-            params.push(`content=${content}`);
-        }
-        if (category) {
-            params.push(`category=${category}`);
-        }
-        if (tradeMethod) {
-            params.push(`tradeMethod=${tradeMethod}`);
-        }
-        if (tradeStatus == 'ON_SALE') {
-            params.push(`tradeStatus=${tradeStatus}`);
-        }
-    
-        if (params.length > 0) {
-            url += `?${params.join('&')}`;
-        }
-    
-        try {
-            const response = await instance.get(url);
-            const data = response.data;
-            if (typeof data === 'number') {
-                setTotalCount(data);
-            } else {
-                console.error('Expected an array but got:', data);
-            }
-        } catch (error) {
-            console.error('Error fetching articles:', error);
-        }
-    };
-
-    useEffect(() => {
-        fetchArticles(true);
-    }, [content, orderBy, tradeMethod, tradeStatus]);
 
     return (
         <div>
@@ -82,7 +17,7 @@ const HeaderComponent = () => {
                 <h3 className="inline-block m-0 text-m font-bold border-b-2 border-gray-300">
                 {content ? (
                     <>
-                        <span className='text-red-500'>'{content}'</span> 의 검색 결과
+                        <span className='text-red-500'>&apos;{content}&apos;</span> 의 검색 결과
                     </>
                 ) : (
                     "전체 검색 결과"

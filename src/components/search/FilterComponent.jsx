@@ -1,95 +1,15 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import searchStore from '../../zustand/searchStore';
+import { categoryCode, tradeMethodCode, tradeStatusCode } from '@utils/useFillterCode';
 
-const FilterComponent = () => {
-    const {
-        category, setCategory,
-        tradeMethod, setTradeMethod,
-        tradeStatus, setTradeStatus,
-        isopenedFilter, setIsopenedFilter
-    } = searchStore();
+const FilterComponent = ({category, setCategory, tradeMethod, setTradeMethod, tradeStatus, setTradeStatus}) => {
+    const { isopenedFilter, setIsopenedFilter } = searchStore();
 
     useEffect(() => {
         const initialCategory = new URLSearchParams(location.search).get('category') || location.state?.category || null;
         setCategory(initialCategory);
     }, [setCategory]);
 
-
-     //필터 구분
-     const categoryCode = [
-        {
-            id : 'MEMBERSHIP',
-            value : false,
-            htmlFor: '회원권',
-            key: 1,
-        },
-        {
-            id : 'PT',
-            value : false,
-            htmlFor: 'PT',
-            key: 2,
-        },
-        {
-            id : 'HEALTH_SUPPLIES',
-            value : false,
-            htmlFor: '헬스용품',
-            key: 3,
-        },
-        {
-            id : 'HEALTH_EQUIPMENT',
-            value : false,
-            htmlFor: '헬스장비',
-            key: 4,
-        },
-        {
-            id : 'SPORT_WEAR',
-            value : false,
-            htmlFor: '스포츠웨어',
-            key: 5,
-        },
-        {
-            id : 'FOOD',
-            value : false,
-            htmlFor: '건강식품',
-            key: 6,
-        },
-    ]
-
-    const tradeMethodCode = [
-        {
-            htmlFor: '상관없음',
-            key: 1,
-            value: false,
-            id: 'NO_MATTER'  
-        },
-        {
-            htmlFor: '직거래',
-            key: 2,
-            value: false,
-            id: 'FACE_TO_FACE'
-        },
-        {
-            htmlFor: '택배 거래',
-            key: 3,
-            value: false,
-            id: 'DELIVERY'
-        }
-    ]
-
-    const tradeStatusCode = [
-        {
-            id: 'ON_SALE',
-            value: false,
-            htmlFor: "거래가능만 보기",
-            key: 1
-        },
-        {
-            id: 'ALL',
-            value: false,
-            htmlFor: "모든거래 보기",
-            key: 1
-        }
-    ]
 
     //카테고리 선택
     const handleCategory = (item) => {
@@ -189,32 +109,6 @@ const FilterComponent = () => {
                                         ))}
                                     </div>
                                 </div>
-
-
-                                {/* 가격 */}
-                                {/* <div className="px-8 pt-10">
-                                    <h3 className="font-bold pb-4 text-lg border-b-2 border-solid">가격</h3>
-                                    <div className="flex flex-col space-y-4 mt-10">
-                                        <div className="flex space-x-4">
-                                            <input 
-                                                
-                                                name="minPrice"
-                                                placeholder="최소 가격"     
-                                                className="input input-bordered w-1/2 text-center bg-white border-gray-300"
-                                                type="number"
-                                            />
-                                            <input id="maxPrice"
-                                                name="maxPrice"
-                                                placeholder="최대 가격"
-                                                className="input input-bordered w-1/2 text-center bg-white border-gray-300"
-                                                type="number"                                   
-                                            />  
-                                        </div>
-                                        <p className="text-gray-500 text-sm text-center">
-                                                가격은 숫자로만 입력할 수 있어요!
-                                        </p>
-                                    </div>
-                                </div> */}
 
                             </div>
                             <div className="pt-10 flex flex-col items-center space-y-4">
