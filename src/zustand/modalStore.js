@@ -11,6 +11,7 @@ const useModalStore = create(
             isReviewModalOpen: false,
             isUpdateReviewModalOpen : false,
             selectedArticleId: null,
+            isCheckModalOpen: false,
             openLoginModal: () => set((state) => ({ isLoginModalOpen: true })),
             closeLoginModal: () => set((state) => { document.body.style.overflow = 'auto'; return { isLoginModalOpen: false }; }),
             openSignupModal: () => set((state) => ({ isSignupModalOpen: true })),
@@ -24,6 +25,8 @@ const useModalStore = create(
             closeReviewModal: () => set((state) => { document.body.style.overflow = 'auto'; return { isReviewModalOpen: false }; }),
             openUpdateReviewModal: () => set((state) => ({ isUpdateReviewModalOpen: true })),
             closeUpdateReviewModal: () => set((state) => { document.body.style.overflow = 'auto'; return { isUpdateReviewModalOpen: false }; }),
+            openCheckModal: (onConfirm, onCancel) => set((state) => ({ isCheckModalOpen: true, onConfirm, onCancel })),
+            closeCheckModal: () => set((state) => { document.body.style.overflow = "auto"; return { isCheckModalOpen: false }; }),
         })
     
 )

@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 const OfferModal = () => {
     const [offerPrice, setOfferPrice] = useState("");
+    const [loading, setLoading] = useState(false);
     const { id, token } = useAuthStore();
     const { closeOfferModal, selectedArticleId } = useModalStore(
         (state) => state
@@ -18,6 +19,7 @@ const OfferModal = () => {
         // console.log(selectedArticleId);
 
         try {
+            setLoading(true);
             const response = await auth.post(
                 `/api/v1/offers/${selectedArticleId}`,
                 {
@@ -30,22 +32,36 @@ const OfferModal = () => {
 
             if (response.resultCode === "201") {
                 console.log("가격 제안이 성공적으로 생성되었습니다.");
-                try{
-                    const {articleId, userId} = {articleId: selectedArticleId, userId: id}
-                    const getRoomId = await auth.post(`/api/v1/chatroom/enter`, {
-                        body: JSON.stringify({ articleId, userId }),
-                        withCredentials: true,
-                    });
+                try {
+                    const { articleId, userId } = {
+                        articleId: selectedArticleId,
+                        userId: id,
+                    };
+                    const getRoomId = await auth.post(
+                        `/api/v1/chatroom/enter`,
+                        {
+                            body: JSON.stringify({ articleId, userId }),
+                            withCredentials: true,
+                        }
+                    );
 
-                    await fetch(`/socket/messages/send/${getRoomId.data.chatRoomId}/${userId}`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `${token}`,
-                        },
-                        body: JSON.stringify({message: "🔥 새로운 가격제안이 도착했습니다 !\n" + offerPrice + " 원은 어떠신가요?!"}),
-                        });
-                }catch(error){
+                    await fetch(
+                        `/socket/messages/send/${getRoomId.data.chatRoomId}/${userId}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `${token}`,
+                            },
+                            body: JSON.stringify({
+                                message:
+                                    "🔥 새로운 가격제안이 도착했습니다 !\n" +
+                                    offerPrice +
+                                    " 원은 어떠신가요?!",
+                            }),
+                        }
+                    );
+                } catch (error) {
                     console.error(error);
                 }
                 closeOfferModal();
@@ -56,6 +72,8 @@ const OfferModal = () => {
             }
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -93,6 +111,7 @@ const OfferModal = () => {
                         <button
                             type="submit"
                             className="btn btn-primary w-3/5 text-lg mb-3 font-bold"
+                            disabled={loading}
                         >
                             제안하기
                         </button>

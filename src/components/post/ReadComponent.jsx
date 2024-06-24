@@ -37,6 +37,7 @@ function ReadComponent({ aid }) {
     const { openOfferModal, closeOfferModal, selectedArticleId } =
         useModalStore((state) => state);
     const { openLoginModal, closeLoginModal } = useModalStore((state) => state);
+    const { openCheckModal, closeCheckModal } = useModalStore((state) => state);
     const { setSelectedArticleId } = useModalStore((state) => state);
 
     const [article, setArticle] = useState(initState);
@@ -114,7 +115,6 @@ function ReadComponent({ aid }) {
         article.offers.filter((offer) => offer.selected).length,
     ]);
 
-    //게시글 삭제
     const handleDelete = async () => {
         try {
             const response = await auth.delete(`/api/v1/articles/${aid}`, {
@@ -129,6 +129,10 @@ function ReadComponent({ aid }) {
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const handleCancelDelete = () => {
+        toast.success("삭제가 취소되었습니다.");
     };
 
     const handleAcceptOffer = async (offerId) => {
@@ -530,7 +534,10 @@ function ReadComponent({ aid }) {
                                                     "거래 완료된 상품은 삭제할 수 없습니다"
                                                 );
                                             } else {
-                                                handleDelete();
+                                                openCheckModal(
+                                                    handleDelete,
+                                                    handleCancelDelete
+                                                );
                                             }
                                         }}
                                     >
