@@ -4,11 +4,12 @@ const footerStore = create(
 
     (set) => ({
         currentPage: '',
-        openSearchPage: () => set({ currentPage: 'search' }),
-        openMyLocationPage: () => set({ currentPage: 'MyLocation' }),
-        openHomePage: () => set({ currentPage: '/ ' }),
-        openChatPage: () => set({ currentPage: 'chat/list' }),
-        openMyPage: () => set({ currentPage: 'users/me' })
+        setCurrentPage: (page) => set({ currentPage: page }),
+        openSearchPage: () => set({ currentPage: '/search' }),
+        openMyLocationPage: () => set({ currentPage: '/myLocation' }),
+        openHomePage: () => set({ currentPage: '/' }),
+        openChatPage: () => set({ currentPage: '/chat' }),
+        openMyPage: () => set({ currentPage: '/users' })
     })
 )
 

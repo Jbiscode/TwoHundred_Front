@@ -4,6 +4,8 @@ import CLOTHES from "@/assets/images/clothes.png"
 import useAuthStore from "@zustand/authStore"
 import {auth} from "@api/index"
 import useModalStore from "@zustand/modalStore"
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 
 const OfferComponent = ({updateMyProfileInfo }) => {
@@ -127,7 +129,7 @@ const OfferComponent = ({updateMyProfileInfo }) => {
                                             거래 완료
                                         </div>
                                 }
-                                <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
+                                <img className="absolute top-2 right-2" src={item.isLiked === true ? HeartFill : HeartBlank} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
                             </div>
                             <p className="text-[16px] whitespace-nowrap text-ellipsis overflow-hidden font-bold mt-2 mb-1 pl-1">{item.title}</p>
                             <div className="mb-1 flex text-sm gap-1 font-bold text-gray-400 pl-1">

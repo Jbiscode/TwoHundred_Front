@@ -10,6 +10,7 @@ const ChatListItem = ({ chat, user, lastMessage, unreadCount,modifiedDate }) => 
 
   const handleChatClick = (chatId) => {
     setSelectedConversation(chatId);
+    window.scrollTo({ top: 0 });
     navigate(`/chat/room/${chatId}`);
   };
 

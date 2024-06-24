@@ -1,5 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 const Goods = ({ data, isLoading, likeState, handleLikeChange, isArticleLikedByUser }) => {
     return (
@@ -13,7 +14,7 @@ const Goods = ({ data, isLoading, likeState, handleLikeChange, isArticleLikedByU
                         {data.length > 0 ? (
                             data.map((item) => {
                                 const isLiked = likeState[item.id] || isArticleLikedByUser(item.id);
-                                const image = isLiked ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg';
+                                const image = isLiked ? HeartFill : HeartBlank;
                                 
                                 return (
                                     <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>

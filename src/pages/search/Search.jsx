@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import filter from '@assets/images/icon/filter.svg';
 import { Link, useLocation } from 'react-router-dom';
 import {instance, auth} from '@api/index';
 import useModalStore from "@zustand/modalStore"
 import usemyprofileStore from "@zustand/myprofileStore"
 import useAuthStore from "@zustand/authStore"
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
+import toast from 'react-hot-toast';
 
 
 
@@ -284,6 +287,9 @@ const Search = () => {
                             return [...prev, { user_id: id, article_id: articleId }];
                         }
                     });
+                    if(response.resultCode == '403'){
+                        toast.error("자신의 게시글은 좋아요할 수 없습니다.")
+                    }
                 }
             }catch(error){
                 console.log(error)
@@ -476,7 +482,7 @@ const Search = () => {
                                         className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow"
                                         to={`/post/${item.id}`}
                                     >
-                                        <div className="relative">
+                                        <div className="relative w-1/2">
                                             <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%] border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
                                             {
                                                 item.tradeStatus === 'SOLD_OUT' &&
@@ -485,7 +491,7 @@ const Search = () => {
                                                 </div>
                                             }
                                             <img 
-                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
+                                                src={isArticleLikedByUser(item.id) ? HeartFill : HeartBlank} 
                                                 alt='like' 
                                                 className="absolute top-2 right-2"
                                                 onClick={ (e) => { 
@@ -494,7 +500,7 @@ const Search = () => {
                                                 }}
                                             />
                                         </div>
-                                        <div className='ml-3 flex-grow'>
+                                        <div className='ml-3 flex-grow w-1/2'>
                                             <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
                                                 {item.title}
                                             </p>

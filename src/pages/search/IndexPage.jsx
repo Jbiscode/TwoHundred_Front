@@ -3,6 +3,7 @@ import HeaderComponent from "../../components/search/HeaderComponent.jsx";
 import SearchArticleComponent from "../../components/search/SearchArticleComponent.jsx";
 import BasicLayout from "../../layouts/BasicLayout.jsx";
 
+
 function IndexPage() {
 
     return (

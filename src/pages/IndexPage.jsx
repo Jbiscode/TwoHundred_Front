@@ -109,7 +109,6 @@ function IndexPage() {
                 setData(shuffledData);
                 setTotalPages(Math.ceil(totalCount / size));
                 setLikeArticle(data.likeResult);
-
             } else {
                 console.error('searchResult가 배열이 아닙니다:', result.data.searchResult);
                 setData([]);
@@ -154,8 +153,6 @@ function IndexPage() {
     const handleLikeChange = (e, articleId) => {
         e.stopPropagation()
         e.preventDefault()
-        //console.log('왜 안눌리누?')
-        console.log(articleId)
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -172,8 +169,9 @@ function IndexPage() {
                         [articleId]: !prevState[articleId]
                     }));
                     updateMyProfileInfo();
-
-                    //await fetchArticles(true);
+                }
+                if(response.resultCode == '403'){
+                    toast.error("자신의 게시글은 좋아요할 수 없습니다.")
                 }
             }catch(error){
                 console.log(error)
@@ -184,6 +182,7 @@ function IndexPage() {
     
     return (
         <BasicLayout>
+            <div className='md:absolute md:top-0 md:left-0 md:z-[9999] md:w-full md:h-screen bg-white hidden md:block'>모바일버전으로 봐주세요</div>
             <div>
                 <div className="flex flex-col">
 

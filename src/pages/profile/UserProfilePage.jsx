@@ -13,7 +13,7 @@ const UserProfilePage = () => {
         return () =>{
             setSalesView();
         }
-    },[])
+    },[userId])
     return (
        <div className="px-6">
             <ProfileInfoComponent userId={userId}/>
