@@ -108,7 +108,6 @@ const MyReviewModal = () => {
                     </div>
                 </form>
                 <div className="flex justify-around">
-                    <button className="btn btn-error" onClick={handleDeleteReviewBtn}>삭제하기</button>
                     <button className="btn btn-accent" onClick={handleUpdateReviewBtn}>수정하기</button>
                 </div>
             </div>

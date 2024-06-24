@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { instance } from "@api";
+import ReviewItemComponent from "@/components/profile/ReviewItemComponent";
 
 
 const ReviewComponent = ({userId}) => {
@@ -58,26 +59,7 @@ const ReviewComponent = ({userId}) => {
                 <div>
                     {
                         reviewDTO.map(item => (
-                            <div className="px-3 border-solid border-b-2 border-gray-300" key={item}>
-                                <div className="py-6">
-                                    <div className="flex items-center mb-5">
-                                        <div className="grow flex items-baseline gap-1">
-                                            <span className="font-bold text-lx">{item.reviewerName}</span>
-                                            <span className="text-orange-500 text-base font-semibold">Lv. {reviewStatus === 'SALE' ? item.reviewerLevel : item.revieweeLevel}</span>
-                                        </div>
-                                        <div className="flex items-end">
-                                            <p className="text-gray-400 text-base">{item.timeAgo}</p>
-                                        </div>
-                                    </div>
-                                    <div className="font-bold text-lg">
-                                        <p className="mb-2">{item.content}</p>
-                                        <div className="flex justify-between gap-10"> 
-                                            <div className="p-1 text-base text-gray-400 border-solid border-gray-300 border flex items-center"><Link to={`/post/${item.articleId}`}>구매상품 | {item.articleTitle}</Link></div>
-                                        
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ReviewItemComponent item={item} reviewStatus={reviewStatus}/>
                         ))
                     }
                 </div>

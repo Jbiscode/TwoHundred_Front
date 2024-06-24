@@ -318,14 +318,18 @@ function ReadComponent({ aid }) {
                     </div>
                     <div className="w-[300px]">
                         <div className="flex items-center">
-                            <img
-                                src={`https://kr.object.ncloudstorage.com/kjwtest/article/${article.writerProfileImageUrl}`}
-                                alt="프로필"
-                                className="w-[50px] h-[50px] rounded-full mr-4"
-                            />
-                            <h2 className="text-3xl text-[#EFA43D] mt-5 mb-5">
-                                {article.writerUsername}
-                            </h2>
+                            <Link to={`/users/${article.writerId}`}>
+                                <img
+                                    src={`https://kr.object.ncloudstorage.com/kjwtest/article/${article.writerProfileImageUrl}`}
+                                    alt="프로필"
+                                    className="w-[50px] h-[50px] rounded-full mr-4"
+                                />
+                            </Link>
+                            <Link to={`/users/${article.writerId}`}>
+                                <h2 className="text-3xl text-[#EFA43D] mt-5 mb-5">
+                                    {article.writerUsername}
+                                </h2>
+                            </Link>
                         </div>
                         <hr className="mt-4" />
                         <h2 className="text-3xl mt-4 mb-2">{article.title}</h2>

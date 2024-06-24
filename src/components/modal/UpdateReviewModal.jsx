@@ -139,7 +139,7 @@ const UpdateReviewModal = () => {
                        </div>
                     </div>
                     <div className="mb-8">
-                        <textarea placeholder="상대방에게 거래 후기를 작성해주세요!" value={reviewContent} className="placeholder:text-base w-full min-h-64 border-solid border-black border p-5 text-base" name="" id="" onChange={(e) => {setReviewContent(e.target.value); setCharCount(e.target.value.length)}}>
+                        <textarea placeholder="상대방에게 거래 후기를 작성해주세요!" maxLength={100} value={reviewContent} className="placeholder:text-base w-full min-h-64 border-solid border-black border p-5 text-base" name="" id="" onChange={(e) => {setReviewContent(e.target.value); setCharCount(e.target.value.length)}}>
                             
                         </textarea>
                         <p className="text-base font-bold text-end">{charCount} / 100</p>
