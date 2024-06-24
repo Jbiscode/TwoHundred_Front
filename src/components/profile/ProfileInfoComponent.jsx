@@ -45,7 +45,7 @@ const ProfileInfoComponent = ({userId}) => {
         
         fetchData();
 
-    },[])
+    },[userId])
 
     return (
         <div className="border w-full border-gray-300 px-6 py-10 border-solid mt-8 mb-8 rounded-[10%]">

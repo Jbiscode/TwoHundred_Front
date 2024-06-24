@@ -105,6 +105,7 @@ const SignupModal = () => {
             const status = await userSignUp(formData);
             if(status == 201){
                 closeSignupModal();
+                toast.success("회원가입 되었습니다.")
             }
             console.log(status)
         }
@@ -169,7 +170,7 @@ const SignupModal = () => {
     }
 
     const handleAuthCodeCheck = () => {
-        if(inputEmailAuthCode == emailAuthCode){
+        if(inputEmailAuthCode !== '' && inputEmailAuthCode == emailAuthCode){
             setIsverifiedCode(true)
             toast.success("인증에 성공했습니다.")
             setIsReadOnly(true)
@@ -249,7 +250,7 @@ const SignupModal = () => {
                             {
                                 authCodeInputTag && 
                                     <div className="flex gap-3 mt-1">
-                                        <input type="text" placeholder="이메일" className={`input input-bordered w-full`} name="email" value={inputEmailAuthCode} onChange={(e) => {setInputEmailAuthCode(e.target.value)}} disabled={isReadOnly}/>
+                                        <input type="text" placeholder="인증코드 입력" className={`input input-bordered w-full`} name="email" value={inputEmailAuthCode} onChange={(e) => {setInputEmailAuthCode(e.target.value)}} disabled={isReadOnly}/>
                                         <button className={`btn  ${isReadOnly ? 'btn-success' : 'btn-outline'}`}  onClick={handleAuthCodeCheck}>인증코드 확인</button>
                                     </div>
                             }
