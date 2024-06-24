@@ -35,7 +35,6 @@ function ModifyComponent() {
                 const response = await instance.get(`/api/v1/articles/${aid}`, {
                     withCredentials: true,
                 });
-                console.log("response:", response);
 
                 if (response.resultCode === "200") {
                     const articleData = response.data;
@@ -168,7 +167,7 @@ function ModifyComponent() {
             const response = await auth.delete(`/api/v1/articles/${aid}`, {
                 withCredentials: true,
             });
-            console.log("response:", response);
+
             if (response.resultCode === "200") {
                 toast.success("게시글이 삭제되었습니다.");
                 setTimeout(() => {

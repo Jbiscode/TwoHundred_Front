@@ -22,9 +22,6 @@ const PostModal = ({setUserSignupDTO}) => {
       
       const cleanedAddress = fullAddress.replace(/[^\w\s가-힣]/g, ' ').trim();
       
-      console.log(fullAddress);
-      console.log(cleanedAddress); 
-      
       const [addr1, addr2] = cleanedAddress.split(' ').filter(Boolean);
       setUserSignupDTO(prev => ({
         ...prev,

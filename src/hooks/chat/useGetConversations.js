@@ -24,7 +24,6 @@ const useGetConversations = () => {
           refreshToken();
         }
           const data = await response.json();  
-          console.log(data);
         if(data.length > 0){
           setConversations(data);
         } else if(isLoggedin && response.status!==401){

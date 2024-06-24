@@ -7,6 +7,7 @@ import useAuthStore from "@zustand/authStore";
 import searchStore from '../../zustand/searchStore';
 import HeartBlank from '@assets/images/icon/heart_blank.svg';
 import HeartFill from '@assets/images/icon/heart_fill.svg';
+import toast from 'react-hot-toast';
 
 const MyLocationComponent = () => {
     const {
@@ -69,9 +70,7 @@ const MyLocationComponent = () => {
             const data = response.data;
             if (Array.isArray(data.searchResult)) {
                 setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
-                console.log('articleDTO:', data.searchResult); 
                 setLikeArticle(data.likeResult);
-                console.log('likeArticle:', data.likeResult); 
 
                 setHasMore(data.searchResult.length === 10);
                
@@ -135,8 +134,6 @@ const MyLocationComponent = () => {
     const handleLikeChange = (e, articleId) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('왜 안눌리누?')
-        console.log(articleId)
 
         const fetch = async() => {
             try{
@@ -148,7 +145,6 @@ const MyLocationComponent = () => {
                     openLoginModal();
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     updateMyProfileInfo();
 
                     setLikeArticle(prev => {
@@ -158,6 +154,9 @@ const MyLocationComponent = () => {
                             return [...prev, { user_id: id, article_id: articleId }];
                         }
                     });
+                }
+                if(response.resultCode == '403'){
+                    toast.error("자신의 게시글은 좋아요를 누를 수 없습니다.")
                 }
             }catch(error){
                 console.log(error)

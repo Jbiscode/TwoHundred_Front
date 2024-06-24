@@ -40,7 +40,6 @@ const LikeComponent = ({updateMyProfileInfo }) => {
                 setNextPage(response.data.nextPage)
                 
             }
-            console.log(response.data)
             }catch(error){
                 console.log(error)
             }
@@ -68,8 +67,6 @@ const LikeComponent = ({updateMyProfileInfo }) => {
     const handleLikeChange = (e,id) => {
         e.stopPropagation()
         e.preventDefault()
-        console.log('왜 안눌리누?')
-        console.log(id)
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -80,7 +77,6 @@ const LikeComponent = ({updateMyProfileInfo }) => {
                     openLoginModal()
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     setLike(prev => !prev)
                     updateMyProfileInfo();
                 }

@@ -154,10 +154,8 @@ const Search = () => {
             const data = response.data;
             if (Array.isArray(data.searchResult)) {
                 setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
-                console.log('articleDTO:', data.searchResult); 
                 setTotalCount(data.totalCount);
                 setLikeArticle(data.likeResult);
-                console.log('likeArticle:', data.likeResult); 
 
                 setHasMore(data.searchResult.length === 10);
                
@@ -264,8 +262,6 @@ const Search = () => {
     const handleLikeChange = (e, articleId) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('왜 안눌리누?')
-        console.log(articleId)
 
         const fetch = async() => {
             try{
@@ -277,7 +273,6 @@ const Search = () => {
                     openLoginModal();
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     updateMyProfileInfo();
 
                     setLikeArticle(prev => {

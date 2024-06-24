@@ -101,7 +101,6 @@ function IndexPage() {
         try {
             const response = await fetch(`/api/v1/search?page=${page}&size=${size}&tradeStatus=ON_SALE`);
             const result = await response.json();
-            console.log('Fetched data:', result);
             
             if (result.data && Array.isArray(result.data.searchResult)) {
                 const totalCount = result.data.totalCount > maxItems ? maxItems : result.data.totalCount;
@@ -163,7 +162,6 @@ function IndexPage() {
                     openLoginModal();
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     setLikeState(prevState => ({
                         ...prevState,
                         [articleId]: !prevState[articleId]

@@ -32,7 +32,6 @@ function useGetMessages() {
 
         const data = await response.json();
         if(data.error) throw new Error(data.error);
-        console.log("데이터",data);
 
         setMessages(data);
       } catch (error) {

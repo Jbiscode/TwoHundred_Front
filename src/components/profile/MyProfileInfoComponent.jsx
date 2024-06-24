@@ -37,9 +37,7 @@ const MyProfileInfoComponent = () => {
             }
             if(response.resultCode == '200'){
                 setUserDTO(response.data)
-                console.log(response.data)
             }
-            console.log(response.data)
             }catch(error){
                 console.log(error)
             }

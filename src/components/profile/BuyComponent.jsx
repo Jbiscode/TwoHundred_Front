@@ -41,7 +41,6 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                 setPrevPage(response.data.prevPage)
                 setNextPage(response.data.nextPage)
             }
-            console.log(response.data)
             }catch(error){
                 console.log(error)
             }
@@ -99,7 +98,6 @@ const BuyComponent = ({updateMyProfileInfo }) => {
                     openLoginModal()
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     setLike(prev => !prev)
                     updateMyProfileInfo();
                 }

@@ -47,7 +47,6 @@ function ReadComponent({ aid }) {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("나는 리로드", offerReload);
             try {
                 const response = await auth.get(`/api/v1/articles/${aid}`, {
                     withCredentials: true,

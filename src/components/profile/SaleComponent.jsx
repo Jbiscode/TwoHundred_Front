@@ -25,7 +25,6 @@ const SaleComponent = ({userId}) => {
     const [prevPage, setPrevPage] = useState();
     const [like, setLike] = useState(false);
     
-    console.log(userId)
     useEffect(()=>{
         if(isLoggedin && !userId){
             const fetchData = async () => {
@@ -46,7 +45,6 @@ const SaleComponent = ({userId}) => {
                     setPrevPage(response.data.prevPage)
                     setNextPage(response.data.nextPage)
                 }
-                console.log(response.data)
                 }catch(error){
                     console.log(error)
                 }
@@ -73,7 +71,6 @@ const SaleComponent = ({userId}) => {
                     setPrevPage(response.data.prevPage)
                     setNextPage(response.data.nextPage)
                 }
-                console.log(response.data)
                 }catch(error){
                     console.log(error)
                 }
@@ -122,7 +119,6 @@ const SaleComponent = ({userId}) => {
                     openLoginModal()
                 }
                 if(response.resultCode == '200'){
-                    console.log("click")
                     setLike(prev => !prev)
                 }
                 if(response.resultCode == '403'){

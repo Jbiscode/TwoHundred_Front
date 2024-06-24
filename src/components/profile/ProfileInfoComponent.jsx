@@ -34,10 +34,8 @@ const ProfileInfoComponent = ({userId}) => {
             
             if(response.resultCode == '200'){
                 setUserDTO(response.data)
-                console.log(response.data)
                 updateMyProfileInfo();
             }
-            console.log(response.data)
             }catch(error){
                 console.log(error)
             }

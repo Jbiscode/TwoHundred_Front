@@ -87,7 +87,7 @@ export const setInterceptors = (withAuth, fetchInstance) => {
     try {
       const response = await fetchInstance(endpoint, method, config);
       // console.log("3.인스턴스에서 응답 확인(from index.js -> convertResponse)",response);
-      console.log(response)
+      // console.log(response)
       if (withAuth && response.resultCode == 401) {
         console.log("401 에러 발생");
         refreshToken();

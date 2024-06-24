@@ -42,7 +42,6 @@ function AddComponent() {
 
     useEffect(() => {
         if (!loggedInUserId) {
-            console.log("로그인이 필요합니다.");
             openLoginModal();
         }
     }, [loggedInUserId]);
@@ -57,7 +56,6 @@ function AddComponent() {
 
     const handleChangeArticle = (e) => {
         if (!loggedInUserId) {
-            console.log("로그인이 필요합니다.");
             openLoginModal();
             return;
         }
@@ -81,7 +79,6 @@ function AddComponent() {
     // 버튼을 누르면 실행되는 함수
     const handleClickAdd = async (e) => {
         e.preventDefault();
-        console.log(articleRequestDTO);
 
         // 유효성 검사
         let newErrors = {};

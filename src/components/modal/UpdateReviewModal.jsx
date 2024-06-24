@@ -76,7 +76,6 @@ const UpdateReviewModal = () => {
                     }
                 )
                 if(response.resultCode == '200'){
-                    console.log(response.data)
                     setReviewDTO(response.data)
                     setCharCount(response.data.content.length)
                     setReviewContent(response.data.content)
@@ -102,7 +101,6 @@ const UpdateReviewModal = () => {
                     }
                 )
                 if(response.resultCode == '200'){
-                    console.log(response.data)
                     toast.success("리뷰를 수정했습니다.")
                     updateMyProfileInfo();
                     closeUpdateReviewModal();

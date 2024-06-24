@@ -102,7 +102,7 @@ export const userSignUp = async(formData) => {
         "Content-Type": 'multipart/form-data'
       }
     });
-    console.log(response)
+
     return response.status;
   } catch (error) {
     console.log("error" + error.response.request.status)
@@ -119,7 +119,7 @@ export const addArticle = async (formData) => {
       },
       withCredentials: true
     });
-    console.log(response);
+
     return response.data;
   } catch (error) {
     console.log("error: ", error);
@@ -135,7 +135,6 @@ export const updateArticle = async (aid, formData) => {
       },
       withCredentials: true
   });
-  console.log(response);
   return response.status;
   } catch(error) {
   console.log("error: ", error);

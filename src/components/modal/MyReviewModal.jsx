@@ -37,7 +37,6 @@ const MyReviewModal = () => {
                     }
                 )
                 if(response.resultCode == '200'){
-                    console.log(response.data)
                     setReviewDTO(response.data)
                     setCharCount(response.data.content.length)
                 }

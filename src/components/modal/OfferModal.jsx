@@ -30,7 +30,6 @@ const OfferModal = () => {
             );
 
             if (response.resultCode === "201") {
-                console.log("가격 제안이 성공적으로 생성되었습니다.");
                 try {
                     const { articleId, userId } = {
                         articleId: selectedArticleId,

@@ -44,10 +44,10 @@ const WriteReviewModal = () => {
                 openLoginModal()
             }
             if(response.resultCode == '200'){
-                console.log(response.data)
+
                 setArticleDTO(response.data)
             }
-            console.log(response.data)
+
             }catch(error){
                 console.log(error)
             }
@@ -103,7 +103,6 @@ const WriteReviewModal = () => {
                 updateMyProfileInfo();
                 closeWriteReviewModal()
             }
-            console.log(response.data)
             }catch(error){
                 console.log(error)
             }

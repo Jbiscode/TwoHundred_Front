@@ -85,7 +85,6 @@ const SignupModal = () => {
             return;
         } 
         
-        console.log(userSignupDTO)
         // 모든 값이 false인 경우에만 회원가입 진행
         
         var formData = new FormData()
@@ -107,7 +106,6 @@ const SignupModal = () => {
                 closeSignupModal();
                 toast.success("회원가입 되었습니다.")
             }
-            console.log(status)
         }
          
         singUp();
