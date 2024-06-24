@@ -9,9 +9,8 @@ const OfferModal = () => {
     const [offerPrice, setOfferPrice] = useState("");
     const [loading, setLoading] = useState(false);
     const { id, token } = useAuthStore();
-    const { closeOfferModal, selectedArticleId } = useModalStore(
-        (state) => state
-    );
+    const { closeOfferModal, selectedArticleId, setOfferReload } =
+        useModalStore((state) => state);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -61,11 +60,12 @@ const OfferModal = () => {
                             }),
                         }
                     );
+                    toast.success("가격 제안이 성공적으로 생성되었습니다.");
+                    setOfferReload();
                 } catch (error) {
                     console.error(error);
                 }
                 closeOfferModal();
-                // location.href = `/post/${selectedArticleId}`;
             }
             if (response.resultCode == "409") {
                 toast.error(response.msg);
