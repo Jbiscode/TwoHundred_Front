@@ -4,12 +4,15 @@ import useModalStore from "@zustand/modalStore";
 import toast, { Toaster } from "react-hot-toast";
 import {Link, useNavigate} from "react-router-dom";
 import {auth} from "@/api/index"
+import useSocketStore from "@zustand/useSocketStore";
+import ChatAlarm from "@components/chat/ChatAlarm";
 
 function BasicHeader() {
+    const {socket} = useSocketStore();
     const [content, setContent] = useState('');
     const navigate = useNavigate();
     const { openLoginModal } = useModalStore();
-    const {isLoggedin}  = useAuthStore(state => state)
+    const {isLoggedin, token}  = useAuthStore(state => state)
     const [userDTO, setUserDTO] = useState({
         id : '',
         name : '',
@@ -74,7 +77,18 @@ function BasicHeader() {
             
             fetchData();
         }
-    },[isLoggedin])
+    },[isLoggedin, token])
+    useEffect(() => {
+        socket?.on("newMessage", (newMessage) => {
+            toast.custom((t) => (
+                <ChatAlarm t={t} newMessage={newMessage} />
+            ));
+            useAuthStore.getState().setAlarmCountPlus();
+        });
+        return () => {
+            socket?.off("newMessage");
+        };
+    }, [socket]);
     
     return (<>
         <Toaster></Toaster>

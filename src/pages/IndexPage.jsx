@@ -67,13 +67,8 @@ function IndexPage() {
             setCurrentSlide((prevSlide) => (prevSlide === 2 ? 0 : prevSlide + 1));
         }, 4000); // 4초
 
-        socket?.on("newMessage", (newMessage) => {
-            toast.custom((t) => (
-                <ChatAlarm t={t} newMessage={newMessage} />
-            ))
-        });
         return () => clearInterval(interval); 
-    }, [socket]);
+    }, []);
 
     // 카테고리 Enum 정의
     const CategoryEnum = {

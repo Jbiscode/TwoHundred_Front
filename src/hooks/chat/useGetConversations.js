@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import authStore from '@zustand/authStore';
 
 const useGetConversations = () => {
-  const { token, refreshToken } = authStore();
+  const { token, refreshToken, isLoggedin } = authStore();
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState([]);
 
@@ -27,7 +27,8 @@ const useGetConversations = () => {
           console.log(data);
         if(data.length > 0){
           setConversations(data);
-        } else {
+        } else if(isLoggedin && response.status!==401){
+          setConversations([]);
           throw new Error("대화방이 없습니다.");
         }
 
@@ -39,7 +40,7 @@ const useGetConversations = () => {
       
     };
     getConversation();
-  },[token]);
+  },[token ,isLoggedin]);
 
   return { loading, conversations };
 };
