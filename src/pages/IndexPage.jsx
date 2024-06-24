@@ -159,8 +159,6 @@ function IndexPage() {
     const handleLikeChange = (e, articleId) => {
         e.stopPropagation()
         e.preventDefault()
-        //console.log('왜 안눌리누?')
-        console.log(articleId)
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -177,8 +175,9 @@ function IndexPage() {
                         [articleId]: !prevState[articleId]
                     }));
                     updateMyProfileInfo();
-
-                    //await fetchArticles(true);
+                }
+                if(response.resultCode == '403'){
+                    toast.error("자신의 게시글은 좋아요할 수 없습니다.")
                 }
             }catch(error){
                 console.log(error)

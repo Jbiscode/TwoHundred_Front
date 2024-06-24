@@ -5,6 +5,7 @@ import {instance, auth} from '@api/index';
 import useModalStore from "@zustand/modalStore"
 import usemyprofileStore from "@zustand/myprofileStore"
 import useAuthStore from "@zustand/authStore"
+import toast from 'react-hot-toast';
 
 
 
@@ -261,9 +262,6 @@ const Search = () => {
     const handleLikeChange = (e, articleId) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('왜 안눌리누?')
-        console.log(articleId)
-
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -284,6 +282,9 @@ const Search = () => {
                             return [...prev, { user_id: id, article_id: articleId }];
                         }
                     });
+                }
+                if(response.resultCode == '403'){
+                    toast.error("자신의 게시글은 좋아요할 수 없습니다.")
                 }
             }catch(error){
                 console.log(error)

@@ -105,6 +105,7 @@ const SignupModal = () => {
             const status = await userSignUp(formData);
             if(status == 201){
                 closeSignupModal();
+                toast.success("회원가입 되었습니다.")
             }
             console.log(status)
         }
