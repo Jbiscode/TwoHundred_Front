@@ -12,7 +12,7 @@ select.select {
     background-color: #fff;
 }
 
-textarea.textarea {
+textarea.textarea, textarea.placeholder\:text-base {
     background-color: #fff;
 }
 
