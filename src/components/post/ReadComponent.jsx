@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@zustand/authStore.js";
-import { instance } from "@api/index.js";
 import useModalStore from "@zustand/modalStore.js";
 
 import PostButton from "@components/post/PostButton.jsx";
 import { Link } from "react-router-dom";
 import { auth } from "@api/index.js";
 import toast, { Toaster } from "react-hot-toast";
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
@@ -311,9 +312,7 @@ function ReadComponent({ aid }) {
                         >
                             <img
                                 className="w-6 h-6"
-                                src={`/src/assets/images/icon/${
-                                    liked ? "heart_fill.svg" : "heart_blank.svg"
-                                }`}
+                                src={liked ? HeartFill : HeartBlank}
                                 alt={liked ? "좋아요 취소" : "좋아요"}
                             />
                             <span className="text-black">{likeCount}</span>

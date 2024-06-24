@@ -4,6 +4,8 @@ import CLOTHES from "@/assets/images/clothes.png"
 import useAuthStore from "@zustand/authStore"
 import {auth, instance} from "@api/index"
 import useModalStore from "@zustand/modalStore"
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 
 const SaleComponent = ({userId}) => {
@@ -162,7 +164,7 @@ const SaleComponent = ({userId}) => {
                                         </div>
                                 }
                                 {
-                                    item.isLiked == null ? '' :  <img className="absolute top-2 right-2" src={`/src/assets/images/icon/${item.isLiked === true ? 'heart_fill.svg' : 'heart_blank.svg'}`} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
+                                    item.isLiked == null ? '' :  <img className="absolute top-2 right-2" src={item.isLiked === true ? HeartFill : HeartBlank} onClick={(e)=>{handleLikeChange(e,item.id)}}/>
                                 }
                                
                             </div>
