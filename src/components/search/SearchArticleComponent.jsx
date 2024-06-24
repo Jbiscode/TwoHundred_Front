@@ -5,6 +5,8 @@ import useModalStore from "@zustand/modalStore"
 import usemyprofileStore from "@zustand/myprofileStore"
 import useAuthStore from "@zustand/authStore"
 import searchStore from '../../zustand/searchStore';
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 const SearchArticleComponent = () => {
     const {
@@ -185,7 +187,7 @@ const SearchArticleComponent = () => {
                                                 </div>
                                             }
                                             <img 
-                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
+                                                src={isArticleLikedByUser(item.id) ? HeartFill : HeartBlank} 
                                                 alt='like' 
                                                 className="absolute top-2 right-2"
                                                 onClick={ (e) => { 

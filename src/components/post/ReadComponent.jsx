@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@zustand/authStore.js";
-import { instance } from "@api/index.js";
 import useModalStore from "@zustand/modalStore.js";
 
 import PostButton from "@components/post/PostButton.jsx";
 import { Link } from "react-router-dom";
 import { auth } from "@api/index.js";
 import toast, { Toaster } from "react-hot-toast";
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 function ReadComponent({ aid }) {
     const tradeMethodMap = {
@@ -157,6 +158,9 @@ function ReadComponent({ aid }) {
                         ),
                     }));
                 }
+                if (response.resultCode == "500") {
+                    toast.error("존재하지 않는 제안입니다.");
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -301,19 +305,17 @@ function ReadComponent({ aid }) {
                             </div>
                         )}
                         <button
-                            className={`absolute top-5 right-4 py-1.5 px-2.5 pl-1 pr-2 hover:scale-105 text-center border rounded-md h-8 text-sm flex items-center gap-1 lg:gap-2 ${
+                            className={`absolute bg-white top-5 right-4 py-1.5 px-2.5 pl-1 pr-2 hover:scale-105 text-center border rounded-md h-8 text-sm flex items-center gap-1 lg:gap-2 ${
                                 liked ? "text-red-500" : "hover:text-gray-400"
                             }`}
                             onClick={handleLike}
                         >
                             <img
                                 className="w-6 h-6"
-                                src={`/src/assets/images/icon/${
-                                    liked ? "heart_fill.svg" : "heart_blank.svg"
-                                }`}
+                                src={liked ? HeartFill : HeartBlank}
                                 alt={liked ? "좋아요 취소" : "좋아요"}
                             />
-                            <span>{likeCount}</span>
+                            <span className="text-black">{likeCount}</span>
                         </button>
                     </div>
                     <div className="w-[300px]">

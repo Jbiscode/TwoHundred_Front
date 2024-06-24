@@ -26,8 +26,16 @@ const ChatAlarm = ({ t, newMessage }) => {
             />
           </div>
           <div className="ml-3 flex-1">
-            <p className="text-sm font-medium text-gray-900">Emilia Gates</p>
-            <p className="mt-1 text-sm text-gray-500">{newMessage.message}</p>
+            {/* <p className="text-sm font-medium text-gray-900">Emilia Gates</p> */}
+            <p className="mt-1 text-sm text-gray-500" 
+                style={{
+                  display: '-webkit-box', 
+                  WebkitBoxOrient: 'vertical', 
+                  overflow: 'hidden', 
+                  WebkitLineClamp: 2,
+                  whiteSpace:"pre-wrap"}}
+                  >{newMessage.message}
+            </p>
           </div>
         </div>
       </button>
