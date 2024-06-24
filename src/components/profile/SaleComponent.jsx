@@ -6,7 +6,7 @@ import {auth, instance} from "@api/index"
 import useModalStore from "@zustand/modalStore"
 import HeartBlank from '@assets/images/icon/heart_blank.svg';
 import HeartFill from '@assets/images/icon/heart_fill.svg';
-
+import toast from "react-hot-toast";
 
 const SaleComponent = ({userId}) => {
 
@@ -111,8 +111,6 @@ const SaleComponent = ({userId}) => {
     const handleLikeChange = (e,id) => {
         e.stopPropagation()
         e.preventDefault()
-        console.log('왜 안눌리누?')
-        console.log(id)
         const fetch = async() => {
             try{
                 const response = await auth.put(
@@ -125,7 +123,9 @@ const SaleComponent = ({userId}) => {
                 if(response.resultCode == '200'){
                     console.log("click")
                     setLike(prev => !prev)
-                    // updateMyProfileInfo();
+                }
+                if(response.resultCode == '403'){
+                    toast.error("자신의 게시글은 좋아요할 수 없습니다.")
                 }
             }catch(error){
                 console.log(error)
