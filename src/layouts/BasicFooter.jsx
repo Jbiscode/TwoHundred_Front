@@ -28,11 +28,11 @@ function BasicFooter() {
 
     useEffect(() => {
         if (currentPage) {
-            navigate(currentPage);
+            navigate(`${currentPage}`);
             window.scrollTo({ top: 0 });
-            console.log(currentPage);
+            useFooterStore.setState({currentPage:''});
         }
-    }, [currentPage, navigate, alarmCount]);
+    }, [currentPage, alarmCount]);
 
     
 
