@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import filter from '@assets/images/icon/filter.svg';
 import { Link, useLocation } from 'react-router-dom';
 import {instance, auth} from '@api/index';
 import useModalStore from "@zustand/modalStore"
 import usemyprofileStore from "@zustand/myprofileStore"
 import useAuthStore from "@zustand/authStore"
+import HeartBlank from '@assets/images/icon/heart_blank.svg';
+import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 
 
@@ -485,7 +487,7 @@ const Search = () => {
                                                 </div>
                                             }
                                             <img 
-                                                src={isArticleLikedByUser(item.id) ? '/src/assets/images/icon/heart_fill.svg' : '/src/assets/images/icon/heart_blank.svg'} 
+                                                src={isArticleLikedByUser(item.id) ? HeartFill : HeartBlank} 
                                                 alt='like' 
                                                 className="absolute top-2 right-2"
                                                 onClick={ (e) => { 
