@@ -123,9 +123,9 @@ function BasicHeader() {
                                         <li>
                                             <Link to={'/users/me'}>프로필</Link>
                                         </li>
-                                        <li>
-                                            <a onClick={handleLogout}>로그아웃</a>
-                                        </li>
+                                        {
+                                            isLoggedin ? <li onClick={handleLogout}><a>로그아웃</a></li> : <li onClick={openLoginModal}><a>로그인</a></li>     
+                                        }
                                     </ul>
                                 </details>
                             </li>

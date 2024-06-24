@@ -114,7 +114,6 @@ function IndexPage() {
                 setData(shuffledData);
                 setTotalPages(Math.ceil(totalCount / size));
                 setLikeArticle(data.likeResult);
-
             } else {
                 console.error('searchResult가 배열이 아닙니다:', result.data.searchResult);
                 setData([]);
@@ -188,6 +187,7 @@ function IndexPage() {
     
     return (
         <BasicLayout>
+            <div className='md:absolute md:top-0 md:left-0 md:z-[9999] md:w-full md:h-screen bg-white hidden md:block'>모바일버전으로 봐주세요</div>
             <div>
                 <div className="flex flex-col">
 

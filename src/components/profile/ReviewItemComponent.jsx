@@ -29,7 +29,7 @@ const ReviewItemComponent = ({item, reviewStatus}) => {
                 <div className="flex items-center mb-3 pl-2">
                     <div className="grow flex items-baseline gap-1">
                         <Link className="font-bold text-lx" to={`/users/${item.reviewerId}`}>{item.reviewerName}</Link>
-                        <span className="text-orange-500 text-base font-semibold">Lv. {reviewStatus === 'SALE' ? item.reviewerLevel : item.revieweeLevel}</span>
+                        <span className="text-orange-500 text-base font-semibold">Lv. {item.reviewerLevel}</span>
                     </div>
                     <div className="flex items-end">
                         <p className="text-gray-400 text-base">{item.timeAgo}</p>

@@ -477,7 +477,7 @@ const Search = () => {
                                         className="goods-cont overflow-hidden pb-2 mb-5 px-2 flex flex-grow"
                                         to={`/post/${item.id}`}
                                     >
-                                        <div className="relative">
+                                        <div className="relative w-1/2">
                                             <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%] border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
                                             {
                                                 item.tradeStatus === 'SOLD_OUT' &&
@@ -495,7 +495,7 @@ const Search = () => {
                                                 }}
                                             />
                                         </div>
-                                        <div className='ml-3 flex-grow'>
+                                        <div className='ml-3 flex-grow w-1/2'>
                                             <p className="text-[20px] whitespace-nowrap text-ellipsis overflow-hidden font-bold">
                                                 {item.title}
                                             </p>

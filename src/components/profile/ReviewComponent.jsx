@@ -59,7 +59,7 @@ const ReviewComponent = ({userId}) => {
                 <div>
                     {
                         reviewDTO.map(item => (
-                            <ReviewItemComponent item={item} reviewStatus={reviewStatus}/>
+                            <ReviewItemComponent item={item} reviewStatus={reviewStatus} key={item}/>
                         ))
                     }
                 </div>
