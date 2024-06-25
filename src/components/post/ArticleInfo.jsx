@@ -4,6 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import HeartBlank from "@assets/images/icon/heart_blank.svg";
 import HeartFill from "@assets/images/icon/heart_fill.svg";
+import { timeAgo } from "@utils/timeAgo";
 
 function ArticleInfo({ article, initialLiked, initialLikeCount }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -50,27 +51,6 @@ function ArticleInfo({ article, initialLiked, initialLikeCount }) {
         }
     };
 
-    function timeAgo(dateParam) {
-        const date =
-            typeof dateParam === "object" ? dateParam : new Date(dateParam);
-        const now = new Date();
-        const secondsPast = (now.getTime() - date.getTime()) / 1000;
-
-        if (secondsPast < 60) {
-            return parseInt(secondsPast) + "초 전";
-        }
-        if (secondsPast < 3600) {
-            return parseInt(secondsPast / 60) + "분 전";
-        }
-        if (secondsPast <= 86400) {
-            return parseInt(secondsPast / 3600) + "시간 전";
-        }
-        if (secondsPast > 86400) {
-            const day = parseInt(secondsPast / 86400);
-            return day + "일 전";
-        }
-    }
-
     return (
         <>
             <div className="flex gap-3 flex-col md:flex-row m-auto md:m-0">
@@ -98,9 +78,7 @@ function ArticleInfo({ article, initialLiked, initialLikeCount }) {
                     >
                         <img
                             className="w-6 h-6"
-                            src={
-                                liked ? HeartFill : HeartBlank
-                            }
+                            src={liked ? HeartFill : HeartBlank}
                             alt={liked ? "좋아요 취소" : "좋아요"}
                         />
                         <span className="text-black">{likeCount}</span>
