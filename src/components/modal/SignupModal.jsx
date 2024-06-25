@@ -50,6 +50,7 @@ const SignupModal = () => {
    
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     const [isValidEmail, setIsValidEmail] = useState(true)
+    const [loading, setLoading] = useState(false)
 
     const onInputChange = (e) => {
         setUserSignupDTO({
@@ -64,6 +65,12 @@ const SignupModal = () => {
 
     const onSignup = (e) => {
         e.preventDefault();
+        setLoading(true)
+
+        if(loading){
+            return;
+        }
+
         setIsValidEmail(emailRegex.test(email))
         let newIsEmptyInput = {
             isUsernameEmpty: username === '',
@@ -78,10 +85,12 @@ const SignupModal = () => {
     
         // newIsEmptyInput 객체의 값 중 하나라도 true이면 return
         if (Object.values(newIsEmptyInput).some(value => value)) {
+            setLoading(false)
             return;
         }
         if(!isverifiedCode){
             toast.error("인증코드를 다시 확인해주세요.")
+            setLoading(false)
             return;
         } 
         
@@ -112,6 +121,7 @@ const SignupModal = () => {
             if(status == 411){
                 toast.error("비밀번호를 8자 이상 입력해주세요.")
             }
+            setLoading(false)
         }
          
         singUp();
@@ -287,7 +297,7 @@ const SignupModal = () => {
                         </div>
                     </div>
                     <div>
-                        <button className="btn btn-primary w-full text-lg mb-3 font-bold" onClick={onSignup}>회원가입</button>
+                        <button className="btn btn-primary w-full text-lg mb-3 font-bold" onClick={onSignup} disabled={loading}>회원가입</button>
                     </div>
                 </form>
             </div>
