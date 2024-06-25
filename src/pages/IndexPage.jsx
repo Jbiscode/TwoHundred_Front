@@ -238,7 +238,6 @@ function IndexPage() {
                     {/* 추천상품 */}
                     <div className="goods px-6">
                         <Goods data={data}
-                                isLoading={isLoading}
                                 likeState={likeState}
                                 handleLikeChange={handleLikeChange}
                                 isArticleLikedByUser={isArticleLikedByUser} />
