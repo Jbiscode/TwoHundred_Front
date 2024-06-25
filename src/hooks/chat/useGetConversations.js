@@ -26,9 +26,11 @@ const useGetConversations = () => {
           const data = await response.json();  
         if(data.length > 0){
           setConversations(data);
-        } else if(isLoggedin && response.status!==401){
+        } else if(isLoggedin && data.length === 0){
           setConversations([]);
-          throw new Error("대화방이 없습니다.");
+        }else if(!isLoggedin){
+          setConversations([]);
+          throw new Error("채팅방은 로그인이 필요합니다.");
         }
 
       } catch (error) {
@@ -38,7 +40,9 @@ const useGetConversations = () => {
       }
       
     };
+    if(isLoggedin){
     getConversation();
+    }
   },[token ,isLoggedin]);
 
   return { loading, conversations };
