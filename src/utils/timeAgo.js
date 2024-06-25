@@ -3,7 +3,9 @@ export function timeAgo(dateParam) {
         typeof dateParam === "object" ? dateParam : new Date(dateParam);
     const now = new Date();
     const secondsPast = (now.getTime() - date.getTime()) / 1000;
-
+    if (secondsPast < 1) {
+        return "방금 전";
+    }
     if (secondsPast < 60) {
         return parseInt(secondsPast) + "초 전";
     }
