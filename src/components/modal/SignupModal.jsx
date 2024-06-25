@@ -106,6 +106,12 @@ const SignupModal = () => {
                 closeSignupModal();
                 toast.success("회원가입 되었습니다.")
             }
+            if(status == 409){
+                toast.error("필수 입력값을 입력해주세요.")
+            }
+            if(status == 411){
+                toast.error("비밀번호를 8자 이상 입력해주세요.")
+            }
         }
          
         singUp();
