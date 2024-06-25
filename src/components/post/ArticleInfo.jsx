@@ -123,7 +123,7 @@ function ArticleInfo({ article, initialLiked, initialLikeCount }) {
             <div className="w-[300px]">
                 <h1 className="text-4xl text-black md:mt-10 mb-4">상품 정보</h1>
                 <hr className="border-2 border-black" />
-                <p className="space-y-2 mt-4 mb-4">{article.content}</p>
+                <p className="space-y-2 mt-4 mb-4 whitespace-pre-line">{article.content}</p>
                 <div
                     className="relative w-full mb-4"
                     style={{ paddingTop: "100%" }}
