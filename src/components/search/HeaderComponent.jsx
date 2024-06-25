@@ -88,7 +88,7 @@ const HeaderComponent = () => {
                     "전체 검색 결과"
                 )}
                 </h3>
-                <span className="ml-2 text-red-500 text-[20px]">{totalCount}</span>
+                <span className="ml-2 text-red-500 text-[17px]">{totalCount}</span>
             </div>
             <div className="mt-5 w-full flex justify-between items-center  pb-2 px-3">
                 <div className="">
