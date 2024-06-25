@@ -14,7 +14,7 @@ const Goods = ({ data, likeState, handleLikeChange, isArticleLikedByUser }) => {
                                 const image = isLiked ? HeartFill : HeartBlank;
                                 
                                 return (
-                                    <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`}>
+                                    <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`} onClick={window.scrollTo(0, 0)}>
                                         <div className='rounded-[10%] relative'>
                                             <img 
                                                 src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
