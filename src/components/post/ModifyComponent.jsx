@@ -25,6 +25,7 @@ function ModifyComponent() {
     const [addr2Options, setAddr2Options] = useState([]);
     const [imageUrls, setImageUrls] = useState([]);
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
     const { openCheckModal, closeCheckModal } = useModalStore((state) => state);
     const handleCancelDelete = () => {
         toast.success("삭제가 취소되었습니다.");
@@ -99,6 +100,11 @@ function ModifyComponent() {
 
     const handleClickUpdate = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
+        if (loading) {
+            return;
+        }
 
         // 유효성 검사
         let newErrors = {};
@@ -132,6 +138,7 @@ function ModifyComponent() {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            setLoading(false);
             return;
         }
 
@@ -154,16 +161,21 @@ function ModifyComponent() {
             const response = await updateArticle(aid, formData);
             console.log(response);
             toast.success("게시글이 수정되었습니다.");
-            setTimeout(() => {
-                location.href = `/post/${aid}`;
-            }, 500);
+
+            location.href = `/post/${aid}`;
         } catch (error) {
             console.error("게시글 수정 실패:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     //게시글 삭제
     const handleDelete = async () => {
+        setLoading(true);
+        if (loading) {
+            return;
+        }
         try {
             const response = await auth.delete(`/api/v1/articles/${aid}`, {
                 withCredentials: true,
@@ -171,12 +183,13 @@ function ModifyComponent() {
 
             if (response.resultCode === "200") {
                 toast.success("게시글이 삭제되었습니다.");
-                setTimeout(() => {
-                    location.href = "/";
-                }, 1000);
+
+                location.href = "/";
             }
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -451,6 +464,7 @@ function ModifyComponent() {
                 <button
                     className="btn btn-ghost bg-violet-500 text-white mb-10 mr-1"
                     onClick={handleClickUpdate}
+                    disabled={loading}
                 >
                     수정하기
                 </button>

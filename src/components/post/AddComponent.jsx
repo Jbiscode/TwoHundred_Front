@@ -16,6 +16,8 @@ function AddComponent() {
 
     const [addr2Options, setAddr2Options] = useState([]);
 
+    const [loading, setLoading] = useState(false);
+
     const [articleRequestDTO, setArticleRequestDTO] = useState({
         title: "",
         content: "",
@@ -80,6 +82,11 @@ function AddComponent() {
     // 버튼을 누르면 실행되는 함수
     const handleClickAdd = async (e) => {
         e.preventDefault();
+        setLoading(true);
+
+        if (loading) {
+            return;
+        }
 
         // 유효성 검사
         let newErrors = {};
@@ -112,6 +119,7 @@ function AddComponent() {
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            setLoading(false);
             return;
         }
 
@@ -136,6 +144,8 @@ function AddComponent() {
             location.href = `/post/${data.data.id}`;
         } catch (error) {
             console.error("게시글 작성 실패:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -381,6 +391,7 @@ function AddComponent() {
                 <button
                     className="btn btn-ghost bg-orange-400 text-white mb-10"
                     onClick={handleClickAdd}
+                    disabled={loading}
                 >
                     등록하기
                 </button>
