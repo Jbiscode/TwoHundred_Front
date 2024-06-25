@@ -5,7 +5,7 @@ import HeartFill from '@assets/images/icon/heart_fill.svg';
 const Goods = ({ data, likeState, handleLikeChange, isArticleLikedByUser }) => {
     return (
         <div>
-            <div className="goods-wrapper -mx-2 w-full grid justify-center box-border">
+            <div className="goods-wrapper w-full grid justify-center box-border">
                 <div className="newgoods-title mt-30 mb-4 mx-7 text-lg font-bold">추천 상품</div>
                     <div className="goods-list w-full grid box-border list-none grid-cols-2">
                         {data.length > 0 ? (

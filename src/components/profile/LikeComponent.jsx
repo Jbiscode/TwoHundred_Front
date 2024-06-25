@@ -107,7 +107,7 @@ const LikeComponent = ({updateMyProfileInfo }) => {
                     mySalesDTO.map(item => (
                         <Link className="w-1/2 px-2 mb-4" key={item.id} to={`/post/${item.id}`}>
                             <div className="relative">
-                                <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}` } className="rounded-[10%]  border-solid border-[1px] border-[#f1f1f1]  h-[180px]"/>
+                                <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}` } className="rounded-[10%] w-full border-solid border-[1px] border-[#f1f1f1]  h-[180px]"/>
                                 {
                                     item.tradeStatus === 'SOLD_OUT' &&
                                     <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0 rounded-[10%]">
