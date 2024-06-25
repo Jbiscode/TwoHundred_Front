@@ -5,9 +5,12 @@ import FilterComponent from "@components/search/FilterComponent.jsx";
 import HeaderComponent from "@components/search/HeaderComponent.jsx";
 import SearchArticleComponent from "@components/search/SearchArticleComponent.jsx";
 import BasicLayout from "@layouts/BasicLayout.jsx";
+import useAuthStore from "@zustand/authStore";
 
 
 function IndexPage() {
+    const {id} = useAuthStore();
+
     const location = useLocation();
     const query1 = new URLSearchParams(location.search).get('content');
     const query2 = new URLSearchParams(location.search).get('category');
@@ -98,6 +101,9 @@ function IndexPage() {
         if (tradeStatus == 'ON_SALE') {
             params.push(`tradeStatus=${tradeStatus}`);
         }
+        if (id) {
+            params.push(`id=${id}`);
+        }
         params.push(`page=${reset? paging: page}`);
         params.push(`size=10`);
     
@@ -114,6 +120,7 @@ function IndexPage() {
             if (Array.isArray(data.searchResult)) {
                 setArticleDTO(prev => reset ? data.searchResult : [...prev, ...data.searchResult]);
                 setLikeArticle(data.likeResult);
+                console.log('likeArticle:', data.likeResult); 
 
                 setHasMore(data.searchResult.length === 10);
             
@@ -133,7 +140,7 @@ function IndexPage() {
     useEffect(() => {
         setPage(1);
         fetchArticles(true);
-    }, [content, orderBy, category, tradeMethod, tradeStatus]);
+    }, [content, orderBy, category, tradeMethod, tradeStatus, id]);
     
     useEffect(() => {
         if (page > 1) fetchArticles();
