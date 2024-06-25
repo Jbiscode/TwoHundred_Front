@@ -13,6 +13,9 @@ const SearchArticleComponent = () => {
         category, tradeMethod, tradeStatus, orderBy
     } = searchStore();
 
+    //로그인했을 경우 id 값 가져오기
+    const {id} = useAuthStore()
+
     const [articleDTO, setArticleDTO] = useState([]);
     //검색 결과
     const location = useLocation();
@@ -51,6 +54,9 @@ const SearchArticleComponent = () => {
         if (tradeStatus == 'ON_SALE') {
             params.push(`tradeStatus=${tradeStatus}`);
         }
+        if (id) {
+            params.push(`id=${id}`);
+        }
         params.push(`page=${page}`);
         params.push(`size=10`);
     
@@ -88,7 +94,7 @@ const SearchArticleComponent = () => {
     useEffect(() => {
         setPage(1);
         fetchArticles(true);
-    }, [content, orderBy, category, tradeMethod, tradeStatus]);
+    }, [content, orderBy, category, tradeMethod, tradeStatus, id]);
     
     useEffect(() => {
         if (page > 1) fetchArticles();
@@ -109,9 +115,6 @@ const SearchArticleComponent = () => {
         [loading, hasMore]
     );
     
-
-    //로그인했을 경우 id 값 가져오기
-    const {id} = useAuthStore()
 
     const [likeArticle, setLikeArticle] = useState([]);
     
