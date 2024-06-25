@@ -2,6 +2,7 @@ import React from "react";
 import { auth } from "@api/index.js";
 import toast, { Toaster } from "react-hot-toast";
 import useModalStore from "@zustand/modalStore";
+import { timeAgo } from "@utils/timeAgo";
 
 function OfferList({ article, loggedInUserId, setArticle }) {
     const { setOfferReload } = useModalStore((state) => state);
@@ -104,27 +105,6 @@ function OfferList({ article, loggedInUserId, setArticle }) {
             console.error(error);
         }
     };
-
-    function timeAgo(dateParam) {
-        const date =
-            typeof dateParam === "object" ? dateParam : new Date(dateParam);
-        const now = new Date();
-        const secondsPast = (now.getTime() - date.getTime()) / 1000;
-
-        if (secondsPast < 60) {
-            return parseInt(secondsPast) + "초 전";
-        }
-        if (secondsPast < 3600) {
-            return parseInt(secondsPast / 60) + "분 전";
-        }
-        if (secondsPast <= 86400) {
-            return parseInt(secondsPast / 3600) + "시간 전";
-        }
-        if (secondsPast > 86400) {
-            const day = parseInt(secondsPast / 86400);
-            return day + "일 전";
-        }
-    }
 
     return (
         <div className="w-[300px]">
