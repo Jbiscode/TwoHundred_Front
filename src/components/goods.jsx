@@ -1,8 +1,13 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import HeartBlank from '@assets/images/icon/heart_blank.svg';
 import HeartFill from '@assets/images/icon/heart_fill.svg';
 
 const Goods = ({ data, likeState, handleLikeChange, isArticleLikedByUser }) => {
+    const navigate = useNavigate();
+    const handlePostLinkClick = (id) => {
+        window.scrollTo({top:0});
+        navigate(`/post/${id}`);
+    }
     return (
         <div>
             <div className="goods-wrapper w-full grid justify-center box-border">
@@ -14,7 +19,7 @@ const Goods = ({ data, likeState, handleLikeChange, isArticleLikedByUser }) => {
                                 const image = isLiked ? HeartFill : HeartBlank;
                                 
                                 return (
-                                    <Link key={item.id} className="goods-cont mb-7 px-2" to={`/post/${item.id}`} onClick={window.scrollTo(0, 0)}>
+                                    <div key={item.id} className="goods-cont mb-7 px-2" onClick={() => handlePostLinkClick(item.id)}>
                                         <div className='rounded-[10%] relative'>
                                             <img 
                                                 src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} 
@@ -39,7 +44,7 @@ const Goods = ({ data, likeState, handleLikeChange, isArticleLikedByUser }) => {
                                                 {Number(item.price).toLocaleString()} 원
                                             </div>
                                         </div>               
-                                    </Link>
+                                    </div>
                                 );
                             })
                         ) : (
