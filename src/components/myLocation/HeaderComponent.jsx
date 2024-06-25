@@ -20,6 +20,8 @@ const HeaderComponent = () => {
     const query = new URLSearchParams(location.search).get('content');
     const [content, setContent] = useState(query || '');
 
+    const [ addr, setAddr ] = useState('');
+
     useEffect(() => {
         const query = new URLSearchParams(location.search).get('content');
         setContent(query || '');
@@ -66,8 +68,23 @@ const HeaderComponent = () => {
         try {
             const response = await instance.get(url);
             const data = response.data;
-            if (typeof data === 'number') {
-                setTotalCount(data);
+            if (data && typeof data === 'object') {
+                setTotalCount(data.totalCount);
+                console.log(data.totalCount);
+
+                if (Array.isArray(data.address) && data.address.length > 0) {
+                    const address = data.address[0];
+                    console.log(address.addr1);
+                    console.log(address.addr2);
+
+                    if (address.addr1.endsWith('구')) {
+                        setAddr(address.addr1);
+                    } else {
+                        setAddr(address.addr2);
+                    }
+                } else {
+                    console.error('addr 없다아악');
+                }
             } else {
                 console.error('Expected an array but got:', data);
             }
@@ -85,16 +102,10 @@ const HeaderComponent = () => {
             <div className="w-full mx-auto">
             <div className="text-2xl">
             <div className="text-2xl px-3">
-                <h3 className="inline-block m-0 text-m font-bold border-b-2 border-gray-300">
-                {content ? (
-                    <>
-                        <span className='text-red-500'>'{content}'</span> 의 검색 결과
-                    </>
-                ) : (
-                    "전체 검색 결과"
-                )}
-                </h3>
-                <span className="ml-2 text-red-500 text-[20px]">{totalCount}</span>
+                <h6 className="inline-block m-0 text-[17px] font-bold border-b-2 border-gray-300">
+                    우리 동네<span className='text-red-500 text-[20px]'>&nbsp;{addr}</span> 에서는
+                </h6>
+                <span className="ml-2 text-red-500 text-[13px]">{totalCount}</span>
             </div>
             <div className="mt-5 w-full flex justify-between items-center  pb-2 px-3">
                 <div className="">
