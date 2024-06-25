@@ -88,7 +88,7 @@ const SearchArticleComponent = ({content, articleDTO, likeArticle, setLikeArticl
                                         to={`/post/${item.id}`}
                                     >
                                         <div className="relative">
-                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%] border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] w-full block" />
+                                            <img src={`https://kr.object.ncloudstorage.com/kjwtest/article/${item.thumbnailUrl}`} alt={item.imageId} className="rounded-[10%] border-solid border-[1px] border-[#f1f1f1] goods-icn mb-3 items-center max-w-[194px] block w-[194px] h-[140px]" />
                                             {
                                                 item.tradeStatus === 'SOLD_OUT' &&
                                                 <div className="text-lg text-white flex justify-center items-center w-full h-full absolute bg-black/30 top-0 rounded-[10%]">
