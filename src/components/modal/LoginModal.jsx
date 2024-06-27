@@ -53,7 +53,7 @@ const LoginModal = () => {
                     </div>
                     <div>
                         <button className="btn btn-primary w-full text-lg mb-3 font-bold" onClick={handleLogin}>이메일로 로그인</button>
-                        <button className="btn btn-accent w-full text-lg">카카오로 로그인</button>
+                        <button className="btn btn-accent w-full text-lg" disabled>카카오로 로그인</button>
                     </div>
                 </form>
                 <div className="mt-8">
